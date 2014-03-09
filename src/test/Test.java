@@ -6,11 +6,11 @@ import java.io.InputStreamReader;
 
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 public class Test {
 
@@ -20,9 +20,9 @@ public class Test {
 	public static void main(String[] args) {
 
 		try {
-			HttpClient client = new DefaultHttpClient();
+			CloseableHttpClient client = HttpClients.createDefault();
 			HttpGet httpget = new HttpGet("http://www.seznam.cz");
-			HttpResponse response = client.execute(httpget);
+			CloseableHttpResponse response = client.execute(httpget);
 			System.out.println(response.getStatusLine());
 			HeaderIterator it = response.headerIterator();
 			while (it.hasNext()) {
@@ -53,6 +53,7 @@ public class Test {
 					br.close();
 				}
 		    }
+		    response.close();
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
