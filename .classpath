@@ -6,6 +6,7 @@
 	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/httpclient-4.3.3.jar"/>
 	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/httpcore-4.3.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/httpmime-4.3.3.jar"/>
-	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/jackson-core-2.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/jackson-databind-2.2.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
