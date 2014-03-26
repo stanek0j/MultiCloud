@@ -1,0 +1,17 @@
+{
+	"authorize":
+	{
+		"uri":"https://accounts.google.com/o/oauth2/auth",
+		"method":"GET"
+	},
+	"token":
+	{
+		"uri":"https://accounts.google.com/o/oauth2/token",
+		"method":"POST"
+	},
+	"response_type":"code",
+	"client_id":"",
+	"client_secret":"",
+	"redirect_uri":null,
+	"scope":"https://www.googleapis.com/auth/drive"
+}

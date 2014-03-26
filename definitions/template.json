@@ -1,0 +1,17 @@
+{
+	"authorize":
+	{
+		"uri":"",
+		"method":""
+	},
+	"token":
+	{
+		"uri":"",
+		"method":""
+	},
+	"response_type":"",
+	"client_id":"",
+	"client_secret":"",
+	"redirect_uri":"",
+	"scope":""
+}

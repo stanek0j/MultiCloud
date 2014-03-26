@@ -1,0 +1,17 @@
+{
+	"authorize":
+	{
+		"uri":"https://login.live.com/oauth20_authorize.srf",
+		"method":"GET"
+	},
+	"token":
+	{
+		"uri":"https://login.live.com/oauth20_token.srf",
+		"method":"POST"
+	},
+	"response_type":"code",
+	"client_id":"",
+	"client_secret":"",
+	"redirect_uri":null,
+	"scope":null
+}

@@ -1,0 +1,17 @@
+{
+	"authorize":
+	{
+		"uri":"https://www.dropbox.com/1/oauth2/authorize",
+		"method":"GET"
+	},
+	"token":
+	{
+		"uri":"https://api.dropbox.com/1/oauth2/token",
+		"method":"POST"
+	},	
+	"response_type":"code",
+	"client_id":"",
+	"client_secret":"",
+	"redirect_uri":null,
+	"scope":null
+}
