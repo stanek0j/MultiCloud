@@ -21,6 +21,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cz.zcu.kiv.multicloud.core.oauth2.RedirectServer;
+
 public class Test {
 
 	/**
@@ -90,6 +92,21 @@ public class Test {
 			response.close();
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		RedirectServer server = RedirectServer.getInstance();
+		try {
+			server.start();
+			System.out.println("Bound to: " + server.getBoundAddress() + ":" + server.getBoundPort());
+			Thread.sleep(60000);
+		} catch (InterruptedException | IllegalStateException | IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			server.stop();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
