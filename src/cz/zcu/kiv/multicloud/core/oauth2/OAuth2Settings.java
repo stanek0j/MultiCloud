@@ -29,6 +29,10 @@ public class OAuth2Settings {
 	private String tokenUri;
 	/** Requested scopes. */
 	private String scope;
+	/** Username for the authorization. */
+	private String username;
+	/** Password for the authorization. */
+	private String password;
 
 	/** Additional parameters passed to the authorization server. */
 	private final Map<String, String> extraAuthorizeParams;
@@ -110,6 +114,14 @@ public class OAuth2Settings {
 	}
 
 	/**
+	 * Returns the password for the authorization.
+	 * @return Password.
+	 */
+	public String getPassword() {
+		return password;
+	}
+
+	/**
 	 * Returns the URI of redirect server.
 	 * @return Redirect server URI.
 	 */
@@ -131,6 +143,14 @@ public class OAuth2Settings {
 	 */
 	public String getTokenUri() {
 		return tokenUri;
+	}
+
+	/**
+	 * Returns  the username for the authorization.
+	 * @return Username.
+	 */
+	public String getUsername() {
+		return username;
 	}
 
 	/**
@@ -166,6 +186,14 @@ public class OAuth2Settings {
 	}
 
 	/**
+	 * Sets the password for the authorization.
+	 * @param password Password.
+	 */
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	/**
 	 * Sets the URI of the redirect server.
 	 * @param redirectUri Redirect server URI.
 	 */
@@ -187,5 +215,13 @@ public class OAuth2Settings {
 	 */
 	public void setTokenUri(String tokenUri) {
 		this.tokenUri = tokenUri;
+	}
+
+	/**
+	 * Sets the username for the authorization.
+	 * @param username Username.
+	 */
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }
