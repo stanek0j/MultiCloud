@@ -15,12 +15,37 @@ import java.util.Set;
 public interface CredentialStore {
 
 	/**
+	 * Retrieves all the identifiers used in the store.
+	 * @return Set of all identifiers.
+	 */
+	Set<String> getIdentifiers();
+
+	/**
+	 * Retrieves all the tokens from the store.
+	 * @return Set of all the tokens.
+	 */
+	Set<OAuth2Token> getTokens();
+
+	/**
+	 * Retrieves all the credentials stored in the store.
+	 * @return Set of all identifier - token pairs.
+	 */
+	Set<Entry<String, OAuth2Token>> retrieveAllCredentials();
+
+	/**
+	 * Returns {@link cz.zcu.kiv.multicloud.core.oauth2.OAuth2Token} from the store identified by identifier.
+	 * @param identifier Identifier of the token in the store.
+	 * @return Returns the token, if it exists. If not, null is returned.
+	 */
+	OAuth2Token retrieveCredential(String identifier);
+
+	/**
 	 * Save new {@link cz.zcu.kiv.multicloud.core.oauth2.OAuth2Token} into the store.
 	 * @param token Token to be saved.
 	 * @return Assigned identifier.
 	 */
 	String storeCredential(OAuth2Token token);
-	
+
 	/**
 	 * Update existing {@link cz.zcu.kiv.multicloud.core.oauth2.OAuth2Token} or save it with custom identifier.
 	 * @param identifier Identifier of the token in the store.
@@ -28,30 +53,5 @@ public interface CredentialStore {
 	 * @return Returns false if identifier is already taken, otherwise return true on success.
 	 */
 	boolean storeCredential(String identifier, OAuth2Token token);
-	
-	/**
-	 * Returns {@link cz.zcu.kiv.multicloud.core.oauth2.OAuth2Token} from the store identified by identifier.
-	 * @param identifier Identifier of the token in the store.
-	 * @return Returns the token, if it exists. If not, null is returned.
-	 */
-	OAuth2Token retrieveCredential(String identifier);
-	
-	/**
-	 * Retrieves all the credentials stored in the store.
-	 * @return Set of all identifier - token pairs.
-	 */
-	Set<Entry<String, OAuth2Token>> retrieveAllCredentials();
-	
-	/**
-	 * Retrieves all the identifiers used in the store.
-	 * @return Set of all identifiers.
-	 */
-	Set<String> getIdentifiers();
-	
-	/**
-	 * Retrieves all the tokens from the store.
-	 * @return Set of all the tokens.
-	 */
-	Set<OAuth2Token> getTokens();
 
 }

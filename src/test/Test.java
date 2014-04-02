@@ -2,8 +2,8 @@ package test;
 
 import com.fasterxml.jackson.core.JsonFactory;
 
-import cz.zcu.kiv.multicloud.core.oauth2.AuthorizationCodeGrant;
 import cz.zcu.kiv.multicloud.core.oauth2.AuthorizationRequest;
+import cz.zcu.kiv.multicloud.core.oauth2.ImplicitGrant;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Grant;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Settings;
 
@@ -112,7 +112,8 @@ public class Test {
 		settings.setScope("wl.skydrive_update,wl.offline_access");
 
 
-		OAuth2Grant grant = new AuthorizationCodeGrant();
+		//OAuth2Grant grant = new AuthorizationCodeGrant();
+		OAuth2Grant grant = new ImplicitGrant();
 		grant.setup(settings);
 		AuthorizationRequest request = grant.authorize();
 		System.out.println(request);

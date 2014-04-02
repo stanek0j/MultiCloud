@@ -19,5 +19,5 @@ public interface RedirectCallback {
 	 * @return Web page to be displayed.
 	 */
 	WebPage onRedirect(Map<String, String> request);
-	
+
 }
