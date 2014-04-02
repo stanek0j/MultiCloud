@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Map.Entry;
 
 import org.simpleframework.http.Query;
@@ -18,6 +19,8 @@ import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.Server;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
+
+import cz.zcu.kiv.multicloud.core.Utils;
 
 /**
  * cz.zcu.kiv.multicloud.core.oauth2/RedirectServer.java
@@ -32,9 +35,9 @@ public class RedirectServer implements Container {
 
 	public static final String DEFAULT_LOCAL_ADDRESS = "127.0.0.1";
 	public static final int DEFAULT_LOCAL_PORT = 0;
-	
-	private static RedirectServer instance;
-	
+	public static final int STATE_MIN_LEN = 16;
+	public static final int STATE_MAX_LEN = 32;
+
 	protected String boundAddress;
 	protected int boundPort;
 	protected String localAddress;
@@ -43,7 +46,7 @@ public class RedirectServer implements Container {
 	
 	protected Connection connection;
 	
-	private RedirectServer() {
+	public RedirectServer() {
 		boundAddress = "";
 		boundPort = -1;
 		localAddress = DEFAULT_LOCAL_ADDRESS;
@@ -52,11 +55,24 @@ public class RedirectServer implements Container {
 		connection = null;
 	}
 	
-	public static RedirectServer getInstance() {
-		if (instance == null) {
-			instance = new RedirectServer();
+	public String generateRandomState(boolean encodePortNumber) {
+		StringBuilder sb = new StringBuilder();
+		Random r = new Random();
+		int stateLength = r.nextInt(STATE_MAX_LEN - STATE_MIN_LEN) + STATE_MIN_LEN;
+		int length = 0;
+		if (encodePortNumber) {
+			sb.append(boundPort);
+			sb.append('-');
+			length = sb.length();
 		}
-		return instance;
+		while (length < stateLength) {
+			char ch = (char)r.nextInt();
+			if (Utils.isUriLetterOrDigit(ch)) {
+				sb.append(ch);
+				length++;
+			}
+		}
+		return sb.toString();
 	}
 	
 	public String getBoundAddress() {
@@ -65,6 +81,10 @@ public class RedirectServer implements Container {
 
 	public int getBoundPort() {
 		return boundPort;
+	}
+	
+	public String getBoundUri() {
+		return "http://" + boundAddress + ":" + boundPort;
 	}
 
 	public String getLocalAddress() {
@@ -99,8 +119,7 @@ public class RedirectServer implements Container {
 		if (connection != null) {
 			throw new IllegalStateException("Server already started.");
 		}
-		Container container = getInstance();
-		Server server = new ContainerServer(container);
+		Server server = new ContainerServer(this);
 		connection = new SocketConnection(server);
 		SocketAddress address = new InetSocketAddress(InetAddress.getByName(localAddress), localPort);
 		SocketAddress actual = connection.connect(address);
@@ -119,33 +138,33 @@ public class RedirectServer implements Container {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void handle(Request request, Response response) {
 		try {
 			Map<String, String> params = new HashMap<>();
-			Query query = request.getQuery();
-			for (Entry<String, String> entry: query.entrySet()) {
-				params.put(entry.getKey(), entry.getValue());
-				System.out.println(entry.getKey() + " : " + entry.getValue());
-			}
+			params.putAll(request.getQuery());
 
-			WebPage page;
+			WebPage page = null;
 			if (redirectCallback != null) {
 				page = redirectCallback.onRedirect(params);
 			}
-
-			PrintStream body = response.getPrintStream();
-			body.println("Simple HTTP Server:");
-			body.println("  Bound address: " + getBoundAddress());
-			body.println("  Bound port: " + getBoundPort());
-			body.println();
-			body.println("Request params:");
-			for (Entry<String, String> entry: params.entrySet()) {
-				body.println("  " + entry.getKey() + " = " + entry.getValue());
+			if (page != null) {
+				response.setStatus(page.getStatus());
+				for (Entry<String, String> entry: page.getHeaders().entrySet()) {
+					response.setValue(entry.getKey(), entry.getValue());
+				}
+				PrintStream body = response.getPrintStream();
+				for (String line: page.getContentLines()) {
+					body.println(line);
+				}
+				body.close();
+			} else {
+				response.getPrintStream().close();
 			}
-			body.close();
-			
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

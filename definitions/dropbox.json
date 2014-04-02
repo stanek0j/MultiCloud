@@ -10,8 +10,8 @@
 		"method":"POST"
 	},	
 	"response_type":"code",
-	"client_id":"",
-	"client_secret":"",
-	"redirect_uri":null,
+	"client_id":"hq3ir6cgpeynus1",
+	"client_secret":"q20xd395442f54b",
+	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
 	"scope":null
 }

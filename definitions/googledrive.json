@@ -10,8 +10,8 @@
 		"method":"POST"
 	},
 	"response_type":"code",
-	"client_id":"",
-	"client_secret":"",
+	"client_id":"45396671053.apps.googleusercontent.com",
+	"client_secret":"ZLa85_y8DSnMoEJ1IsyW3fmm",
 	"redirect_uri":null,
 	"scope":"https://www.googleapis.com/auth/drive"
 }

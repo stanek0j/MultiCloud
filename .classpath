@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/jackson-core-2.2.3.jar"/>
 	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/jackson-databind-2.2.3.jar"/>
 	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/simple-5.1.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dbx/git/MultiCloud/lib/jackson-annotations-2.2.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
