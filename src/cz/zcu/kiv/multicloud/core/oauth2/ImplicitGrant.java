@@ -49,7 +49,7 @@ public class ImplicitGrant implements OAuth2Grant, RedirectCallback {
 		server = new RedirectServer();
 		server.setRedirectCallback(this);
 		authorizeParams = new HashMap<>();
-		ready = false;
+		ready = true;
 		waitObject = new Object();
 	}
 
@@ -58,8 +58,8 @@ public class ImplicitGrant implements OAuth2Grant, RedirectCallback {
 	 */
 	@Override
 	public AuthorizationRequest authorize() {
-		String queryString = URLEncodedUtils.format(Utils.mapToList(authorizeParams), Charset.forName("utf-8"));
 		ready = false;
+		String queryString = URLEncodedUtils.format(Utils.mapToList(authorizeParams), Charset.forName("utf-8"));
 		return new AuthorizationRequest(authorizeServer + "?" + queryString);
 	}
 

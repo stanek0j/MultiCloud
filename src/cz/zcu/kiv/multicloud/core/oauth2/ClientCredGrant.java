@@ -29,16 +29,19 @@ import cz.zcu.kiv.multicloud.core.json.Json;
  */
 public class ClientCredGrant implements OAuth2Grant {
 
+	/** Time to wait for a thread to finish. */
+	public static final int THREAD_JOIN_TIMEOUT = 500;
+
 	/** JSON factory and Object mapper. */
 	private final Json json;
 
 	/** Thread to exchange authorization code for access token. */
-	private final Thread tokenRequest;
+	private Thread tokenRequest;
 
 	/** OAuth access and optional refresh token. */
-	protected final OAuth2Token token;
+	protected OAuth2Token token;
 	/** OAuth error that occurred. */
-	protected final OAuth2Error error;
+	protected OAuth2Error error;
 	/** If the OAuth token and error are ready. */
 	protected boolean ready;
 	/** Synchronization object. */
@@ -54,19 +57,11 @@ public class ClientCredGrant implements OAuth2Grant {
 	 */
 	public ClientCredGrant() {
 		json = Json.getInstance();
-		token = new OAuth2Token();
-		error = new OAuth2Error();
+		token = null;
+		error = null;
 		tokenParams = new HashMap<>();
-		tokenRequest = new Thread() {
-			/**
-			 * Obtain access (and refresh) token from the authorization server.
-			 */
-			@Override
-			public void run() {
-				obtainAccessToken();
-			}
-		};
-		ready = false;
+		tokenRequest = null;
+		ready = true;
 		waitObject = new Object();
 	}
 
@@ -75,7 +70,24 @@ public class ClientCredGrant implements OAuth2Grant {
 	 */
 	@Override
 	public AuthorizationRequest authorize() {
-		if (!tokenRequest.isAlive()) {
+		if (ready) {
+			ready = false;
+			if (tokenRequest != null) {
+				try {
+					tokenRequest.join(THREAD_JOIN_TIMEOUT);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			tokenRequest = new Thread() {
+				/**
+				 * Obtain access (and refresh) token from the authorization server.
+				 */
+				@Override
+				public void run() {
+					obtainAccessToken();
+				}
+			};
 			tokenRequest.start();
 		}
 		return new AuthorizationRequest(null);
@@ -85,7 +97,12 @@ public class ClientCredGrant implements OAuth2Grant {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void close() throws IOException {}
+	public void close() throws IOException {
+		/* interrupt running thread */
+		if (tokenRequest != null && tokenRequest.isAlive()) {
+			tokenRequest.interrupt();
+		}
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -135,6 +152,8 @@ public class ClientCredGrant implements OAuth2Grant {
 			CloseableHttpResponse response = client.execute(request);
 			HttpEntity entity = response.getEntity();
 			/* get the response and parse it */
+			token = new OAuth2Token();
+			error = new OAuth2Error();
 			JsonParser jp = json.getFactory().createParser(entity.getContent());
 			while (jp.nextToken() != null) {
 				JsonToken jsonToken = jp.getCurrentToken();

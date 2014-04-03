@@ -33,9 +33,12 @@ public class OAuth2Settings {
 	private String username;
 	/** Password for the authorization. */
 	private String password;
+	/** Refresh token for requesting new access token. */
+	private String refreshToken;
 
 	/** Additional parameters passed to the authorization server. */
 	private final Map<String, String> extraAuthorizeParams;
+
 	/** Additional parameters passed to the token server. */
 	private final Map<String, String> extraTokenParams;
 
@@ -46,7 +49,6 @@ public class OAuth2Settings {
 		extraAuthorizeParams = new HashMap<>();
 		extraTokenParams = new HashMap<>();
 	}
-
 	/**
 	 * Adds one additional parameter for the authorization server.
 	 * @param key Parameter name.
@@ -130,6 +132,14 @@ public class OAuth2Settings {
 	}
 
 	/**
+	 * Returns the refresh token for requesting new access token.
+	 * @return Refresh token.
+	 */
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	/**
 	 * Returns the scopes requested.
 	 * @return Scopes.
 	 */
@@ -199,6 +209,14 @@ public class OAuth2Settings {
 	 */
 	public void setRedirectUri(String redirectUri) {
 		this.redirectUri = redirectUri;
+	}
+
+	/**
+	 * Sets the refresh token to specified value.
+	 * @param refreshToken Refresh token.
+	 */
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
 	}
 
 	/**

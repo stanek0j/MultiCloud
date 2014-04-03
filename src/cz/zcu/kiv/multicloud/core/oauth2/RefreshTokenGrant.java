@@ -18,16 +18,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import cz.zcu.kiv.multicloud.core.Utils;
 import cz.zcu.kiv.multicloud.core.json.Json;
 
-/**
- * cz.zcu.kiv.multicloud.core.oauth2/ResOwnerPassCredGrant.java
- *
- * Implementation of the <a href="http://tools.ietf.org/html/rfc6749#section-4.3">OAuth 2.0 Resource Owner Password Credentials Grant</a>.
- *
- * @author Jaromír Staněk
- * @version 1.0
- *
- */
-public class ResOwnerPassCredGrant implements OAuth2Grant {
+public class RefreshTokenGrant implements OAuth2Grant {
 
 	/** Time to wait for a thread to finish. */
 	public static final int THREAD_JOIN_TIMEOUT = 500;
@@ -35,7 +26,7 @@ public class ResOwnerPassCredGrant implements OAuth2Grant {
 	/** JSON factory and Object mapper. */
 	private final Json json;
 
-	/** Thread to obtain the access token. */
+	/** Thread to exchange authorization code for access token. */
 	private Thread tokenRequest;
 
 	/** OAuth access and optional refresh token. */
@@ -47,15 +38,15 @@ public class ResOwnerPassCredGrant implements OAuth2Grant {
 	/** Synchronization object. */
 	protected Object waitObject;
 
-	/** URI of the authorization server. */
+	/** URI of the token server. */
 	protected String tokenServer;
-	/** Parameters passed to the authorization server. */
+	/** Parameters passed to the token server. */
 	protected Map<String, Object> tokenParams;
 
 	/**
 	 * Ctor.
 	 */
-	public ResOwnerPassCredGrant() {
+	public RefreshTokenGrant() {
 		json = Json.getInstance();
 		token = null;
 		error = null;
@@ -140,7 +131,6 @@ public class ResOwnerPassCredGrant implements OAuth2Grant {
 		return token;
 	}
 
-
 	/**
 	 * Sends a POST request to obtain an access token.
 	 */
@@ -216,18 +206,17 @@ public class ResOwnerPassCredGrant implements OAuth2Grant {
 		} else {
 			tokenServer = settings.getTokenUri();
 		}
-		if (Utils.isNullOrEmpty(settings.getUsername())) {
-			throw new IllegalArgumentException("Username cannot be null or empty.");
+		if (Utils.isNullOrEmpty(settings.getRefreshToken())) {
+			throw new IllegalArgumentException("Refresh token cannot be null or empty.");
 		}
-		if (Utils.isNullOrEmpty(settings.getPassword())) {
-			throw new IllegalArgumentException("Password cannot be null or empty.");
+		if (!Utils.isNullOrEmpty(settings.getScope())) {
+			tokenParams.put("scope", settings.getScope());
 		}
 
 		/* populate token request params */
-		tokenParams.put("username", settings.getUsername());
-		tokenParams.put("password", settings.getPassword());
-		tokenParams.put("response_type", "password");
-		for (Entry<String, String> entry: settings.getExtraAuthorizeParams().entrySet()) {
+		tokenParams.put("grant_type", "refresh_token");
+		tokenParams.put("refresh_token", settings.getRefreshToken());
+		for (Entry<String, String> entry: settings.getExtraTokenParams().entrySet()) {
 			if (!tokenParams.containsKey(entry.getKey())) {
 				tokenParams.put(entry.getKey(), entry.getValue());
 			}

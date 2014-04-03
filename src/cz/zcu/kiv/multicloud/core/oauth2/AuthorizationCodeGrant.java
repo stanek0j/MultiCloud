@@ -31,11 +31,14 @@ import cz.zcu.kiv.multicloud.core.json.Json;
  */
 public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 
+	/** Time to wait for a thread to finish. */
+	public static final int THREAD_JOIN_TIMEOUT = 500;
+
 	/** JSON factory and Object mapper. */
 	private final Json json;
 
 	/** Thread to exchange authorization code for access token. */
-	private final Thread tokenRequest;
+	private Thread tokenRequest;
 	/** Local server for listening for incoming redirects. */
 	private final RedirectServer server;
 	/** The state string used in the authorization process. */
@@ -70,16 +73,8 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 		server.setRedirectCallback(this);
 		authorizeParams = new HashMap<>();
 		tokenParams = new HashMap<>();
-		tokenRequest = new Thread() {
-			/**
-			 * Obtain access (and refresh) token from the authorization server.
-			 */
-			@Override
-			public void run() {
-				obtainAccessToken();
-			}
-		};
-		ready = false;
+		tokenRequest = null;
+		ready = true;
 		waitObject = new Object();
 	}
 
@@ -88,8 +83,26 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 	 */
 	@Override
 	public AuthorizationRequest authorize() {
+		if (ready) {
+			ready = false;
+			if (tokenRequest != null) {
+				try {
+					tokenRequest.join(THREAD_JOIN_TIMEOUT);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			tokenRequest = new Thread() {
+				/**
+				 * Obtain access (and refresh) token from the authorization server.
+				 */
+				@Override
+				public void run() {
+					obtainAccessToken();
+				}
+			};
+		}
 		String queryString = URLEncodedUtils.format(Utils.mapToList(authorizeParams), Charset.forName("utf-8"));
-		ready = false;
 		return new AuthorizationRequest(authorizeServer + "?" + queryString);
 	}
 
@@ -98,6 +111,10 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 	 */
 	@Override
 	public void close() throws IOException {
+		/* interrupt running thread */
+		if (tokenRequest != null && tokenRequest.isAlive()) {
+			tokenRequest.interrupt();
+		}
 		/* stops listening on local port */
 		server.stop();
 	}
