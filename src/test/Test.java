@@ -1,9 +1,13 @@
 package test;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonFactory;
 
+import cz.zcu.kiv.multicloud.core.oauth2.AuthorizationCodeGrant;
 import cz.zcu.kiv.multicloud.core.oauth2.AuthorizationRequest;
-import cz.zcu.kiv.multicloud.core.oauth2.ImplicitGrant;
+import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Error;
+import cz.zcu.kiv.multicloud.core.oauth2.OAuth2ErrorType;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Grant;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Settings;
 
@@ -86,13 +90,11 @@ public class Test {
 
 		OAuth2Settings settings = new OAuth2Settings();
 		/* dropbox */
-		/*
 		settings.setClientId("hq3ir6cgpeynus1");
 		settings.setClientSecret("q20xd395442f54b");
 		settings.setAuthorizeUri("https://www.dropbox.com/1/oauth2/authorize");
 		settings.setTokenUri("https://api.dropbox.com/1/oauth2/token");
 		settings.setRedirectUri("https://home.zcu.cz/~stanek0j/multicloud");
-		 */
 
 		/* google drive */
 		/*
@@ -104,22 +106,35 @@ public class Test {
 		 */
 
 		/* onedrive */
+		/*
 		settings.setClientId("00000000400ECF3A");
 		settings.setClientSecret("GlPTCgir1pn35eaXlqe29avCnVmSNg5i");
 		settings.setAuthorizeUri("https://login.live.com/oauth20_authorize.srf");
 		settings.setTokenUri("https://login.live.com/oauth20_token.srf");
 		settings.setRedirectUri("https://home.zcu.cz/~stanek0j/multicloud");
 		settings.setScope("wl.skydrive_update,wl.offline_access");
+		 */
 
 
 		//OAuth2Grant grant = new AuthorizationCodeGrant();
-		OAuth2Grant grant = new ImplicitGrant();
+		OAuth2Grant grant = new AuthorizationCodeGrant();
 		grant.setup(settings);
 		AuthorizationRequest request = grant.authorize();
 		System.out.println(request);
 
-		System.out.println(grant.getToken().toString());
-		System.out.println(grant.getError().toString());
+		OAuth2Error error;
+		do {
+			System.out.println(grant.getToken().toString());
+			System.out.println((error = grant.getError()).toString());
+			grant.authorize();
+			System.out.flush();
+		} while (error.getType() != OAuth2ErrorType.SUCCESS);
+		System.out.println("Authorization finished.");
+		try {
+			grant.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		/*
 		RedirectServer server = RedirectServer.getInstance();

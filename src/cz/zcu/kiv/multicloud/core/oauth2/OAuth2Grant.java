@@ -1,5 +1,8 @@
 package cz.zcu.kiv.multicloud.core.oauth2;
 
+import java.io.Closeable;
+
+
 /**
  * cz.zcu.kiv.multicloud.core.oauth2/OAuth2Grant.java
  *
@@ -9,7 +12,7 @@ package cz.zcu.kiv.multicloud.core.oauth2;
  * @version 1.0
  *
  */
-public interface OAuth2Grant {
+public interface OAuth2Grant extends Closeable {
 
 	/**
 	 * Start of the authorization process. If the implemented grant requires a redirect to authorization server, it is returned as a {@link cz.zcu.kiv.multicloud.core.oauth2.AuthorizationRequest}. If no redirect is required, null should be returned.

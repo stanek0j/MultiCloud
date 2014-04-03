@@ -153,8 +153,10 @@ public class RedirectServer implements Container {
 
 			/* prepare a web page as a response */
 			WebPage page = null;
-			if (redirectCallback != null) {
-				page = redirectCallback.onRedirect(params);
+			if (!request.getQuery().isEmpty()) {
+				if (redirectCallback != null) {
+					page = redirectCallback.onRedirect(params);
+				}
 			}
 
 			/* return the web page */

@@ -42,9 +42,9 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 	private String state;
 
 	/** OAuth access and optional refresh token. */
-	protected final OAuth2Token token;
+	protected OAuth2Token token;
 	/** OAuth error that occurred. */
-	protected final OAuth2Error error;
+	protected OAuth2Error error;
 	/** If the OAuth token and error are ready. */
 	protected boolean ready;
 	/** Synchronization object. */
@@ -64,8 +64,8 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 	 */
 	public AuthorizationCodeGrant() {
 		json = Json.getInstance();
-		token = new OAuth2Token();
-		error = new OAuth2Error();
+		token = null;
+		error = null;
 		server = new RedirectServer();
 		server.setRedirectCallback(this);
 		authorizeParams = new HashMap<>();
@@ -89,7 +89,17 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 	@Override
 	public AuthorizationRequest authorize() {
 		String queryString = URLEncodedUtils.format(Utils.mapToList(authorizeParams), Charset.forName("utf-8"));
+		ready = false;
 		return new AuthorizationRequest(authorizeServer + "?" + queryString);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void close() throws IOException {
+		/* stops listening on local port */
+		server.stop();
 	}
 
 	/**
@@ -192,25 +202,30 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 	 */
 	@Override
 	public WebPage onRedirect(Map<String, String> request) {
+		token = new OAuth2Token();
+		error = new OAuth2Error();
 		RedirectWebPage page = new RedirectWebPage();
 		page.addHeader("Content-type", "text/html; charset=utf-8");
 		page.setTitle("Error occured");
 		if (request.containsKey("state")) { // state parameter found
 			if (request.get("state").equals(state)) { // state parameter matches expected value
 				if (request.containsKey("error")) { // error during authorization
-					String errorType = OAuth2ErrorType.valueOf(request.get("error").toUpperCase()).toString();
+					error.setType(OAuth2ErrorType.valueOf(request.get("error").toUpperCase()));
+					String errorType = error.getType().toString();
 					page.addBodyLine("<p id=\"error\">Error occured during authorization.</p>");
 					page.addBodyLine("<p>");
 					if (errorType != null) {
 						errorType = "<strong>" + errorType.replace('_', ' ') + "</strong>";
 						if (request.containsKey("error_description")) {
-							errorType += ": " + request.get("error_description");
+							error.setDescription(request.get("error_description"));
+							errorType += ": " + error.getDescription();
 						}
 						page.addBodyLine(errorType);
 					}
 					if (request.containsKey("error_uri")) {
+						error.setUri(request.get("error_uri"));
 						page.addBodyLine("<br />");
-						page.addBodyLine("For more information, visit: <a href=\"" + request.get("error_uri") + "\">" + request.get("error_uri") + "</a>");
+						page.addBodyLine("For more information, visit: <a href=\"" + error.getUri() + "\">" + request.get("error_uri") + "</a>");
 					}
 					page.addBodyLine("</p>");
 				} else {
@@ -223,17 +238,30 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 						page.addBodyLine("<p id=\"success\">Authorization successful.</p>");
 						page.addBodyLine("<p>You may now close this page and return to the application.</p>");
 					} else { // authorization code not found in the request
+						error.setType(OAuth2ErrorType.CODE_MISSING);
+						error.setDescription("Authorization code missing.");
 						page.addBodyLine("<p id=\"error\">Error occured during authorization.</p>");
-						page.addBodyLine("<p>Authorization code missing.</p>");
+						page.addBodyLine("<p><strong>" + error.getType().toString().replace('_', ' ') + "</strong>: " + error.getDescription() + "</p>");
 					}
 				}
 			} else { // state parameter doesn't match the actual state
+				error.setType(OAuth2ErrorType.STATE_MISMATCH);
+				error.setDescription("Mismatch in <code>state</code> parameter.");
 				page.addBodyLine("<p id=\"error\">Error occured during authorization.</p>");
-				page.addBodyLine("<p>Mismatch in <code>state</code> parameter.</p>");
+				page.addBodyLine("<p><strong>" + error.getType().toString().replace('_', ' ') + "</strong>: " + error.getDescription() + "</p>");
 			}
 		} else { // state parameter not set in the request
+			error.setType(OAuth2ErrorType.STATE_MISSING);
+			error.setDescription("Missing <code>state</code> parameter.");
 			page.addBodyLine("<p id=\"error\">Error occured during authorization.</p>");
-			page.addBodyLine("<p>Missing <code>state</code> parameter.</p>");
+			page.addBodyLine("<p><strong>" + error.getType().toString().replace('_', ' ') + "</strong>: " + error.getDescription() + "</p>");
+		}
+		if (error.getType() != OAuth2ErrorType.SUCCESS) {
+			/* notify all waiting objects */
+			synchronized (waitObject) {
+				ready = true;
+				waitObject.notifyAll();
+			}
 		}
 		return page;
 	}

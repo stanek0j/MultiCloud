@@ -21,6 +21,11 @@ public enum OAuth2ErrorType {
 	TEMPORARILY_UNAVAILABLE,
 	INVALID_CLIENT,
 	INVALID_GRANT,
-	UNSUPPORTED_GRANT_TYPE
+	UNSUPPORTED_GRANT_TYPE,
+	ACCESS_TOKEN_MISSING,		// custom error to reflect on missing access token
+	CODE_MISSING,				// custom error to reflect on missing code parameter
+	STATE_MISSING,				// custom error to reflect on missing state parameter
+	STATE_MISMATCH,				// custom error to reflect on mismatch in state parameter
+	TOKEN_TYPE_MISSING			// custom error to reflect on missing token type parameter
 
 }

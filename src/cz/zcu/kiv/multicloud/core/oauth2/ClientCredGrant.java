@@ -85,6 +85,12 @@ public class ClientCredGrant implements OAuth2Grant {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void close() throws IOException {}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public OAuth2Error getError() {
 		try {
 			synchronized (waitObject) {

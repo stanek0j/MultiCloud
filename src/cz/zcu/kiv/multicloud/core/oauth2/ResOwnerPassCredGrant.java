@@ -85,6 +85,12 @@ public class ResOwnerPassCredGrant implements OAuth2Grant {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void close() throws IOException {}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public OAuth2Error getError() {
 		try {
 			synchronized (waitObject) {
@@ -116,6 +122,7 @@ public class ResOwnerPassCredGrant implements OAuth2Grant {
 		}
 		return token;
 	}
+
 
 	/**
 	 * Sends a POST request to obtain an access token.
@@ -175,7 +182,6 @@ public class ResOwnerPassCredGrant implements OAuth2Grant {
 			e.printStackTrace();
 		}
 	}
-
 
 	/**
 	 * {@inheritDoc}
