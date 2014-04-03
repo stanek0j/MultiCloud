@@ -36,6 +36,6 @@ public interface OAuth2Grant extends Closeable {
 	 * Setting up the grant.
 	 * @param settings Settings.
 	 */
-	void setup(OAuth2Settings settings) throws IllegalArgumentException;
+	void setup(OAuth2Settings settings) throws OAuth2SettingsException;
 
 }

@@ -18,6 +18,15 @@ import com.fasterxml.jackson.core.JsonToken;
 import cz.zcu.kiv.multicloud.core.Utils;
 import cz.zcu.kiv.multicloud.core.json.Json;
 
+/**
+ * cz.zcu.kiv.multicloud.core.oauth2/RefreshTokenGrant.java
+ *
+ * Implementation of the <a href="http://tools.ietf.org/html/rfc6749#section-6">Refreshing an Access Token</a> section of the OAuth 2.0 specification.
+ *
+ * @author Jaromír Staněk
+ * @version 1.0
+ *
+ */
 public class RefreshTokenGrant implements OAuth2Grant {
 
 	/** Time to wait for a thread to finish. */
@@ -196,24 +205,31 @@ public class RefreshTokenGrant implements OAuth2Grant {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setup(OAuth2Settings settings) throws IllegalArgumentException {
+	public void setup(OAuth2Settings settings) throws OAuth2SettingsException {
 		/* validate supplied settings */
 		if (settings == null) {
-			throw new IllegalArgumentException("Missing settings.");
+			throw new OAuth2SettingsException("Missing settings.");
 		}
 		if (Utils.isNullOrEmpty(settings.getTokenUri())) {
-			throw new IllegalArgumentException("Token server URI missing.");
+			throw new OAuth2SettingsException("Token server URI missing.");
 		} else {
 			tokenServer = settings.getTokenUri();
 		}
 		if (Utils.isNullOrEmpty(settings.getRefreshToken())) {
-			throw new IllegalArgumentException("Refresh token cannot be null or empty.");
+			throw new OAuth2SettingsException("Refresh token cannot be null or empty.");
+		}
+		if (Utils.isNullOrEmpty(settings.getClientId())) {
+			throw new OAuth2SettingsException("Client ID cannot be null or empty.");
+		}
+		if (settings.getClientSecret() != null) {
+			tokenParams.put("client_secret", settings.getClientSecret());
 		}
 		if (!Utils.isNullOrEmpty(settings.getScope())) {
 			tokenParams.put("scope", settings.getScope());
 		}
 
 		/* populate token request params */
+		tokenParams.put("client_id", settings.getClientId());
 		tokenParams.put("grant_type", "refresh_token");
 		tokenParams.put("refresh_token", settings.getRefreshToken());
 		for (Entry<String, String> entry: settings.getExtraTokenParams().entrySet()) {

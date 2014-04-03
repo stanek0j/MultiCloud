@@ -11,7 +11,7 @@ package cz.zcu.kiv.multicloud.core.oauth2;
  */
 public enum OAuth2ErrorType {
 
-	SUCCESS,
+	SUCCESS,					// no error
 	INVALID_REQUEST,
 	UNAUTHORIZED_CLIENT,
 	ACCESS_DENIED,

@@ -205,13 +205,13 @@ public class ClientCredGrant implements OAuth2Grant {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setup(OAuth2Settings settings) throws IllegalArgumentException {
+	public void setup(OAuth2Settings settings) throws OAuth2SettingsException {
 		/* validate supplied settings */
 		if (settings == null) {
-			throw new IllegalArgumentException("Missing settings.");
+			throw new OAuth2SettingsException("Missing settings.");
 		}
 		if (Utils.isNullOrEmpty(settings.getTokenUri())) {
-			throw new IllegalArgumentException("Token server URI missing.");
+			throw new OAuth2SettingsException("Token server URI missing.");
 		} else {
 			tokenServer = settings.getTokenUri();
 		}

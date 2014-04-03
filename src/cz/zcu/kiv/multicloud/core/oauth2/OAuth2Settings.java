@@ -16,6 +16,8 @@ public class OAuth2Settings {
 
 	/** Grant type being used. */
 	private OAuth2GrantType grantType;
+	/** Implementation class of the extension grant. */
+	private Class<? extends OAuth2Grant> grantClass;
 
 	/** Client identifier. */
 	private String clientId;
@@ -35,10 +37,8 @@ public class OAuth2Settings {
 	private String password;
 	/** Refresh token for requesting new access token. */
 	private String refreshToken;
-
 	/** Additional parameters passed to the authorization server. */
 	private final Map<String, String> extraAuthorizeParams;
-
 	/** Additional parameters passed to the token server. */
 	private final Map<String, String> extraTokenParams;
 
@@ -49,6 +49,7 @@ public class OAuth2Settings {
 		extraAuthorizeParams = new HashMap<>();
 		extraTokenParams = new HashMap<>();
 	}
+
 	/**
 	 * Adds one additional parameter for the authorization server.
 	 * @param key Parameter name.
@@ -66,7 +67,6 @@ public class OAuth2Settings {
 	public void addExtraTokenParams(String key, String value) {
 		extraTokenParams.put(key, value);
 	}
-
 	/**
 	 * Returns the URI of the authorization server.
 	 * @return Authorization server URI.
@@ -105,6 +105,14 @@ public class OAuth2Settings {
 	 */
 	public Map<String, String> getExtraTokenParams() {
 		return extraTokenParams;
+	}
+
+	/**
+	 * Returns the class of the extention grant.
+	 * @return Extension grant class.
+	 */
+	public Class<? extends OAuth2Grant> getGrantClass() {
+		return grantClass;
 	}
 
 	/**
@@ -185,6 +193,14 @@ public class OAuth2Settings {
 	 */
 	public void setClientSecret(String clientSecret) {
 		this.clientSecret = clientSecret;
+	}
+
+	/**
+	 * Sets the class of the extension grant.
+	 * @param grantClass Extension grant class.
+	 */
+	public void setGrantClass(Class<? extends OAuth2Grant> grantClass) {
+		this.grantClass = grantClass;
 	}
 
 	/**

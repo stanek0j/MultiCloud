@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 
-import cz.zcu.kiv.multicloud.core.oauth2.AuthorizationCodeGrant;
 import cz.zcu.kiv.multicloud.core.oauth2.AuthorizationRequest;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Error;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2ErrorType;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Grant;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Settings;
+import cz.zcu.kiv.multicloud.core.oauth2.OAuth2SettingsException;
+import cz.zcu.kiv.multicloud.core.oauth2.RefreshTokenGrant;
 
 public class Test {
 
@@ -90,20 +91,21 @@ public class Test {
 
 		OAuth2Settings settings = new OAuth2Settings();
 		/* dropbox */
+		/*
 		settings.setClientId("hq3ir6cgpeynus1");
 		settings.setClientSecret("q20xd395442f54b");
 		settings.setAuthorizeUri("https://www.dropbox.com/1/oauth2/authorize");
 		settings.setTokenUri("https://api.dropbox.com/1/oauth2/token");
 		settings.setRedirectUri("https://home.zcu.cz/~stanek0j/multicloud");
+		 */
 
 		/* google drive */
-		/*
 		settings.setClientId("45396671053.apps.googleusercontent.com");
 		settings.setClientSecret("ZLa85_y8DSnMoEJ1IsyW3fmm");
 		settings.setAuthorizeUri("https://accounts.google.com/o/oauth2/auth");
 		settings.setTokenUri("https://accounts.google.com/o/oauth2/token");
 		settings.setScope("https://www.googleapis.com/auth/drive");
-		 */
+		settings.setRefreshToken("1/-_DynXynwO26MR5PLrwE5RMArZz4zRxESYLjAqh5KYc");
 
 		/* onedrive */
 		/*
@@ -113,14 +115,20 @@ public class Test {
 		settings.setTokenUri("https://login.live.com/oauth20_token.srf");
 		settings.setRedirectUri("https://home.zcu.cz/~stanek0j/multicloud");
 		settings.setScope("wl.skydrive_update,wl.offline_access");
+		settings.setRefreshToken("CtUkV61al976gTo6GRkYZqPEHa493QKRaem4nuAjRfx897lo05N9hGe1hh17vZcPQKql3sER1URZK*8l3jY3F2MG1BP6daandi!hQVj!rxsmuARa2inFTwC49jvurz3OFnCn8IwhGCLby8OXCP7*z8mujt9ZxreH5qrLOoTNDn3psUUbUhhZGYd8uZLalsBMTeKSrY8LqSsDIUi2IdlvSlIJhgfWloKEh07Bbv60CtP3irYhMbD1ZevWRszJ4lUQ9apjz9wt8LEYlLhkpPRR3NkqxjqeF1yPoN5*cWle30pbZWKpV5!Efiya19Rvjh3S80pA!jKBJXFd*UBY4jJhIDjFY!1vsHa0Faayptl2kWOm");
 		 */
 
-
 		//OAuth2Grant grant = new AuthorizationCodeGrant();
-		OAuth2Grant grant = new AuthorizationCodeGrant();
-		grant.setup(settings);
+		OAuth2Grant grant = new RefreshTokenGrant();
+		try {
+			grant.setup(settings);
+		} catch (OAuth2SettingsException e1) {
+			e1.printStackTrace();
+		}
 		AuthorizationRequest request = grant.authorize();
-		System.out.println(request);
+		if (request.isActionRequied()) {
+			System.out.println(request);
+		}
 
 		OAuth2Error error;
 		do {
@@ -152,6 +160,8 @@ public class Test {
 			e.printStackTrace();
 		}
 		 */
+
+		System.exit(0);
 
 	}
 

@@ -1,5 +1,7 @@
 package cz.zcu.kiv.multicloud.core.oauth2;
 
+import cz.zcu.kiv.multicloud.core.Utils;
+
 /**
  * cz.zcu.kiv.multicloud.core.oauth2/AuthorizationRequest.java
  *
@@ -23,11 +25,27 @@ public class AuthorizationRequest {
 	}
 
 	/**
+	 * Returns the URI to be requested.
+	 * @return URI to be requested.
+	 */
+	public String getRequestUri() {
+		return requestUri;
+	}
+
+	/**
+	 * Determines if any additional action is required.
+	 * @return If additional action is required.
+	 */
+	public boolean isActionRequied() {
+		return !Utils.isNullOrEmpty(requestUri);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		if (requestUri != null && !requestUri.isEmpty()) {
+		if (!Utils.isNullOrEmpty(requestUri)) {
 			return "To authorize this application, visit:" + System.getProperty("line.separator") + requestUri;
 		} else {
 			return "No action required.";

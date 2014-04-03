@@ -287,23 +287,23 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setup(OAuth2Settings settings) throws IllegalArgumentException {
+	public void setup(OAuth2Settings settings) throws OAuth2SettingsException {
 		/* validate supplied settings */
 		if (settings == null) {
-			throw new IllegalArgumentException("Missing settings.");
+			throw new OAuth2SettingsException("Missing settings.");
 		}
 		if (Utils.isNullOrEmpty(settings.getAuthorizeUri())) {
-			throw new IllegalArgumentException("Authorization server URI missing.");
+			throw new OAuth2SettingsException("Authorization server URI missing.");
 		} else {
 			authorizeServer = settings.getAuthorizeUri();
 		}
 		if (Utils.isNullOrEmpty(settings.getTokenUri())) {
-			throw new IllegalArgumentException("Token server URI missing.");
+			throw new OAuth2SettingsException("Token server URI missing.");
 		} else {
 			tokenServer = settings.getTokenUri();
 		}
 		if (Utils.isNullOrEmpty(settings.getClientId())) {
-			throw new IllegalArgumentException("Client ID cannot be null or empty.");
+			throw new OAuth2SettingsException("Client ID cannot be null or empty.");
 		}
 		if (Utils.isNullOrEmpty(state)) {
 			state = server.generateRandomState(false);
