@@ -13,6 +13,9 @@ package cz.zcu.kiv.multicloud.core.oauth2;
  */
 public class OAuth2Token {
 
+	/** Timestamp in seconds representing token creation time. */
+	protected long timestamp;
+
 	/** Type of token. */
 	private OAuth2TokenType type;
 
@@ -28,9 +31,6 @@ public class OAuth2Token {
 	private String macAlgorithm;
 	/** Expiration time in seconds. */
 	private int expiresIn;
-
-	/** Timestamp in seconds representing token creation time. */
-	private long timestamp;
 
 	/**
 	 * Ctor.

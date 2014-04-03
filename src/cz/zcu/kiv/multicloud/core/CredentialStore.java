@@ -52,8 +52,7 @@ public interface CredentialStore {
 	 * Update existing {@link cz.zcu.kiv.multicloud.core.oauth2.OAuth2Token} or save it with custom identifier.
 	 * @param identifier Identifier of the token in the store.
 	 * @param token Token to be saved.
-	 * @return Returns false if identifier is already taken, otherwise return true on success.
 	 */
-	boolean storeCredential(String identifier, OAuth2Token token);
+	void storeCredential(String identifier, OAuth2Token token);
 
 }

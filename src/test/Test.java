@@ -1,16 +1,11 @@
 package test;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonFactory;
 
-import cz.zcu.kiv.multicloud.core.oauth2.AuthorizationRequest;
-import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Error;
-import cz.zcu.kiv.multicloud.core.oauth2.OAuth2ErrorType;
-import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Grant;
+import cz.zcu.kiv.multicloud.core.oauth2.OAuth2;
+import cz.zcu.kiv.multicloud.core.oauth2.OAuth2GrantType;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Settings;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2SettingsException;
-import cz.zcu.kiv.multicloud.core.oauth2.RefreshTokenGrant;
 
 public class Test {
 
@@ -90,6 +85,7 @@ public class Test {
 		 */
 
 		OAuth2Settings settings = new OAuth2Settings();
+		settings.setGrantType(OAuth2GrantType.AUTHORIZATION_CODE_GRANT);
 		/* dropbox */
 		/*
 		settings.setClientId("hq3ir6cgpeynus1");
@@ -118,6 +114,14 @@ public class Test {
 		settings.setRefreshToken("CtUkV61al976gTo6GRkYZqPEHa493QKRaem4nuAjRfx897lo05N9hGe1hh17vZcPQKql3sER1URZK*8l3jY3F2MG1BP6daandi!hQVj!rxsmuARa2inFTwC49jvurz3OFnCn8IwhGCLby8OXCP7*z8mujt9ZxreH5qrLOoTNDn3psUUbUhhZGYd8uZLalsBMTeKSrY8LqSsDIUi2IdlvSlIJhgfWloKEh07Bbv60CtP3irYhMbD1ZevWRszJ4lUQ9apjz9wt8LEYlLhkpPRR3NkqxjqeF1yPoN5*cWle30pbZWKpV5!Efiya19Rvjh3S80pA!jKBJXFd*UBY4jJhIDjFY!1vsHa0Faayptl2kWOm");
 		 */
 
+		OAuth2 oauth = new OAuth2(settings);
+		try {
+			oauth.authorize(null);
+		} catch (OAuth2SettingsException e) {
+			e.printStackTrace();
+		}
+
+		/*
 		//OAuth2Grant grant = new AuthorizationCodeGrant();
 		OAuth2Grant grant = new RefreshTokenGrant();
 		try {
@@ -143,6 +147,7 @@ public class Test {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		 */
 
 		/*
 		RedirectServer server = RedirectServer.getInstance();

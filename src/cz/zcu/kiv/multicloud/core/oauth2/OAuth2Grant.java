@@ -35,6 +35,7 @@ public interface OAuth2Grant extends Closeable {
 	/**
 	 * Setting up the grant.
 	 * @param settings Settings.
+	 * @throws OAuth2SettingsException Exception when not proper settings are passed.
 	 */
 	void setup(OAuth2Settings settings) throws OAuth2SettingsException;
 

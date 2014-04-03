@@ -67,6 +67,7 @@ public class OAuth2Settings {
 	public void addExtraTokenParams(String key, String value) {
 		extraTokenParams.put(key, value);
 	}
+
 	/**
 	 * Returns the URI of the authorization server.
 	 * @return Authorization server URI.
