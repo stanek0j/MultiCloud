@@ -5,3 +5,5 @@
 *.ear
 /bin
 
+/credential-store.sec
+/credential-store.txt

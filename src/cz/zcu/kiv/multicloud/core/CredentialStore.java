@@ -1,5 +1,6 @@
 package cz.zcu.kiv.multicloud.core;
 
+import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -24,9 +25,9 @@ public interface CredentialStore {
 
 	/**
 	 * Retrieves all the tokens from the store.
-	 * @return Set of all the tokens.
+	 * @return Collection of all the tokens.
 	 */
-	Set<OAuth2Token> getTokens();
+	Collection<OAuth2Token> getTokens();
 
 	/**
 	 * Retrieves all the credentials stored in the store.
@@ -52,7 +53,8 @@ public interface CredentialStore {
 	 * Update existing {@link cz.zcu.kiv.multicloud.core.oauth2.OAuth2Token} or save it with custom identifier.
 	 * @param identifier Identifier of the token in the store.
 	 * @param token Token to be saved.
+	 * @return Assigned identifier, if the supplied one wasn't valid.
 	 */
-	void storeCredential(String identifier, OAuth2Token token);
+	String storeCredential(String identifier, OAuth2Token token);
 
 }

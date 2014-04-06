@@ -2,6 +2,7 @@ package test;
 
 import com.fasterxml.jackson.core.JsonFactory;
 
+import cz.zcu.kiv.multicloud.core.SecureFileCredentialStore;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2GrantType;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Settings;
@@ -114,7 +115,13 @@ public class Test {
 		settings.setRefreshToken("CtUkV61al976gTo6GRkYZqPEHa493QKRaem4nuAjRfx897lo05N9hGe1hh17vZcPQKql3sER1URZK*8l3jY3F2MG1BP6daandi!hQVj!rxsmuARa2inFTwC49jvurz3OFnCn8IwhGCLby8OXCP7*z8mujt9ZxreH5qrLOoTNDn3psUUbUhhZGYd8uZLalsBMTeKSrY8LqSsDIUi2IdlvSlIJhgfWloKEh07Bbv60CtP3irYhMbD1ZevWRszJ4lUQ9apjz9wt8LEYlLhkpPRR3NkqxjqeF1yPoN5*cWle30pbZWKpV5!Efiya19Rvjh3S80pA!jKBJXFd*UBY4jJhIDjFY!1vsHa0Faayptl2kWOm");
 		 */
 
-		OAuth2 oauth = new OAuth2(settings);
+		/*
+		CredentialStore store = new SecureFileCredentialStore("credential-store.sec");
+		for (Entry<String, OAuth2Token> entry: store.retrieveAllCredentials()) {
+			System.out.println(entry.getKey() + " ==>\n" + entry.getValue());
+		}
+		 */
+		OAuth2 oauth = new OAuth2(settings, new SecureFileCredentialStore("credential-store.sec"));
 		try {
 			oauth.authorize(null);
 		} catch (OAuth2SettingsException e) {

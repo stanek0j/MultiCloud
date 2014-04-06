@@ -1,5 +1,9 @@
 package cz.zcu.kiv.multicloud.core.oauth2;
 
+import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * cz.zcu.kiv.multicloud.core.oauth2/OAuth2Token.java
  *
@@ -11,7 +15,10 @@ package cz.zcu.kiv.multicloud.core.oauth2;
  * @version 1.0
  *
  */
-public class OAuth2Token {
+public class OAuth2Token implements Serializable {
+
+	/** Serialization constant. */
+	private static final long serialVersionUID = 2872874560545563982L;
 
 	/** Timestamp in seconds representing token creation time. */
 	protected long timestamp;
@@ -94,6 +101,14 @@ public class OAuth2Token {
 	}
 
 	/**
+	 * Returns the time when the access token was created.
+	 * @return
+	 */
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	/**
 	 * Returns the type of this token.
 	 * @return Type of token.
 	 */
@@ -105,6 +120,7 @@ public class OAuth2Token {
 	 * Determines if the token has already expired.
 	 * @return If the token expired.
 	 */
+	@JsonIgnore
 	public boolean isExpired() {
 		return ((System.currentTimeMillis() / 1000) >= timestamp + expiresIn);
 	}
@@ -114,6 +130,7 @@ public class OAuth2Token {
 	 * @param accessToken Access token.
 	 */
 	public void setAccessToken(String accessToken) {
+		this.timestamp = System.currentTimeMillis() / 1000;
 		this.accessToken = accessToken;
 	}
 

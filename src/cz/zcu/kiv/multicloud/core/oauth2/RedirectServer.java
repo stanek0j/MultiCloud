@@ -84,7 +84,7 @@ public class RedirectServer implements Container {
 		}
 		/* generate random data */
 		while (length < stateLength) {
-			char ch = (char)r.nextInt();
+			char ch = (char) r.nextInt();
 			if (Utils.isUriLetterOrDigit(ch)) {
 				sb.append(ch);
 				length++;
