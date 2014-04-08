@@ -205,6 +205,19 @@ public class OAuth2Settings {
 	}
 
 	/**
+	 * Sets the class of the extension grant.
+	 * @param grantClass Name of the extension grant class.
+	 */
+	@SuppressWarnings("unchecked")
+	public void setGrantClass(String grantClass) {
+		try {
+			this.grantClass = (Class<? extends OAuth2Grant>) Class.forName(grantClass);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Sets the type of grant.
 	 * @param grantType Grant type.
 	 */

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 import cz.zcu.kiv.multicloud.core.CloudManager;
 import cz.zcu.kiv.multicloud.core.UserManager;
-import cz.zcu.kiv.multicloud.core.json.UserSettings;
+import cz.zcu.kiv.multicloud.core.Utils;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2GrantType;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Settings;
 
@@ -91,16 +91,22 @@ public class Test {
 		UserManager um = UserManager.getInstance();
 		try {
 			cm.loadCloudSettings();
-			um.loadUserSettings();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		try {
+			um.loadUserSettings();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
+		/*
 		UserSettings us = new UserSettings();
 		us.setUserId("dropbox-01");
 		us.setSettingsId("Dropbox");
-		us.setTokenId("EoYaXp1d");
+		us.setTokenId("Xk1tNHPD");
 		um.addUserSettings(us);
+		 */
 
 		try {
 			um.saveUserSettings();
@@ -108,24 +114,26 @@ public class Test {
 			e.printStackTrace();
 		}
 
+		Utils.cloudSettingsToOAuth2Settings(cm.getCloudSettings("Dropbox"));
+
 		OAuth2Settings settings = new OAuth2Settings();
 		settings.setGrantType(OAuth2GrantType.AUTHORIZATION_CODE_GRANT);
 		/* dropbox */
-		/*
 		settings.setClientId("hq3ir6cgpeynus1");
 		settings.setClientSecret("q20xd395442f54b");
 		settings.setAuthorizeUri("https://www.dropbox.com/1/oauth2/authorize");
 		settings.setTokenUri("https://api.dropbox.com/1/oauth2/token");
 		settings.setRedirectUri("https://home.zcu.cz/~stanek0j/multicloud");
-		 */
 
 		/* google drive */
+		/*
 		settings.setClientId("45396671053.apps.googleusercontent.com");
 		settings.setClientSecret("ZLa85_y8DSnMoEJ1IsyW3fmm");
 		settings.setAuthorizeUri("https://accounts.google.com/o/oauth2/auth");
 		settings.setTokenUri("https://accounts.google.com/o/oauth2/token");
 		settings.setScope("https://www.googleapis.com/auth/drive");
 		settings.setRefreshToken("1/-_DynXynwO26MR5PLrwE5RMArZz4zRxESYLjAqh5KYc");
+		 */
 
 		/* onedrive */
 		/*

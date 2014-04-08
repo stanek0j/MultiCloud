@@ -59,6 +59,15 @@ public class CloudManager {
 	}
 
 	/**
+	 * Returns the {@link cz.zcu.kiv.multicloud.core.json.CloudSettings} identified by its name.
+	 * @param cloudName Name of the settings.
+	 * @return Cloud settings.
+	 */
+	public CloudSettings getCloudSettings(String cloudName) {
+		return settings.get(cloudName);
+	}
+
+	/**
 	 * Load {@link cz.zcu.kiv.multicloud.core.json.CloudSettings} from default location.
 	 * @throws IOException If the location doesn't exist or some files are unreadable.
 	 */

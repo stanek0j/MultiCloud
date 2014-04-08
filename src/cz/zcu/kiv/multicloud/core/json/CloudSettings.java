@@ -2,6 +2,7 @@ package cz.zcu.kiv.multicloud.core.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Grant;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2GrantType;
 
 /**
@@ -31,12 +32,19 @@ public class CloudSettings {
 	/** Grant type for authorization. */
 	@JsonProperty("grant_type")
 	private OAuth2GrantType grantType;
+	/** Grant class for extension authorization grant. */
+	@JsonProperty("grant_class")
+	private Class<? extends OAuth2Grant> grantClass;
 	/** Client ID used in authorization. */
 	@JsonProperty("client_id")
 	private String clientId;
 	/** Client secret used in authorization. */
 	@JsonProperty("client_secret")
 	private String clientSecret;
+	/** Username used in authorization. */
+	private String username;
+	/** Password used in authorization. */
+	private String password;
 	/** Redirect URI used in authorization. */
 	@JsonProperty("redirect_uri")
 	private String redirectUri;
@@ -136,6 +144,14 @@ public class CloudSettings {
 	}
 
 	/**
+	 * Returns the grant class for extension authorization grant.
+	 * @return Grant class.
+	 */
+	public Class<? extends OAuth2Grant> getGrantClass() {
+		return grantClass;
+	}
+
+	/**
 	 * Returns the grant type for the authorization.
 	 * @return Grant type.
 	 */
@@ -157,6 +173,14 @@ public class CloudSettings {
 	 */
 	public CloudRequest getMoveRequest() {
 		return moveRequest;
+	}
+
+	/**
+	 * Returns the password used in authorization.
+	 * @return Password.
+	 */
+	public String getPassword() {
+		return password;
 	}
 
 	/**
@@ -213,6 +237,14 @@ public class CloudSettings {
 	 */
 	public CloudRequest getUploadFileRequest() {
 		return uploadFileRequest;
+	}
+
+	/**
+	 * Returns the username used in authorization.
+	 * @return Username.
+	 */
+	public String getUsername() {
+		return username;
 	}
 
 	/**
@@ -279,6 +311,10 @@ public class CloudSettings {
 		this.downloadFileRequest = downloadFileRequest;
 	}
 
+	public void setGrantClass(Class<? extends OAuth2Grant> grantClass) {
+		this.grantClass = grantClass;
+	}
+
 	/**
 	 * Sets the grant type for the authorization.
 	 * @param grantType Grant type.
@@ -301,6 +337,14 @@ public class CloudSettings {
 	 */
 	public void setMoveRequest(CloudRequest moveRequest) {
 		this.moveRequest = moveRequest;
+	}
+
+	/**
+	 * Sets the password used in authorization.
+	 * @param password Password.
+	 */
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	/**
@@ -357,6 +401,14 @@ public class CloudSettings {
 	 */
 	public void setUploadFileRequest(CloudRequest uploadFileRequest) {
 		this.uploadFileRequest = uploadFileRequest;
+	}
+
+	/**
+	 * Sets the username used in authorization.
+	 * @param username Username.
+	 */
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 }

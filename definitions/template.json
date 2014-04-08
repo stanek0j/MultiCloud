@@ -14,11 +14,14 @@
 		"params":null
 	},
 	"grant_type":"",
+	"grant_class":"",
 	"client_id":"",
 	"client_secret":"",
+	"username":"",
+	"password":"",
 	"redirect_uri":"",
 	"scope":"",
-		"account_info_request":
+	"account_info_request":
 	{
 		"uri":"",
 		"method":"",

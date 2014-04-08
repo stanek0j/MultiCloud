@@ -3,10 +3,11 @@ package cz.zcu.kiv.multicloud.core;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cz.zcu.kiv.multicloud.core.json.Json;
@@ -44,7 +45,7 @@ public class UserManager {
 	protected File settingsFile;
 
 	/** Map of all {@link cz.zcu.kiv.multicloud.core.json.UserSettings} loaded. */
-	private final Map<String, UserSettings> users;
+	private Map<String, UserSettings> users;
 	/** Instance of the Jackson JSON components. */
 	private final Json json;
 
@@ -69,6 +70,14 @@ public class UserManager {
 	}
 
 	/**
+	 * Returns all the {@link cz.zcu.kiv.multicloud.core.json.UserSettings} in the store.
+	 * @return All user settings.
+	 */
+	public Collection<UserSettings> getAllUserSettings() {
+		return users.values();
+	}
+
+	/**
 	 * Returns the {@link java.io.File} where the user settings is saved.
 	 * @return User settings file.
 	 */
@@ -81,7 +90,7 @@ public class UserManager {
 	 * @param userId User settings identifier.
 	 * @return User settings.
 	 */
-	public UserSettings getUserSetting(String userId) {
+	public UserSettings getUserSettings(String userId) {
 		return users.get(userId);
 	}
 
@@ -104,12 +113,9 @@ public class UserManager {
 	 */
 	public void loadUserSettings(File file) throws IOException {
 		if (file.isFile()) {
+			settingsFile = file;
 			ObjectMapper om = json.getMapper();
-			UserSettings us = om.readValue(file, UserSettings.class);
-			if (Utils.isNullOrEmpty(us.getUserId())) {
-				throw new JsonMappingException("User settings must contain \"user_id\" property.");
-			}
-			users.put(us.getUserId(), us);
+			users = om.readValue(file, new TypeReference<HashMap<String, UserSettings>>() {});
 		} else {
 			throw new FileNotFoundException("Destination is not a file.");
 		}
@@ -150,6 +156,7 @@ public class UserManager {
 	 * @throws IOException If the file cannot be saved.
 	 */
 	public void saveUserSettings(File file) throws IOException {
+		settingsFile = file;
 		ObjectMapper om = json.getMapper();
 		om.writerWithDefaultPrettyPrinter().writeValue(file, users);
 	}
