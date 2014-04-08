@@ -3,7 +3,7 @@ package cz.zcu.kiv.multicloud;
 /**
  * cz.zcu.kiv.multicloud/MultiCloud.java
  *
- * MultiCloud.
+ * The MultiCloud library.
  *
  * @author Jaromír Staněk
  * @version 1.0
@@ -11,16 +11,16 @@ package cz.zcu.kiv.multicloud;
  */
 public class MultiCloud {
 
-	/** The version of MultiCloud. */ 
+	/** The version of MultiCloud library. */
 	public static final String VERSION = "1.0";
 
 	/**
-	 * @param args
+	 * Main method that prints out library version.
+	 * @param args Start arguments.
 	 */
 	public static void main(String[] args) {
-
-		System.out.println("MultiCloud version: " + VERSION);
-
+		System.out.println("MultiCloud library version: " + VERSION);
+		System.exit(0);
 	}
 
 }

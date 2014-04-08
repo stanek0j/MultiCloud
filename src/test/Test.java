@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 
-import cz.zcu.kiv.multicloud.core.CloudManager;
-import cz.zcu.kiv.multicloud.core.UserManager;
+import cz.zcu.kiv.multicloud.core.FileCloudManager;
+import cz.zcu.kiv.multicloud.core.SecureFileCredentialStore;
+import cz.zcu.kiv.multicloud.core.FileUserManager;
 import cz.zcu.kiv.multicloud.core.Utils;
-import cz.zcu.kiv.multicloud.core.oauth2.OAuth2GrantType;
+import cz.zcu.kiv.multicloud.core.oauth2.OAuth2;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Settings;
+import cz.zcu.kiv.multicloud.core.oauth2.OAuth2SettingsException;
 
 public class Test {
 
@@ -87,8 +89,8 @@ public class Test {
 		}
 		 */
 
-		CloudManager cm = CloudManager.getInstance();
-		UserManager um = UserManager.getInstance();
+		FileCloudManager cm = FileCloudManager.getInstance();
+		FileUserManager um = FileUserManager.getInstance();
 		try {
 			cm.loadCloudSettings();
 		} catch (IOException e) {
@@ -114,16 +116,16 @@ public class Test {
 			e.printStackTrace();
 		}
 
-		Utils.cloudSettingsToOAuth2Settings(cm.getCloudSettings("Dropbox"));
+		OAuth2Settings settings = Utils.cloudSettingsToOAuth2Settings(cm.getCloudSettings("Dropbox"));
 
-		OAuth2Settings settings = new OAuth2Settings();
-		settings.setGrantType(OAuth2GrantType.AUTHORIZATION_CODE_GRANT);
 		/* dropbox */
+		/*
 		settings.setClientId("hq3ir6cgpeynus1");
 		settings.setClientSecret("q20xd395442f54b");
 		settings.setAuthorizeUri("https://www.dropbox.com/1/oauth2/authorize");
 		settings.setTokenUri("https://api.dropbox.com/1/oauth2/token");
 		settings.setRedirectUri("https://home.zcu.cz/~stanek0j/multicloud");
+		 */
 
 		/* google drive */
 		/*
@@ -153,14 +155,12 @@ public class Test {
 		}
 		 */
 
-		/*
 		OAuth2 oauth = new OAuth2(settings, new SecureFileCredentialStore("credential-store.sec"));
 		try {
 			oauth.authorize(null);
 		} catch (OAuth2SettingsException e) {
 			e.printStackTrace();
 		}
-		 */
 
 		/*
 		//OAuth2Grant grant = new AuthorizationCodeGrant();

@@ -3,7 +3,7 @@ package cz.zcu.kiv.multicloud.core;
 /**
  * cz.zcu.kiv.multicloud.core/Core.java
  *
- * The MultiCloud Core.
+ * The MultiCloud core.
  *
  * @author Jaromír Staněk
  * @version 1.0
@@ -11,16 +11,16 @@ package cz.zcu.kiv.multicloud.core;
  */
 public class Core {
 
-	/** The version of MultiCloud Core. */
+	/** The version of MultiCloud core. */
 	public static final String VERSION = "1.0";
 
 	/**
-	 * @param args
+	 * Main method that prints out core version.
+	 * @param args Start arguments.
 	 */
 	public static void main(String[] args) {
-
-		System.out.println("MultiCloud Core version: " + VERSION);
-
+		System.out.println("MultiCloud core version: " + VERSION);
+		System.exit(0);
 	}
 
 }
