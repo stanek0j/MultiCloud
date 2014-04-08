@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.oauth2;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/OAuth2GrantType.java
+ * cz.zcu.kiv.multicloud.oauth2/OAuth2GrantType.java
  *
  * Enumeration of all authorization grant types defined by <a href="http://tools.ietf.org/html/rfc6749#section-4">RFC 6749</a>.
  *
@@ -16,5 +16,5 @@ public enum OAuth2GrantType {
 	RESOURCE_OWNER_PASSWORD_CREDENTIAL_GRANT,
 	CLIENT_CREDENTIAL_GRANT,
 	EXTENSION_GRANT
-	
+
 }

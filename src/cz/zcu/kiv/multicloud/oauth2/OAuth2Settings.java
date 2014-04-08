@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/OAuth2Settings.java
+ * cz.zcu.kiv.multicloud.oauth2/OAuth2Settings.java
  *
  * Generic settings for the OAuth 2.0 implementation.
  *

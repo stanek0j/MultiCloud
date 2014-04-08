@@ -5,7 +5,7 @@ import java.util.Map;
 import cz.zcu.kiv.multicloud.utils.HttpMethod;
 
 /**
- * cz.zcu.kiv.multicloud.core.json/CloudRequest.java
+ * cz.zcu.kiv.multicloud.json/CloudRequest.java
  *
  * Bean for holding basic information about a request to the cloud storage.
  *

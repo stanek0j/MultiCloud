@@ -3,7 +3,7 @@ package cz.zcu.kiv.multicloud.json;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * cz.zcu.kiv.multicloud.core.json/UserSettings.java
+ * cz.zcu.kiv.multicloud.json/UserSettings.java
  *
  * Bean for holding information about user account registered by a cloud storage service provider. No user credentials are stored here.
  *

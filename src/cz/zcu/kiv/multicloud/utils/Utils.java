@@ -13,7 +13,7 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2GrantType;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Settings;
 
 /**
- * cz.zcu.kiv.multicloud.core/Utils.java
+ * cz.zcu.kiv.multicloud.utils/Utils.java
  *
  * General purpose methods for use in the multicloud core.
  *

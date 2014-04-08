@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.oauth2;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/OAuth2Error.java
+ * cz.zcu.kiv.multicloud.oauth2/OAuth2Error.java
  *
  * Class for holding information about an error that occurred.
  *

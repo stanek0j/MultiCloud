@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.utils;
 
 /**
- * cz.zcu.kiv.multicloud.core/FileSerialization.java
+ * cz.zcu.kiv.multicloud.utils/FileSerialization.java
  *
  * List of supported serialization schemes for storing data in a file.
  *

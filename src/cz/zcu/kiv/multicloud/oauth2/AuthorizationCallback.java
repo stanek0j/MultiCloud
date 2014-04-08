@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.oauth2;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/AuthorizationCallback.java
+ * cz.zcu.kiv.multicloud.oauth2/AuthorizationCallback.java
  *
  * Interface for handling {@link cz.zcu.kiv.multicloud.oauth2.AuthorizationRequest} requests.
  *

@@ -19,7 +19,7 @@ import cz.zcu.kiv.multicloud.json.Json;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/ResOwnerPassCredGrant.java
+ * cz.zcu.kiv.multicloud.oauth2/ResOwnerPassCredGrant.java
  *
  * Implementation of the <a href="http://tools.ietf.org/html/rfc6749#section-4.3">OAuth 2.0 Resource Owner Password Credentials Grant</a>.
  *

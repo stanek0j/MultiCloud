@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.oauth2;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/OAuth2SettingsException.java
+ * cz.zcu.kiv.multicloud.oauth2/OAuth2SettingsException.java
  *
  * Exception thrown when inappropriate settings for an {@link cz.zcu.kiv.multicloud.oauth2.OAuth2Grant} are supplied.
  *

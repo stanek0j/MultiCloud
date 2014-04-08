@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/RedirectWebPage.java
+ * cz.zcu.kiv.multicloud.oauth2/RedirectWebPage.java
  *
  * Simple HTML web page serving as a response after authorization of the application on an external authorization site.
  *

@@ -5,7 +5,7 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/OAuth2Token.java
+ * cz.zcu.kiv.multicloud.oauth2/OAuth2Token.java
  *
  * Generic OAuth 2.0 token class.
  * It is able to hold Bearer token as described in <a href="http://tools.ietf.org/html/rfc6749">OAuth 2.0 specification</a>.

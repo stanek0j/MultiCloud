@@ -14,7 +14,7 @@ import cz.zcu.kiv.multicloud.json.Json;
 import cz.zcu.kiv.multicloud.json.UserSettings;
 
 /**
- * cz.zcu.kiv.multicloud.core/FileUserManager.java
+ * cz.zcu.kiv.multicloud.utils/FileUserManager.java
  *
  * Class for managing user accounts for different cloud storage services. It uses files as a storage medium.
  *

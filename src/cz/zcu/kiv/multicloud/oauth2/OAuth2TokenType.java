@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.oauth2;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/OAuth2TokenType.java
+ * cz.zcu.kiv.multicloud.oauth2/OAuth2TokenType.java
  *
  * List of supported access token types.
  *

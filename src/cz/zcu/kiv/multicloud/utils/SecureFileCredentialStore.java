@@ -24,7 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.core/SecureFileCredentialStore.java
+ * cz.zcu.kiv.multicloud.utils/SecureFileCredentialStore.java
  *
  * Implementation of the {@link cz.zcu.kiv.multicloud.utils.CredentialStore} using simple {java.io.File} as a base for storing the tokens.
  * This implementation uses AES file encryption for improving security of stored tokens. Use of default password is not advised.

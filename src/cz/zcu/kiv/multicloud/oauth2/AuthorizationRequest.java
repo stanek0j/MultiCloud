@@ -3,7 +3,7 @@ package cz.zcu.kiv.multicloud.oauth2;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/AuthorizationRequest.java
+ * cz.zcu.kiv.multicloud.oauth2/AuthorizationRequest.java
  *
  * Represents an authorization request of the <a href="http://tools.ietf.org/html/rfc6749">OAuth 2.0 specification</a>.
  *

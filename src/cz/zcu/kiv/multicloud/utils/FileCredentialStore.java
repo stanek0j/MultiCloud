@@ -20,7 +20,7 @@ import cz.zcu.kiv.multicloud.json.Json;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.core/FileCredentialStore.java
+ * cz.zcu.kiv.multicloud.utils/FileCredentialStore.java
  *
  * Implementation of the {@link cz.zcu.kiv.multicloud.utils.CredentialStore} using simple {java.io.File} as a base for storing the tokens.
  *

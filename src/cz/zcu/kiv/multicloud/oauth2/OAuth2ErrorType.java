@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.oauth2;
 
 /**
- * cz.zcu.kiv.multicloud.core.oauth2/OAuth2ErrorType.java
+ * cz.zcu.kiv.multicloud.oauth2/OAuth2ErrorType.java
  *
  * List of all the error types that can occur in a response from the authorization server.
  *
