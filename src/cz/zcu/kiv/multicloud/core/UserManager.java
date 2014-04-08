@@ -40,6 +40,9 @@ public class UserManager {
 		return instance;
 	}
 
+	/** File to save the user settings to. */
+	protected File settingsFile;
+
 	/** Map of all {@link cz.zcu.kiv.multicloud.core.json.UserSettings} loaded. */
 	private final Map<String, UserSettings> users;
 	/** Instance of the Jackson JSON components. */
@@ -51,8 +54,13 @@ public class UserManager {
 	private UserManager() {
 		users = new HashMap<>();
 		json = Json.getInstance();
+		settingsFile = null;
 	}
 
+	/**
+	 * Adds the {@link cz.zcu.kiv.multicloud.core.json.UserSettings} to local store.
+	 * @param settings User settings.
+	 */
 	public void addUserSettings(UserSettings settings) {
 		if (Utils.isNullOrEmpty(settings.getUserId())) {
 			return;
@@ -61,11 +69,32 @@ public class UserManager {
 	}
 
 	/**
+	 * Returns the {@link java.io.File} where the user settings is saved.
+	 * @return User settings file.
+	 */
+	public File getSettingsFile() {
+		return settingsFile;
+	}
+
+	/**
+	 * Returns the {@link cz.zcu.kiv.multicloud.core.json.UserSettings} specified by the identifier.
+	 * @param userId User settings identifier.
+	 * @return User settings.
+	 */
+	public UserSettings getUserSetting(String userId) {
+		return users.get(userId);
+	}
+
+	/**
 	 * Loads {@link cz.zcu.kiv.multicloud.core.json.UserSettings} from the default file.
 	 * @throws IOException If the file cannot be loaded.
 	 */
 	public void loadUserSettings() throws IOException {
-		loadUserSettings(new File(DEFAULT_FILE));
+		if (settingsFile != null) {
+			loadUserSettings(settingsFile);
+		} else {
+			loadUserSettings(new File(DEFAULT_FILE));
+		}
 	}
 
 	/**
@@ -95,6 +124,10 @@ public class UserManager {
 		loadUserSettings(new File(file));
 	}
 
+	/**
+	 * Removes the specified {@link cz.zcu.kiv.multicloud.core.json.UserSettings}.
+	 * @param userId User settings identifier.
+	 */
 	public void removeUserSettings(String userId) {
 		users.remove(userId);
 	}
@@ -104,7 +137,11 @@ public class UserManager {
 	 * @throws IOException If the file cannot be saved.
 	 */
 	public void saveUserSettings() throws IOException {
-		saveUserSettings(new File(DEFAULT_FILE));
+		if (settingsFile != null) {
+			saveUserSettings(settingsFile);
+		} else {
+			saveUserSettings(new File(DEFAULT_FILE));
+		}
 	}
 
 	/**
@@ -124,6 +161,14 @@ public class UserManager {
 	 */
 	public void saveUserSettings(String file) throws IOException {
 		saveUserSettings(new File(file));
+	}
+
+	/**
+	 * Sets the {@link java.io.File} where the user settings is saved.
+	 * @param settingsFile User settings file.
+	 */
+	public void setSettingsFile(File settingsFile) {
+		this.settingsFile = settingsFile;
 	}
 
 }
