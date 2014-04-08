@@ -4,13 +4,13 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 
-import cz.zcu.kiv.multicloud.core.FileCloudManager;
-import cz.zcu.kiv.multicloud.core.SecureFileCredentialStore;
-import cz.zcu.kiv.multicloud.core.FileUserManager;
-import cz.zcu.kiv.multicloud.core.Utils;
-import cz.zcu.kiv.multicloud.core.oauth2.OAuth2;
-import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Settings;
-import cz.zcu.kiv.multicloud.core.oauth2.OAuth2SettingsException;
+import cz.zcu.kiv.multicloud.oauth2.OAuth2;
+import cz.zcu.kiv.multicloud.oauth2.OAuth2Settings;
+import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
+import cz.zcu.kiv.multicloud.utils.FileCloudManager;
+import cz.zcu.kiv.multicloud.utils.FileUserManager;
+import cz.zcu.kiv.multicloud.utils.SecureFileCredentialStore;
+import cz.zcu.kiv.multicloud.utils.Utils;
 
 public class Test {
 
