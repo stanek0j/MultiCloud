@@ -1,12 +1,14 @@
 package test;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonFactory;
 
-import cz.zcu.kiv.multicloud.core.SecureFileCredentialStore;
-import cz.zcu.kiv.multicloud.core.oauth2.OAuth2;
+import cz.zcu.kiv.multicloud.core.CloudManager;
+import cz.zcu.kiv.multicloud.core.UserManager;
+import cz.zcu.kiv.multicloud.core.json.UserSettings;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2GrantType;
 import cz.zcu.kiv.multicloud.core.oauth2.OAuth2Settings;
-import cz.zcu.kiv.multicloud.core.oauth2.OAuth2SettingsException;
 
 public class Test {
 
@@ -85,6 +87,27 @@ public class Test {
 		}
 		 */
 
+		CloudManager cm = CloudManager.getInstance();
+		UserManager um = UserManager.getInstance();
+		try {
+			cm.loadCloudSettings();
+			um.loadUserSettings();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		UserSettings us = new UserSettings();
+		us.setUserId("dropbox-01");
+		us.setSettingsId("Dropbox");
+		us.setTokenId("EoYaXp1d");
+		um.addUserSettings(us);
+
+		try {
+			um.saveUserSettings();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		OAuth2Settings settings = new OAuth2Settings();
 		settings.setGrantType(OAuth2GrantType.AUTHORIZATION_CODE_GRANT);
 		/* dropbox */
@@ -121,12 +144,15 @@ public class Test {
 			System.out.println(entry.getKey() + " ==>\n" + entry.getValue());
 		}
 		 */
+
+		/*
 		OAuth2 oauth = new OAuth2(settings, new SecureFileCredentialStore("credential-store.sec"));
 		try {
 			oauth.authorize(null);
 		} catch (OAuth2SettingsException e) {
 			e.printStackTrace();
 		}
+		 */
 
 		/*
 		//OAuth2Grant grant = new AuthorizationCodeGrant();

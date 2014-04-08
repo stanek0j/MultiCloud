@@ -1,17 +1,101 @@
 {
-	"authorize":
+	"name":"Dropbox",
+	"description":"Dropbox cloud storage service provider.",
+	"authorize_request":
 	{
 		"uri":"https://www.dropbox.com/1/oauth2/authorize",
-		"method":"GET"
+		"method":"GET",
+		"params":null
 	},
-	"token":
+	"token_request":
 	{
 		"uri":"https://api.dropbox.com/1/oauth2/token",
-		"method":"POST"
-	},	
-	"response_type":"code",
+		"method":"POST",
+		"params":null
+	},
+	"grant_type":"AUTHORIZATION_CODE_GRANT",
 	"client_id":"hq3ir6cgpeynus1",
 	"client_secret":"q20xd395442f54b",
 	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
-	"scope":null
+	"scope":null,
+	"account_info_request":
+	{
+		"uri":"https://api.dropbox.com/1/account/info",
+		"method":"GET",
+		"params":null
+	},
+	"download_file_request":
+	{
+		"uri":"https://api-content.dropbox.com/1/files/dropbox/<path>",
+		"method":"GET",
+		"params":null
+	},
+	"upload_file_request":
+	{
+		"uri":"https://api-content.dropbox.com/1/files/dropbox/<path>",
+		"method":"PUT",
+		"params":
+		{
+			"overwrite":"<overwrite>"
+		}
+	},
+	"create_dir_request":
+	{
+		"uri":"https://api.dropbox.com/1/fileops/create_folder",
+		"method":"POST",
+		"params":
+		{
+			"root":"dropbox",
+			"path":"<path>"
+		}
+	},
+	"list_dir_request":
+	{
+		"uri":"https://api.dropbox.com/1/metadata/dropbox/",
+		"method":"GET",
+		"params":
+		{
+			"file_limit":"<max_files>",
+			"hash":"<dir_hash>",
+			"include_deleted":"<deleted>"
+		}
+	},
+	"rename_request":
+	{
+		"uri":"",
+		"method":"PUT",
+		"params":null
+	},	
+	"copy_request":
+	{
+		"uri":"https://api.dropbox.com/1/fileops/copy",
+		"method":"POST",
+		"params":
+		{
+			"root":"dropbox",
+			"from_path":"<path>",
+			"to_path":"<path>"
+		}
+	},
+	"move_request":
+	{
+		"uri":"https://api.dropbox.com/1/fileops/move",
+		"method":"POST",
+		"params":
+		{
+			"root":"dropbox",
+			"from_path":"<path>",
+			"to_path":"<path>"
+		}
+	},
+	"delete_request":
+	{
+		"uri":"https://api.dropbox.com/1/fileops/delete",
+		"method":"POST",
+		"params":
+		{
+			"root":"dropbox",
+			"path":"<path>"
+		}
+	}
 }

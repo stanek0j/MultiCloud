@@ -1,17 +1,87 @@
 {
+	"name:"",
+	"description":"",
 	"authorize":
 	{
 		"uri":"https://login.live.com/oauth20_authorize.srf",
-		"method":"GET"
+		"method":"GET",
+		"params":null
 	},
 	"token":
 	{
 		"uri":"https://login.live.com/oauth20_token.srf",
-		"method":"POST"
+		"method":"POST",
+		"params":null
 	},
-	"response_type":"code",
+	"grant_type":"AUTHORIZATION_CODE_GRANT",
 	"client_id":"00000000400ECF3A",
 	"client_secret":"GlPTCgir1pn35eaXlqe29avCnVmSNg5i",
 	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
-	"scope":"wl.skydrive_update,wl.offline_access"
+	"scope":"wl.skydrive_update,wl.offline_access",
+		"account_info_request":
+	{
+		"uri":"https://apis.live.net/v5.0/me/skydrive/quota",
+		"method":"GET",
+		"params":null
+	},
+	"download_file_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
+	"upload_file_request":
+	{
+		"uri":"https://apis.live.net/v5.0/me/skydrive/files/<name>",
+		"method":"PUT",
+		"params":null
+	},
+	"create_dir_request":
+	{
+		"uri":"https://apis.live.net/v5.0/me/skydrive",
+		"method":"POST",
+		"params":
+		{
+			"name":"<name>"
+		}
+	},
+	"list_dir_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
+	"rename_request":
+	{
+		"uri":"https://apis.live.net/v5.0/<path>",
+		"method":"PUT",
+		"params":
+		{
+			"name":"<name>"
+		}
+	},
+	"copy_request":
+	{
+		"uri":"https://apis.live.net/v5.0/<path_id>",
+		"method":"COPY",
+		"params":
+		{
+			"destination":"<folder_id>"
+		}
+	},
+	"move_request":
+	{
+		"uri":"https://apis.live.net/v5.0/<path_id>",
+		"method":"MOVE",
+		"params":
+		{
+			"destination":"<folder_id>"
+		}
+	},
+	"delete_request":
+	{
+		"uri":"https://apis.live.net/v5.0/<file_id>",
+		"method":"DELETE",
+		"params":null
+	}
 }

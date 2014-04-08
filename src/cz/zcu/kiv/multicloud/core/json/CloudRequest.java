@@ -1,5 +1,7 @@
 package cz.zcu.kiv.multicloud.core.json;
 
+import java.util.Map;
+
 import cz.zcu.kiv.multicloud.core.HttpMethod;
 
 /**
@@ -17,6 +19,8 @@ public class CloudRequest {
 	private String uri;
 	/** HTTP method of the request. */
 	private HttpMethod method;
+	/** Parameters of the request. */
+	private Map<String, String> params;
 
 	/**
 	 * Returns the HTTP method of the request.
@@ -24,6 +28,14 @@ public class CloudRequest {
 	 */
 	public HttpMethod getMethod() {
 		return method;
+	}
+
+	/**
+	 * Return the list of all parameters of the request.
+	 * @return List of parameters.
+	 */
+	public Map<String, String> getParams() {
+		return params;
 	}
 
 	/**
@@ -40,6 +52,14 @@ public class CloudRequest {
 	 */
 	public void setMethod(HttpMethod method) {
 		this.method = method;
+	}
+
+	/**
+	 * Sets the list of all parameters of the request.
+	 * @param params List of parameters.
+	 */
+	public void setParams(Map<String, String> params) {
+		this.params = params;
 	}
 
 	/**

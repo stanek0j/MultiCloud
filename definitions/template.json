@@ -1,17 +1,75 @@
 {
+	"name:"",
+	"description":"",
 	"authorize":
 	{
 		"uri":"",
-		"method":""
+		"method":"",
+		"params":null
 	},
 	"token":
 	{
 		"uri":"",
-		"method":""
+		"method":"",
+		"params":null
 	},
-	"response_type":"",
+	"grant_type":"",
 	"client_id":"",
 	"client_secret":"",
 	"redirect_uri":"",
-	"scope":""
+	"scope":"",
+		"account_info_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
+	"download_file_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
+	"upload_file_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
+	"create_dir_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
+	"list_dir_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
+	"rename_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},	
+	"copy_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
+	"move_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
+	"delete_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	}
 }
