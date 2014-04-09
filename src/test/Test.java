@@ -1,16 +1,8 @@
 package test;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonFactory;
 
-import cz.zcu.kiv.multicloud.oauth2.OAuth2;
-import cz.zcu.kiv.multicloud.oauth2.OAuth2Settings;
-import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
-import cz.zcu.kiv.multicloud.utils.FileCloudManager;
-import cz.zcu.kiv.multicloud.utils.FileUserManager;
-import cz.zcu.kiv.multicloud.utils.SecureFileCredentialStore;
-import cz.zcu.kiv.multicloud.utils.Utils;
+import cz.zcu.kiv.multicloud.MultiCloud;
 
 public class Test {
 
@@ -89,6 +81,10 @@ public class Test {
 		}
 		 */
 
+		MultiCloud cloud = new MultiCloud();
+		cloud.validateUsers();
+
+		/*
 		FileCloudManager cm = FileCloudManager.getInstance();
 		FileUserManager um = FileUserManager.getInstance();
 		try {
@@ -101,6 +97,7 @@ public class Test {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		 */
 
 		/*
 		UserSettings us = new UserSettings();
@@ -110,13 +107,15 @@ public class Test {
 		um.addUserSettings(us);
 		 */
 
+		/*
 		try {
 			um.saveUserSettings();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		 */
 
-		OAuth2Settings settings = Utils.cloudSettingsToOAuth2Settings(cm.getCloudSettings("Dropbox"));
+		//OAuth2Settings settings = Utils.cloudSettingsToOAuth2Settings(cm.getCloudSettings("Dropbox"));
 
 		/* dropbox */
 		/*
@@ -155,12 +154,14 @@ public class Test {
 		}
 		 */
 
+		/*
 		OAuth2 oauth = new OAuth2(settings, new SecureFileCredentialStore("credential-store.sec"));
 		try {
 			oauth.authorize(null);
 		} catch (OAuth2SettingsException e) {
 			e.printStackTrace();
 		}
+		 */
 
 		/*
 		//OAuth2Grant grant = new AuthorizationCodeGrant();

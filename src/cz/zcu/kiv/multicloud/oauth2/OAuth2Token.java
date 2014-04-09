@@ -122,7 +122,11 @@ public class OAuth2Token implements Serializable {
 	 */
 	@JsonIgnore
 	public boolean isExpired() {
-		return ((System.currentTimeMillis() / 1000) >= timestamp + expiresIn);
+		if (expiresIn >= 0) {
+			return ((System.currentTimeMillis() / 1000) >= timestamp + expiresIn);
+		} else {
+			return false;
+		}
 	}
 
 	/**

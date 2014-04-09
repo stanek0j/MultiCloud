@@ -111,12 +111,12 @@ public class FileUserManager implements UserManager {
 	 * @throws IOException If the file cannot be loaded.
 	 */
 	public void loadUserSettings(File file) throws IOException {
-		if (file.isFile()) {
+		if (file.exists() && !file.isFile()) {
+			throw new FileNotFoundException("Destination is not a file.");
+		} else {
 			settingsFile = file;
 			ObjectMapper om = json.getMapper();
 			users = om.readValue(file, new TypeReference<HashMap<String, UserSettings>>() {});
-		} else {
-			throw new FileNotFoundException("Destination is not a file.");
 		}
 	}
 
