@@ -132,6 +132,10 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 			}
 			tokenRequest.join();
 		} catch (InterruptedException e) {
+			synchronized (waitObject) {
+				ready = true;
+				waitObject.notifyAll();
+			}
 			return null;
 		}
 		return error;
@@ -150,6 +154,10 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 			}
 			tokenRequest.join();
 		} catch (InterruptedException e) {
+			synchronized (waitObject) {
+				ready = true;
+				waitObject.notifyAll();
+			}
 			return null;
 		}
 		return token;

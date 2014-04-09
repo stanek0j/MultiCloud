@@ -84,6 +84,10 @@ public class ImplicitGrant implements OAuth2Grant, RedirectCallback {
 				}
 			}
 		} catch (InterruptedException e) {
+			synchronized (waitObject) {
+				ready = true;
+				waitObject.notifyAll();
+			}
 			return null;
 		}
 		return error;
@@ -101,6 +105,10 @@ public class ImplicitGrant implements OAuth2Grant, RedirectCallback {
 				}
 			}
 		} catch (InterruptedException e) {
+			synchronized (waitObject) {
+				ready = true;
+				waitObject.notifyAll();
+			}
 			return null;
 		}
 		return token;

@@ -117,6 +117,10 @@ public class ClientCredGrant implements OAuth2Grant {
 			}
 			tokenRequest.join();
 		} catch (InterruptedException e) {
+			synchronized (waitObject) {
+				ready = true;
+				waitObject.notifyAll();
+			}
 			return null;
 		}
 		return error;
@@ -135,6 +139,10 @@ public class ClientCredGrant implements OAuth2Grant {
 			}
 			tokenRequest.join();
 		} catch (InterruptedException e) {
+			synchronized (waitObject) {
+				ready = true;
+				waitObject.notifyAll();
+			}
 			return null;
 		}
 		return token;

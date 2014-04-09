@@ -109,8 +109,9 @@ public class OAuth2 {
 	 * @param storeKey Key used for storing the access token.
 	 * @return Error occurred during the process.
 	 * @throws OAuth2SettingsException Exception when not proper settings are passed.
+	 * @throws InterruptedException Exception when authorization process is interrupted.
 	 */
-	public OAuth2Error authorize(String storeKey) throws OAuth2SettingsException {
+	public OAuth2Error authorize(String storeKey) throws OAuth2SettingsException, InterruptedException {
 		OAuth2Token token = null;
 		OAuth2Error error = null;
 		obtainedStoreKey = null;
@@ -155,7 +156,7 @@ public class OAuth2 {
 			error = grant.getError();
 
 			/* store the acquired access token */
-			if (store != null && error.getType() == OAuth2ErrorType.SUCCESS) {
+			if (store != null && error != null && error.getType() == OAuth2ErrorType.SUCCESS) {
 				if (Utils.isNullOrEmpty(storeKey)) {
 					obtainedStoreKey = store.storeCredential(token);
 				} else {
@@ -164,6 +165,11 @@ public class OAuth2 {
 				}
 			}
 			close();
+		}
+
+		System.out.println(error);
+		if (error == null) {
+			throw new InterruptedException("Authorization interrupted.");
 		}
 
 		return error;
