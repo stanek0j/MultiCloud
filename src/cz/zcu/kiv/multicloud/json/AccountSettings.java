@@ -1,9 +1,10 @@
 package cz.zcu.kiv.multicloud.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * cz.zcu.kiv.multicloud.json/UserSettings.java
+ * cz.zcu.kiv.multicloud.json/AccountSettings.java
  *
  * Bean for holding information about user account registered by a cloud storage service provider. No user credentials are stored here.
  *
@@ -11,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @version 1.0
  *
  */
-public class UserSettings {
+public class AccountSettings {
 
 	/** User identifier. */
 	@JsonProperty("user_id")
@@ -46,6 +47,15 @@ public class UserSettings {
 	 */
 	public String getUserId() {
 		return userId;
+	}
+
+	/**
+	 * Determines if the user has authorized this client.
+	 * @return If the client is authorized.
+	 */
+	@JsonIgnore
+	public boolean isAuthorized() {
+		return (tokenId != null);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.utils;
 
 /**
- * cz.zcu.kiv.multicloud.utils/FileSerialization.java
+ * cz.zcu.kiv.multicloud.utils/FileSerializationType.java
  *
  * List of supported serialization schemes for storing data in a file.
  *
@@ -9,7 +9,7 @@ package cz.zcu.kiv.multicloud.utils;
  * @version 1.0
  *
  */
-public enum FileSerialization {
+public enum FileSerializationType {
 
 	OBJECT,				// use default Java Object serialization
 	JSON				// use Jackson JSON serialization
