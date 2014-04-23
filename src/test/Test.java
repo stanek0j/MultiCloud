@@ -3,6 +3,8 @@ package test;
 import com.fasterxml.jackson.core.JsonFactory;
 
 import cz.zcu.kiv.multicloud.MultiCloud;
+import cz.zcu.kiv.multicloud.MultiCloudException;
+import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
 
 public class Test {
 
@@ -81,8 +83,35 @@ public class Test {
 		}
 		 */
 
-		MultiCloud cloud = new MultiCloud();
-		cloud.validateUsers();
+		final MultiCloud cloud = new MultiCloud();
+		try {
+			cloud.createAccount("test", "Dropbox");
+			Thread t = new Thread() {
+				@Override
+				public void run() {
+					try {
+						cloud.authorizeAccount("test", null);
+					} catch (MultiCloudException | OAuth2SettingsException
+							| InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			};
+			t.start();
+			Thread.sleep(5000);
+			t.interrupt();
+			//} catch (MultiCloudException | OAuth2SettingsException e) {
+		} catch (MultiCloudException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		/*
 		FileCloudManager cm = FileCloudManager.getInstance();

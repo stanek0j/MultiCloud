@@ -2,7 +2,7 @@ package cz.zcu.kiv.multicloud;
 
 import cz.zcu.kiv.multicloud.utils.CloudManager;
 import cz.zcu.kiv.multicloud.utils.CredentialStore;
-import cz.zcu.kiv.multicloud.utils.UserManager;
+import cz.zcu.kiv.multicloud.utils.AccountManager;
 
 /**
  * cz.zcu.kiv.multicloud/MultiCloudSettings.java
@@ -20,7 +20,7 @@ public class MultiCloudSettings {
 	/** Credential store. */
 	private CredentialStore store;
 	/** User account manager. */
-	private UserManager userManager;
+	private AccountManager userManager;
 
 	/**
 	 * Ctor.
@@ -48,10 +48,10 @@ public class MultiCloudSettings {
 	}
 
 	/**
-	 * Returns the {@link cz.zcu.kiv.multicloud.utils.UserManager} used.
+	 * Returns the {@link cz.zcu.kiv.multicloud.utils.AccountManager} used.
 	 * @return User manager.
 	 */
-	public UserManager getUserManager() {
+	public AccountManager getUserManager() {
 		return userManager;
 	}
 
@@ -72,10 +72,10 @@ public class MultiCloudSettings {
 	}
 
 	/**
-	 * Sets the {@link cz.zcu.kiv.multicloud.utils.UserManager} to be used.
+	 * Sets the {@link cz.zcu.kiv.multicloud.utils.AccountManager} to be used.
 	 * @param userManager User manager.
 	 */
-	public void setUserManager(UserManager userManager) {
+	public void setUserManager(AccountManager userManager) {
 		this.userManager = userManager;
 	}
 
