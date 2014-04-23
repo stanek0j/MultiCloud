@@ -37,7 +37,7 @@ public class FileCredentialStore implements CredentialStore {
 	/** Minimal length of the identifiers in the credential store. */
 	public static final int MIN_ID_LENGTH = 4;
 	/** Default serialization to use. */
-	public static final FileSerialization DEFAULT_SERIALIZATION = FileSerialization.OBJECT;
+	public static final FileSerializationType DEFAULT_SERIALIZATION = FileSerializationType.OBJECT;
 
 	/** Number of tries for generating a unique identifier for the store. */
 	protected static final int RETRY_COUNT = 100;
@@ -45,7 +45,7 @@ public class FileCredentialStore implements CredentialStore {
 	/** Length of the identifiers in the credential store. */
 	protected int idLength;
 	/** Serialization to use. */
-	protected FileSerialization serialization;
+	protected FileSerializationType serialization;
 	/** File used as the credential store. */
 	protected File credentialFile;
 	/** Map of all tokens stored in the store. */
@@ -63,11 +63,11 @@ public class FileCredentialStore implements CredentialStore {
 	}
 
 	/**
-	 * Ctor with supplied {@link java.io.File} and {@link cz.zcu.kiv.multicloud.utils.FileSerialization} of the credential store.
+	 * Ctor with supplied {@link java.io.File} and {@link cz.zcu.kiv.multicloud.utils.FileSerializationType} of the credential store.
 	 * @param file Credential store file.
 	 * @param fileSerialization File serialization.
 	 */
-	public FileCredentialStore(File file, FileSerialization fileSerialization) {
+	public FileCredentialStore(File file, FileSerializationType fileSerialization) {
 		idLength = DEFAULT_ID_LENGTH;
 		serialization = fileSerialization;
 		credentialFile = file;
@@ -85,12 +85,20 @@ public class FileCredentialStore implements CredentialStore {
 	}
 
 	/**
-	 * Ctor with supplied path to the credential store file and {@link cz.zcu.kiv.multicloud.utils.FileSerialization} of the credential store.
+	 * Ctor with supplied path to the credential store file and {@link cz.zcu.kiv.multicloud.utils.FileSerializationType} of the credential store.
 	 * @param file Path to the file.
 	 * @param fileSerialization File serialization.
 	 */
-	public FileCredentialStore(String file, FileSerialization fileSerialization) {
+	public FileCredentialStore(String file, FileSerializationType fileSerialization) {
 		this(new File(file), fileSerialization);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void deleteCredential(String identifier) {
+		tokens.remove(identifier);
 	}
 
 	/**
@@ -144,7 +152,7 @@ public class FileCredentialStore implements CredentialStore {
 	 * Returns the file serialization used.
 	 * @return File serialization.
 	 */
-	public FileSerialization getSerialization() {
+	public FileSerializationType getSerialization() {
 		return serialization;
 	}
 
@@ -267,7 +275,7 @@ public class FileCredentialStore implements CredentialStore {
 	 * Sets the file serialization used.
 	 * @param serialization File serialization.
 	 */
-	public void setSerialization(FileSerialization serialization) {
+	public void setSerialization(FileSerializationType serialization) {
 		this.serialization = serialization;
 	}
 

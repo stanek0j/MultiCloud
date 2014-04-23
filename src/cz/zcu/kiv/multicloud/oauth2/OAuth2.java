@@ -106,8 +106,9 @@ public class OAuth2 {
 
 	/**
 	 * Handles the whole process of requesting for authorization and stores the received access token in the credential store.
+	 * This call is blocking in case the authorization flow requires data flow from authorization server to this client.
 	 * @param storeKey Key used for storing the access token.
-	 * @return Error occurred during the process.
+	 * @return Error that occurred during the process.
 	 * @throws OAuth2SettingsException Exception when not proper settings are passed.
 	 * @throws InterruptedException Exception when authorization process is interrupted.
 	 */
@@ -167,7 +168,6 @@ public class OAuth2 {
 			close();
 		}
 
-		System.out.println(error);
 		if (error == null) {
 			throw new InterruptedException("Authorization interrupted.");
 		}
@@ -230,9 +230,9 @@ public class OAuth2 {
 	}
 
 	/**
-	 * 
+	 * This method represents the authorization flow for obtaining new access token supplying refresh token to the token server.
 	 * @param storeKey Key used for storing the access token.
-	 * @return Error occurred during the process.
+	 * @return Error that occurred during the process.
 	 * @throws OAuth2SettingsException Exception when not proper settings are passed.
 	 */
 	public OAuth2Error refresh(String storeKey) throws OAuth2SettingsException {

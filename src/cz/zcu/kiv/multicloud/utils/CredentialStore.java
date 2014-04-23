@@ -18,6 +18,12 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 public interface CredentialStore {
 
 	/**
+	 * Remove existing {@link cz.zcu.kiv.multicloud.oauth2.OAuth2Token} from the store.
+	 * @param identifier Identifier if the token in the store.
+	 */
+	void deleteCredential(String identifier);
+
+	/**
 	 * Retrieves all the identifiers used in the store.
 	 * @return Set of all identifiers.
 	 */

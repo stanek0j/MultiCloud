@@ -63,10 +63,10 @@ public class FileAccountManager implements AccountManager {
 	 */
 	@Override
 	public void addAccountSettings(AccountSettings settings) {
-		if (Utils.isNullOrEmpty(settings.getUserId())) {
+		if (Utils.isNullOrEmpty(settings.getAccountId())) {
 			return;
 		}
-		accounts.put(settings.getUserId(), settings);
+		accounts.put(settings.getAccountId(), settings);
 	}
 
 	/**

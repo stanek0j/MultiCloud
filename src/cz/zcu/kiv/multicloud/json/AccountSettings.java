@@ -14,9 +14,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class AccountSettings {
 
-	/** User identifier. */
-	@JsonProperty("user_id")
-	private String userId;
+	/** User account identifier. */
+	@JsonProperty("account_id")
+	private String accountId;
 
 	/** Settings identifier. */
 	@JsonProperty("settings_id")
@@ -24,6 +24,14 @@ public class AccountSettings {
 	/** Token identifier. */
 	@JsonProperty("token_id")
 	private String tokenId;
+
+	/**
+	 * Returns the identifier of the user account.
+	 * @return User account identifier.
+	 */
+	public String getAccountId() {
+		return accountId;
+	}
 
 	/**
 	 * Returns the identifier of the settings.
@@ -42,15 +50,7 @@ public class AccountSettings {
 	}
 
 	/**
-	 * Returns the identifier of the user.
-	 * @return User identifier.
-	 */
-	public String getUserId() {
-		return userId;
-	}
-
-	/**
-	 * Determines if the user has authorized this client.
+	 * Determines if the user account has authorized this client.
 	 * @return If the client is authorized.
 	 */
 	@JsonIgnore
@@ -75,11 +75,11 @@ public class AccountSettings {
 	}
 
 	/**
-	 * Sets the identifier of the user.
-	 * @param userId User identifier.
+	 * Sets the identifier of the user account.
+	 * @param accountId User account identifier.
 	 */
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserId(String accountId) {
+		this.accountId = accountId;
 	}
 
 }
