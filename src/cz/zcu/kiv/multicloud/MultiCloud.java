@@ -1,6 +1,8 @@
 package cz.zcu.kiv.multicloud;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import cz.zcu.kiv.multicloud.json.AccountSettings;
 import cz.zcu.kiv.multicloud.json.CloudSettings;
@@ -9,7 +11,6 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Error;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2ErrorType;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
-import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 import cz.zcu.kiv.multicloud.utils.AccountManager;
 import cz.zcu.kiv.multicloud.utils.CloudManager;
 import cz.zcu.kiv.multicloud.utils.CredentialStore;
@@ -34,7 +35,7 @@ public class MultiCloud {
 	/** Cloud settings manager. */
 	private CloudManager cloudManager;
 	/** Credential store. */
-	private CredentialStore store;
+	private CredentialStore credentialStore;
 	/** User account manager. */
 	private AccountManager accountManager;
 
@@ -42,7 +43,7 @@ public class MultiCloud {
 	 * Empty ctor.
 	 */
 	public MultiCloud() {
-		store = new SecureFileCredentialStore(FileCredentialStore.DEFAULT_STORE_FILE);
+		credentialStore = new SecureFileCredentialStore(FileCredentialStore.DEFAULT_STORE_FILE);
 		FileCloudManager cm = FileCloudManager.getInstance();
 		try {
 			cm.loadCloudSettings();
@@ -64,10 +65,10 @@ public class MultiCloud {
 	 * @param settings Custom settings.
 	 */
 	public MultiCloud(MultiCloudSettings settings) {
-		if (settings.getStore() == null) {
-			store = new SecureFileCredentialStore(FileCredentialStore.DEFAULT_STORE_FILE);
+		if (settings.getCredentialStore() == null) {
+			credentialStore = new SecureFileCredentialStore(FileCredentialStore.DEFAULT_STORE_FILE);
 		} else {
-			store = settings.getStore();
+			credentialStore = settings.getCredentialStore();
 		}
 		if (settings.getCloudManager() == null) {
 			FileCloudManager cm = FileCloudManager.getInstance();
@@ -80,7 +81,7 @@ public class MultiCloud {
 		} else {
 			cloudManager = settings.getCloudManager();
 		}
-		if (settings.getUserManager() == null) {
+		if (settings.getAccountManager() == null) {
 			FileAccountManager um = FileAccountManager.getInstance();
 			try {
 				um.loadAccountSettings();
@@ -88,7 +89,7 @@ public class MultiCloud {
 				e.printStackTrace();
 			}
 		} else {
-			accountManager = settings.getUserManager();
+			accountManager = settings.getAccountManager();
 		}
 	}
 
@@ -104,16 +105,16 @@ public class MultiCloud {
 	public void authorizeAccount(String name, AuthorizationCallback callback) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
 		AccountSettings account = accountManager.getAccountSettings(name);
 		if (account == null) {
-			throw new MultiCloudException("User not found.");
+			throw new MultiCloudException("User account not found.");
 		}
 		if (account.isAuthorized()) {
-			throw new MultiCloudException("User already authorized.");
+			throw new MultiCloudException("User account already authorized.");
 		}
 		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
 		if (settings == null) {
 			throw new MultiCloudException("Cloud storage settings not found.");
 		}
-		OAuth2 auth = new OAuth2(Utils.cloudSettingsToOAuth2Settings(settings), store);
+		OAuth2 auth = new OAuth2(Utils.cloudSettingsToOAuth2Settings(settings), credentialStore);
 		if (callback != null) {
 			auth.setAuthCallback(callback);
 		}
@@ -121,8 +122,12 @@ public class MultiCloud {
 		if (error.getType() != OAuth2ErrorType.SUCCESS) {
 			throw new MultiCloudException("Authorization failed.");
 		} else {
+			if (!Utils.isNullOrEmpty(account.getTokenId())) {
+				credentialStore.deleteCredential(account.getTokenId());
+			}
 			account.setTokenId(auth.getObtainedStoreKey());
 		}
+		accountManager.saveAccountSettings();
 	}
 
 	/**
@@ -155,31 +160,73 @@ public class MultiCloud {
 			throw new MultiCloudException("User account does not exist.");
 		}
 		if (account.isAuthorized()) {
-			store.deleteCredential(account.getTokenId());
+			credentialStore.deleteCredential(account.getTokenId());
 		}
 		accountManager.removeAccountSettings(name);
 	}
 
 	/**
-	 * Validates all user entries.
+	 * Returns the {@link cz.zcu.kiv.multicloud.utils.AccountManager}, {@link cz.zcu.kiv.multicloud.utils.CloudManager} and {@link cz.zcu.kiv.multicloud.utils.CredentialStore} used in this library instance.
+	 * @return Settings used in the instance of the library.
 	 */
-	public void validateAccount() {
+	public MultiCloudSettings getSettings() {
+		MultiCloudSettings settings = new MultiCloudSettings();
+		settings.setAccountManager(accountManager);
+		settings.setCloudManager(cloudManager);
+		settings.setCredentialStore(credentialStore);
+		return settings;
+	}
+
+	/**
+	 * Runs the process for access token refreshing.
+	 * Should be used only if the {@link cz.zcu.kiv.multicloud.oauth2.OAuth2Token} contains refresh token, otherwise it fails.
+	 * @param name Name of the user account.
+	 * @param callback Callback from the authorization process, if necessary.
+	 * @throws MultiCloudException If some parameters were wrong.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the authorization process was interrupted.
+	 */
+	public void refreshAccount(String name, AuthorizationCallback callback) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(name);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2 auth = new OAuth2(Utils.cloudSettingsToOAuth2Settings(settings), credentialStore);
+		if (callback != null) {
+			auth.setAuthCallback(callback);
+		}
+		OAuth2Error error = auth.refresh(account.getTokenId());
+		if (error.getType() != OAuth2ErrorType.SUCCESS) {
+			throw new MultiCloudException("Refreshing token failed.");
+		}
+		accountManager.saveAccountSettings();
+	}
+
+	/**
+	 * Validates all user account entries.
+	 */
+	public void validateAccounts() {
+		List<String> usedTokens = new ArrayList<>();
+		/* remove broken token links */
 		for (AccountSettings account: accountManager.getAllAccountSettings()) {
-			System.out.println("Validating account: " + account.getAccountId());
-			if (cloudManager.getCloudSettings(account.getSettingsId()) == null) {
-				System.out.println("  Cloud settings \"" + account.getSettingsId() + "\" not found.");
+			if (credentialStore.retrieveCredential(account.getTokenId()) == null) {
+				account.setTokenId(null);
 			} else {
-				System.out.println("  Cloud settings valid.");
+				usedTokens.add(account.getTokenId());
 			}
-			OAuth2Token token;
-			if ((token = store.retrieveCredential(account.getTokenId())) == null) {
-				System.out.println("  Token \"" + account.getTokenId() + "\" not found.");
-			} else {
-				if (token.isExpired()) {
-					System.out.println("  Token expired.");
-				} else {
-					System.out.println("  Token valid.");
-				}
+		}
+		accountManager.saveAccountSettings();
+		/* remove unused tokens */
+		for (String token: credentialStore.getIdentifiers()) {
+			if (!usedTokens.contains(token)) {
+				credentialStore.deleteCredential(token);
 			}
 		}
 	}

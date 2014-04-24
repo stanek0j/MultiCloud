@@ -139,13 +139,17 @@ public class FileAccountManager implements AccountManager {
 
 	/**
 	 * Saves {@link cz.zcu.kiv.multicloud.json.AccountSettings} to the default file.
-	 * @throws IOException If the file cannot be saved.
 	 */
-	public void saveAccountSettings() throws IOException {
-		if (settingsFile != null) {
-			saveAccountSettings(settingsFile);
-		} else {
-			saveAccountSettings(new File(DEFAULT_FILE));
+	@Override
+	public void saveAccountSettings() {
+		try {
+			if (settingsFile != null) {
+				saveAccountSettings(settingsFile);
+			} else {
+				saveAccountSettings(new File(DEFAULT_FILE));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

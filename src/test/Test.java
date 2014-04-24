@@ -84,13 +84,18 @@ public class Test {
 		 */
 
 		final MultiCloud cloud = new MultiCloud();
+		cloud.validateAccounts();
 		try {
-			cloud.createAccount("test", "Dropbox");
+			//cloud.createAccount("test", "Dropbox");
 			Thread t = new Thread() {
 				@Override
 				public void run() {
 					try {
+						//cloud.authorizeAccount("test", new TestCallback());
 						cloud.authorizeAccount("test", null);
+						System.out.println("done");
+						cloud.refreshAccount("test", null);
+						System.out.println("refreshed");
 					} catch (MultiCloudException | OAuth2SettingsException
 							| InterruptedException e) {
 						e.printStackTrace();
@@ -98,11 +103,10 @@ public class Test {
 				}
 			};
 			t.start();
-			Thread.sleep(5000);
+			Thread.sleep(50000);
 			t.interrupt();
 			//} catch (MultiCloudException | OAuth2SettingsException e) {
-		} catch (MultiCloudException e) {
-			e.printStackTrace();
+			//} catch (MultiCloudException e) {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

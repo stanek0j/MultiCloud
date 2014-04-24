@@ -99,6 +99,7 @@ public class FileCredentialStore implements CredentialStore {
 	@Override
 	public void deleteCredential(String identifier) {
 		tokens.remove(identifier);
+		save();
 	}
 
 	/**

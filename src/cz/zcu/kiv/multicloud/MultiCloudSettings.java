@@ -1,8 +1,8 @@
 package cz.zcu.kiv.multicloud;
 
+import cz.zcu.kiv.multicloud.utils.AccountManager;
 import cz.zcu.kiv.multicloud.utils.CloudManager;
 import cz.zcu.kiv.multicloud.utils.CredentialStore;
-import cz.zcu.kiv.multicloud.utils.AccountManager;
 
 /**
  * cz.zcu.kiv.multicloud/MultiCloudSettings.java
@@ -18,17 +18,25 @@ public class MultiCloudSettings {
 	/** Cloud settings manager. */
 	private CloudManager cloudManager;
 	/** Credential store. */
-	private CredentialStore store;
+	private CredentialStore credentialStore;
 	/** User account manager. */
-	private AccountManager userManager;
+	private AccountManager accountManager;
 
 	/**
 	 * Ctor.
 	 */
 	public MultiCloudSettings() {
 		cloudManager = null;
-		store = null;
-		userManager = null;
+		credentialStore = null;
+		accountManager = null;
+	}
+
+	/**
+	 * Returns the {@link cz.zcu.kiv.multicloud.utils.AccountManager} used.
+	 * @return User account manager.
+	 */
+	public AccountManager getAccountManager() {
+		return accountManager;
 	}
 
 	/**
@@ -43,16 +51,16 @@ public class MultiCloudSettings {
 	 * Returns the {@link cz.zcu.kiv.multicloud.utils.CredentialStore} used.
 	 * @return Credential store.
 	 */
-	public CredentialStore getStore() {
-		return store;
+	public CredentialStore getCredentialStore() {
+		return credentialStore;
 	}
 
 	/**
-	 * Returns the {@link cz.zcu.kiv.multicloud.utils.AccountManager} used.
-	 * @return User manager.
+	 * Sets the {@link cz.zcu.kiv.multicloud.utils.AccountManager} to be used.
+	 * @param accountManager User account manager.
 	 */
-	public AccountManager getUserManager() {
-		return userManager;
+	public void setAccountManager(AccountManager accountManager) {
+		this.accountManager = accountManager;
 	}
 
 	/**
@@ -67,16 +75,8 @@ public class MultiCloudSettings {
 	 * Sets the {@link cz.zcu.kiv.multicloud.utils.CredentialStore} to be used.
 	 * @param store Credential store.
 	 */
-	public void setStore(CredentialStore store) {
-		this.store = store;
-	}
-
-	/**
-	 * Sets the {@link cz.zcu.kiv.multicloud.utils.AccountManager} to be used.
-	 * @param userManager User manager.
-	 */
-	public void setUserManager(AccountManager userManager) {
-		this.userManager = userManager;
+	public void setCredentialStore(CredentialStore store) {
+		this.credentialStore = store;
 	}
 
 }

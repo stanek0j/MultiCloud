@@ -40,4 +40,9 @@ public interface AccountManager {
 	 */
 	void removeAccountSettings(String accountId);
 
+	/**
+	 * Saves all the changes in the {@link cz.zcu.kiv.multicloud.json.AccountSettings} store.
+	 */
+	void saveAccountSettings();
+
 }
