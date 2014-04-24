@@ -24,6 +24,12 @@
 		"method":"GET",
 		"params":null
 	},
+	"account_quota_request":
+	{
+		"uri":"https://api.dropbox.com/1/account/info",
+		"method":"GET",
+		"params":null
+	},
 	"download_file_request":
 	{
 		"uri":"https://api-content.dropbox.com/1/files/dropbox/<path>",

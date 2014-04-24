@@ -54,6 +54,9 @@ public class CloudSettings {
 	/** Account info request parameters. */
 	@JsonProperty("account_info_request")
 	private CloudRequest accountInfoRequest;
+	/** Account quota request parameters. */
+	@JsonProperty("account_quota_request")
+	private CloudRequest accountQuotaRequest;
 	/** File download request parameters. */
 	@JsonProperty("download_file_request")
 	private CloudRequest downloadFileRequest;
@@ -85,6 +88,14 @@ public class CloudSettings {
 	 */
 	public CloudRequest getAccountInfoRequest() {
 		return accountInfoRequest;
+	}
+
+	/**
+	 * Returns the account quota request parameters.
+	 * @return Account quota request parameters.
+	 */
+	public CloudRequest getAccountQuotaRequest() {
+		return accountQuotaRequest;
 	}
 
 	/**
@@ -253,6 +264,14 @@ public class CloudSettings {
 	 */
 	public void setAccountInfoRequest(CloudRequest accountInfoRequest) {
 		this.accountInfoRequest = accountInfoRequest;
+	}
+
+	/**
+	 * Sets the account quota request parameters.
+	 * @param accountQuotaRequest Account quota request parameters.
+	 */
+	public void setAccountQuotaRequest(CloudRequest accountQuotaRequest) {
+		this.accountQuotaRequest = accountQuotaRequest;
 	}
 
 	/**

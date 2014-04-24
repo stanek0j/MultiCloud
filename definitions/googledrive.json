@@ -18,10 +18,16 @@
 	"client_secret":"ZLa85_y8DSnMoEJ1IsyW3fmm",
 	"redirect_uri":null,
 	"scope":"https://www.googleapis.com/auth/drive",
-		"account_info_request":
+	"account_info_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/about",
 		"method":"GET",
+		"params":null
+	},
+	"account_quota_request":
+	{
+		"uri":"",
+		"method":"",
 		"params":null
 	},
 	"download_file_request":
@@ -53,8 +59,8 @@
 	},
 	"rename_request":
 	{
-		"uri":"",
-		"method":"",
+		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
+		"method":"PUT",
 		"params":null
 	},	
 	"copy_request":
@@ -65,8 +71,8 @@
 	},
 	"move_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files",
-		"method":"",
+		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
+		"method":"PUT",
 		"params":null
 	},
 	"delete_request":

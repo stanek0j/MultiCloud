@@ -18,10 +18,16 @@
 	"client_secret":"GlPTCgir1pn35eaXlqe29avCnVmSNg5i",
 	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
 	"scope":"wl.skydrive_update,wl.offline_access",
-		"account_info_request":
+	"account_info_request":
 	{
 		"uri":"https://apis.live.net/v5.0/me/skydrive/quota",
 		"method":"GET",
+		"params":null
+	},
+	"account_quota_request":
+	{
+		"uri":"",
+		"method":"",
 		"params":null
 	},
 	"download_file_request":

@@ -27,6 +27,12 @@
 		"method":"",
 		"params":null
 	},
+	"account_quota_request":
+	{
+		"uri":"",
+		"method":"",
+		"params":null
+	},
 	"download_file_request":
 	{
 		"uri":"",
