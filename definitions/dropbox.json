@@ -20,7 +20,6 @@
 	{
 		"uri":"https://api.dropbox.com/1/account/info",
 		"method":"GET",
-		"params":null,
 		"mapping":
 		{
 			"id":"uid",
@@ -31,7 +30,6 @@
 	{
 		"uri":"https://api.dropbox.com/1/account/info",
 		"method":"GET",
-		"params":null,
 		"mapping":
 		{
 			"totalBytes":"quota_info/quota",
@@ -41,8 +39,7 @@
 	"download_file_request":
 	{
 		"uri":"https://api-content.dropbox.com/1/files/dropbox/<path>",
-		"method":"GET",
-		"params":null
+		"method":"GET"
 	},
 	"upload_file_request":
 	{

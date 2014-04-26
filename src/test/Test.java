@@ -101,18 +101,51 @@ public class Test {
 		} catch (MultiCloudException e1) {
 			e1.printStackTrace();
 		}
+
+		try {
+			AccountInfo info = cloud.getAccountInfo("googledrive");
+			System.out.println("User id: " + info.getId());
+			System.out.println("User name: " + info.getName());
+		} catch (MultiCloudException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			AccountQuota quota = cloud.getAccountQuota("googledrive");
+			System.out.println("Quota total: " + quota.getTotalBytes());
+			System.out.println("Quota used: " + quota.getUsedBytes());
+			System.out.println("Quota free: " + quota.getFreeBytes());
+		} catch (MultiCloudException e1) {
+			e1.printStackTrace();
+		}
+
+		try {
+			AccountInfo info = cloud.getAccountInfo("onedrive");
+			System.out.println("User id: " + info.getId());
+			System.out.println("User name: " + info.getName());
+		} catch (MultiCloudException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			AccountQuota quota = cloud.getAccountQuota("onedrive");
+			System.out.println("Quota total: " + quota.getTotalBytes());
+			System.out.println("Quota used: " + quota.getUsedBytes());
+			System.out.println("Quota free: " + quota.getFreeBytes());
+		} catch (MultiCloudException e1) {
+			e1.printStackTrace();
+		}
+
 		/*
 		try {
-			//cloud.createAccount("test", "Dropbox");
+			cloud.createAccount("onedrive", "OneDrive");
 			Thread t = new Thread() {
 				@Override
 				public void run() {
 					try {
 						//cloud.authorizeAccount("test", new TestCallback());
-						cloud.authorizeAccount("test", null);
+						cloud.authorizeAccount("onedrive", null);
 						System.out.println("done");
-						cloud.refreshAccount("test", null);
-						System.out.println("refreshed");
+						//cloud.refreshAccount("test", null);
+						//System.out.println("refreshed");
 					} catch (MultiCloudException | OAuth2SettingsException
 							| InterruptedException e) {
 						e.printStackTrace();
@@ -126,6 +159,9 @@ public class Test {
 			//} catch (MultiCloudException e) {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		} catch (MultiCloudException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 		 */
 

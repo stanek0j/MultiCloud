@@ -1,17 +1,15 @@
 {
-	"name:"",
-	"description":"",
-	"authorize":
+	"name":"Google Drive",
+	"description":"Google Drive storage service provider.",
+	"authorize_request":
 	{
 		"uri":"https://accounts.google.com/o/oauth2/auth",
-		"method":"GET",
-		"params":null
+		"method":"GET"
 	},
-	"token":
+	"token_request":
 	{
 		"uri":"https://accounts.google.com/o/oauth2/token",
-		"method":"POST",
-		"params":null
+		"method":"POST"
 	},
 	"grant_type":"AUTHORIZATION_CODE_GRANT",
 	"client_id":"45396671053.apps.googleusercontent.com",
@@ -22,19 +20,25 @@
 	{
 		"uri":"https://www.googleapis.com/drive/v2/about",
 		"method":"GET",
-		"params":null
+		"mapping":
+		{
+			"id":"permissionId"
+		}
 	},
 	"account_quota_request":
 	{
-		"uri":"",
-		"method":"",
-		"params":null
+		"uri":"https://www.googleapis.com/drive/v2/about",
+		"method":"GET",
+		"mapping":
+		{
+			"totalBytes":"quotaBytesTotal",
+			"usedBytes":"quotaBytesUsedAggregate"
+		}
 	},
 	"download_file_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
-		"method":"GET",
-		"params":null
+		"method":"GET"
 	},
 	"upload_file_request":
 	{
@@ -57,37 +61,31 @@
 	"create_dir_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files",
-		"method":"",
-		"params":null
+		"method":"GET"
 	},
 	"list_dir_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files",
-		"method":"GET",
-		"params":null
+		"method":"GET"
 	},
 	"rename_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
-		"method":"PUT",
-		"params":null
+		"method":"PUT"
 	},	
 	"copy_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>/copy",
-		"method":"POST",
-		"params":null
+		"method":"POST"
 	},
 	"move_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
-		"method":"PUT",
-		"params":null
+		"method":"PUT"
 	},
 	"delete_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
-		"method":"DELETE",
-		"params":null
+		"method":"DELETE"
 	}
 }

@@ -104,6 +104,9 @@ public abstract class Operation<T> {
 		method = request.getMethod();
 		uriTemplate = request.getUri();
 		jsonMapping = request.getMapping();
+		if (jsonMapping == null) {
+			jsonMapping = new HashMap<>();
+		}
 		requestHeaders = request.getHeaders();
 		if (requestHeaders == null) {
 			requestHeaders = new HashMap<>();
