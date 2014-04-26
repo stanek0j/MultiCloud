@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.json.AccountInfo;
+import cz.zcu.kiv.multicloud.json.AccountQuota;
 
 public class Test {
 
@@ -89,6 +90,14 @@ public class Test {
 			AccountInfo info = cloud.getAccountInfo("test");
 			System.out.println("User id: " + info.getId());
 			System.out.println("User name: " + info.getName());
+		} catch (MultiCloudException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			AccountQuota quota = cloud.getAccountQuota("test");
+			System.out.println("Quota total: " + quota.getTotalBytes());
+			System.out.println("Quota used: " + quota.getUsedBytes());
+			System.out.println("Quota free: " + quota.getFreeBytes());
 		} catch (MultiCloudException e1) {
 			e1.printStackTrace();
 		}

@@ -18,6 +18,25 @@ public class AccountQuota {
 	/** Number of bytes available in the storage. */
 	private long freeBytes;
 
+	public AccountQuota() {
+		totalBytes = -1;
+		usedBytes = -1;
+		freeBytes = -1;
+	}
+
+	/**
+	 * Fills the missing values.
+	 */
+	private void calculateMissing() {
+		if (totalBytes > -1) {
+			if (usedBytes > -1 && freeBytes == -1) {
+				freeBytes = totalBytes - usedBytes;
+			} else if (usedBytes == -1 && freeBytes > -1) {
+				usedBytes = totalBytes - freeBytes;
+			}
+		}
+	}
+
 	/**
 	 * Returns the number of bytes available in the storage.
 	 * @return Available bytes.
@@ -48,6 +67,8 @@ public class AccountQuota {
 	 */
 	public void setFreeBytes(long freeBytes) {
 		this.freeBytes = freeBytes;
+		this.usedBytes = -1;
+		calculateMissing();
 	}
 
 	/**
@@ -56,6 +77,7 @@ public class AccountQuota {
 	 */
 	public void setTotalBytes(long totalBytes) {
 		this.totalBytes = totalBytes;
+		calculateMissing();
 	}
 
 	/**
@@ -64,6 +86,8 @@ public class AccountQuota {
 	 */
 	public void setUsedBytes(long usedBytes) {
 		this.usedBytes = usedBytes;
+		this.freeBytes = -1;
+		calculateMissing();
 	}
 
 }
