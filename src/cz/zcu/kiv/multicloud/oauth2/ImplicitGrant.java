@@ -38,7 +38,7 @@ public class ImplicitGrant implements OAuth2Grant, RedirectCallback {
 	/** URI of the authorization server. */
 	protected String authorizeServer;
 	/** Parameters passed to the authorization server. */
-	protected Map<String, Object> authorizeParams;
+	protected Map<String, String> authorizeParams;
 
 	/**
 	 * Ctor.

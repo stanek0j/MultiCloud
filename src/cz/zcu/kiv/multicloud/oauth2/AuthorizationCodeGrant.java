@@ -58,9 +58,9 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 	/** URI of the token server. */
 	protected String tokenServer;
 	/** Parameters passed to the authorization server. */
-	protected Map<String, Object> authorizeParams;
+	protected Map<String, String> authorizeParams;
 	/** Parameters passed to the token server. */
-	protected Map<String, Object> tokenParams;
+	protected Map<String, String> tokenParams;
 
 	/**
 	 * Ctor.

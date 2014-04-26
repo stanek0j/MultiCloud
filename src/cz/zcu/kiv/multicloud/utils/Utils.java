@@ -109,13 +109,13 @@ public class Utils {
 
 	/**
 	 * Converts a {@link java.util.Map} to a {@link java.util.List} of {@link org.apache.http.NameValuePair} objects.
-	 * @param map Map to be converted.
+	 * @param requestParams Map to be converted.
 	 * @return List of NameValuePair objects.
 	 */
-	public static List<NameValuePair> mapToList(Map<String, Object> map) {
+	public static List<NameValuePair> mapToList(Map<String, String> requestParams) {
 		List<NameValuePair> list = new LinkedList<>();
-		for (Entry<String, Object> entry: map.entrySet()) {
-			list.add(new BasicNameValuePair(entry.getKey(), entry.getValue().toString()));
+		for (Entry<String, String> entry: requestParams.entrySet()) {
+			list.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 		}
 		return list;
 	}

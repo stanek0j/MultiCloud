@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * cz.zcu.kiv.multicloud.json/Json.java
  *
- * Basic class for holding single instances of {@link com.fasterxml.jackson.core.JsonFactory} and {@link com.fasterxml.jackson.databind.ObjectMapper} across the whole multicloud core.
+ * Basic class for holding single instances of {@link com.fasterxml.jackson.core.JsonFactory} and {@link com.fasterxml.jackson.databind.ObjectMapper} across the whole library.
  *
  * @author Jaromír Staněk
  * @version 1.0

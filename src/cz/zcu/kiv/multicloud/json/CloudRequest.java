@@ -21,6 +21,36 @@ public class CloudRequest {
 	private HttpMethod method;
 	/** Parameters of the request. */
 	private Map<String, String> params;
+	/** Header for the request. */
+	private Map<String, String> headers;
+	/** Mapping of the returned JSON parameters to object properties. */
+	private Map<String, String> mapping;
+	/** Authorization parameter for accessing protected resources. Null or empty to disable. */
+	private String authorizationParam;
+
+	/**
+	 * Returns the authorization parameter.
+	 * @return Authorization parameter.
+	 */
+	public String getAuthorizationParam() {
+		return authorizationParam;
+	}
+
+	/**
+	 * Returns the headers for the request.
+	 * @return Headers.
+	 */
+	public Map<String, String> getHeaders() {
+		return headers;
+	}
+
+	/**
+	 * Returns the JSON parameters mapping.
+	 * @return JSON parameters mapping.
+	 */
+	public Map<String, String> getMapping() {
+		return mapping;
+	}
 
 	/**
 	 * Returns the HTTP method of the request.
@@ -44,6 +74,30 @@ public class CloudRequest {
 	 */
 	public String getUri() {
 		return uri;
+	}
+
+	/**
+	 * Sets the authorization parameter for accessing protected resources. Null or empty to disable.
+	 * @param authorizationParam Authorization parameter.
+	 */
+	public void setAuthorizationParam(String authorizationParam) {
+		this.authorizationParam = authorizationParam;
+	}
+
+	/**
+	 * Sets the headers for the request.
+	 * @param headers Headers.
+	 */
+	public void setHeaders(Map<String, String> headers) {
+		this.headers = headers;
+	}
+
+	/**
+	 * Sets the JSON parameters mapping.
+	 * @param mapping JSON parameters mapping.
+	 */
+	public void setMapping(Map<String, String> mapping) {
+		this.mapping = mapping;
 	}
 
 	/**

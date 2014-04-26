@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
-import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
+import cz.zcu.kiv.multicloud.json.AccountInfo;
 
 public class Test {
 
@@ -86,6 +86,14 @@ public class Test {
 		final MultiCloud cloud = new MultiCloud();
 		cloud.validateAccounts();
 		try {
+			AccountInfo info = cloud.getAccountInfo("test");
+			System.out.println("User id: " + info.getId());
+			System.out.println("User name: " + info.getName());
+		} catch (MultiCloudException e1) {
+			e1.printStackTrace();
+		}
+		/*
+		try {
 			//cloud.createAccount("test", "Dropbox");
 			Thread t = new Thread() {
 				@Override
@@ -110,6 +118,7 @@ public class Test {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		 */
 
 		try {
 			Thread.sleep(500);

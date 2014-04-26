@@ -195,6 +195,26 @@ public class OAuth2Token implements Serializable {
 	}
 
 	/**
+	 * Converts the token to string representation for use in HTTP Authorization header.
+	 * @return Header string.
+	 */
+	public String toHeaderString() {
+		StringBuilder sb = new StringBuilder();
+		switch (type) {
+		case BEARER:
+			sb.append("Bearer ");
+			sb.append(accessToken);
+			break;
+		case MAC:
+			/* header representation not yet implemented */
+			break;
+		default:
+			break;
+		}
+		return sb.toString();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

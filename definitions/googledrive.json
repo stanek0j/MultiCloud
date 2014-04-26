@@ -42,7 +42,16 @@
 		"method":"POST",
 		"params":
 		{
-			"uploadType":"media"
+			"uploadType":"resumable"
+		},
+		"mapping":
+		{
+			"sessionId":"upload_id"
+		},
+		"headers":
+		{
+			"X-Upload-Content-Type":"application/octet-stream",
+			"X-Upload-Content-Length":"<file_size>"
 		}
 	},
 	"create_dir_request":

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.zcu.kiv.multicloud.filesystem.AccountInfoOp;
+import cz.zcu.kiv.multicloud.json.AccountInfo;
 import cz.zcu.kiv.multicloud.json.AccountSettings;
 import cz.zcu.kiv.multicloud.json.CloudSettings;
 import cz.zcu.kiv.multicloud.oauth2.AuthorizationCallback;
@@ -11,6 +13,7 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Error;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2ErrorType;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
+import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 import cz.zcu.kiv.multicloud.utils.AccountManager;
 import cz.zcu.kiv.multicloud.utils.CloudManager;
 import cz.zcu.kiv.multicloud.utils.CredentialStore;
@@ -165,6 +168,28 @@ public class MultiCloud {
 		accountManager.removeAccountSettings(name);
 	}
 
+	public AccountInfo getAccountInfo(String name) throws MultiCloudException {
+		AccountSettings account = accountManager.getAccountSettings(name);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		AccountInfoOp op = new AccountInfoOp(token, settings.getAccountInfoRequest());
+		op.execute();
+		return op.getResult();
+	}
+
 	/**
 	 * Returns the {@link cz.zcu.kiv.multicloud.utils.AccountManager}, {@link cz.zcu.kiv.multicloud.utils.CloudManager} and {@link cz.zcu.kiv.multicloud.utils.CredentialStore} used in this library instance.
 	 * @return Settings used in the instance of the library.
@@ -210,7 +235,7 @@ public class MultiCloud {
 	}
 
 	/**
-	 * Validates all user account entries.
+	 * Validates all user account entries and remove broken links and unused tokens.
 	 */
 	public void validateAccounts() {
 		List<String> usedTokens = new ArrayList<>();

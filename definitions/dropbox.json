@@ -4,14 +4,12 @@
 	"authorize_request":
 	{
 		"uri":"https://www.dropbox.com/1/oauth2/authorize",
-		"method":"GET",
-		"params":null
+		"method":"GET"
 	},
 	"token_request":
 	{
 		"uri":"https://api.dropbox.com/1/oauth2/token",
-		"method":"POST",
-		"params":null
+		"method":"POST"
 	},
 	"grant_type":"AUTHORIZATION_CODE_GRANT",
 	"client_id":"hq3ir6cgpeynus1",
@@ -22,13 +20,23 @@
 	{
 		"uri":"https://api.dropbox.com/1/account/info",
 		"method":"GET",
-		"params":null
+		"params":null,
+		"mapping":
+		{
+			"id":"uid",
+			"name":"display_name"
+		}
 	},
 	"account_quota_request":
 	{
 		"uri":"https://api.dropbox.com/1/account/info",
 		"method":"GET",
-		"params":null
+		"params":null,
+		"mapping":
+		{
+			"totalBytes":"quota_info/quota",
+			"usedBytes":"quota_info/shared;quota_info/normal"
+		}
 	},
 	"download_file_request":
 	{

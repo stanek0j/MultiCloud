@@ -51,7 +51,7 @@ public class RefreshTokenGrant implements OAuth2Grant {
 	/** URI of the token server. */
 	protected String tokenServer;
 	/** Parameters passed to the token server. */
-	protected Map<String, Object> tokenParams;
+	protected Map<String, String> tokenParams;
 
 	/**
 	 * Ctor.
