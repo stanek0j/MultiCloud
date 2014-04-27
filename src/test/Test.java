@@ -111,6 +111,7 @@ public class Test {
 			e1.printStackTrace();
 		}
 
+		/*
 		try {
 			AccountInfo info = cloud.getAccountInfo("googledrive");
 			if (info == null) {
@@ -158,6 +159,7 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		 */
 
 		/*
 		try {
