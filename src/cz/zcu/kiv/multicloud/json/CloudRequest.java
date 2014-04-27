@@ -2,6 +2,8 @@ package cz.zcu.kiv.multicloud.json;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import cz.zcu.kiv.multicloud.utils.HttpMethod;
 
 /**
@@ -26,6 +28,7 @@ public class CloudRequest {
 	/** Mapping of the returned JSON parameters to object properties. */
 	private Map<String, String> mapping;
 	/** Authorization parameter for accessing protected resources. Null or empty to disable. */
+	@JsonProperty("auth_param")
 	private String authorizationParam;
 
 	/**

@@ -37,7 +37,7 @@
 	},
 	"download_file_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
+		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
 		"method":"GET"
 	},
 	"upload_file_request":
@@ -55,7 +55,7 @@
 		"headers":
 		{
 			"X-Upload-Content-Type":"application/octet-stream",
-			"X-Upload-Content-Length":"<file_size>"
+			"X-Upload-Content-Length":"<size>"
 		}
 	},
 	"create_dir_request":
@@ -65,27 +65,31 @@
 	},
 	"list_dir_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files",
-		"method":"GET"
+		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
+		"method":"GET",
+		"params":
+		{
+			"trashed":"<deleted>"
+		}
 	},
 	"rename_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
+		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
 		"method":"PUT"
 	},	
 	"copy_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>/copy",
+		"uri":"https://www.googleapis.com/drive/v2/files/<id>/copy",
 		"method":"POST"
 	},
 	"move_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
+		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
 		"method":"PUT"
 	},
 	"delete_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files/<file_id>",
+		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
 		"method":"DELETE"
 	}
 }

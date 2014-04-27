@@ -55,8 +55,12 @@ public class AccountQuotaOp extends Operation<AccountQuota> {
 				public AccountQuota processResponse(HttpResponse response) {
 					AccountQuota quota = null;
 					try {
-						JsonNode tree = parseJsonResponse(response);
-						quota = json.getMapper().treeToValue(tree, AccountQuota.class);
+						if (response.getStatusLine().getStatusCode() >= 400) {
+							parseOperationError(response);
+						} else {
+							JsonNode tree = parseJsonResponse(response);
+							quota = json.getMapper().treeToValue(tree, AccountQuota.class);
+						}
 					} catch (IllegalStateException | IOException e) {
 						/* return null value instead of throwing exception */
 					}
@@ -73,7 +77,7 @@ public class AccountQuotaOp extends Operation<AccountQuota> {
 	 */
 	@Override
 	protected void operationFinish() throws MultiCloudException {
-		/* no preparation necessary */
+		/* no finalization necessary */
 	}
 
 }

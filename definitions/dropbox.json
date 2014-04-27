@@ -62,13 +62,19 @@
 	},
 	"list_dir_request":
 	{
-		"uri":"https://api.dropbox.com/1/metadata/dropbox/",
+		"uri":"https://api.dropbox.com/1/metadata/dropbox/<path>",
 		"method":"GET",
 		"params":
 		{
-			"file_limit":"<max_files>",
-			"hash":"<dir_hash>",
-			"include_deleted":"<deleted>"
+			"include_deleted":"<deleted>",
+			"list":"true"
+		},
+		"mapping":
+		{
+			"content":"contents",
+			"deleted":"is_deleted",
+			"size":"bytes",
+			"mimeType":"mime_type"
 		}
 	},
 	"rename_request":

@@ -78,7 +78,7 @@ public class AccountInfoOp extends Operation<AccountInfo> {
 						}
 					} catch (IllegalStateException | IOException e) {
 						/* return null value instead of throwing exception */
-						e.printStackTrace();
+						e.printStackTrace(); // debug
 					}
 					return info;
 				}

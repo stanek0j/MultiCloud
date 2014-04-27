@@ -33,17 +33,22 @@
 	},
 	"download_file_request":
 	{
-		"uri":"",
+		"uri":"https://apis.live.net/v5.0/<id>/content",
 		"method":"GET"
 	},
 	"upload_file_request":
 	{
-		"uri":"https://apis.live.net/v5.0/me/skydrive/files/<name>",
-		"method":"PUT"
+		"uri":"https://apis.live.net/v5.0/<id>/files/<name>",
+		"method":"PUT",
+		"auth_param":"access_token"
+		"params":
+		{
+			"overwrite":"<overwrite>"
+		}
 	},
 	"create_dir_request":
 	{
-		"uri":"https://apis.live.net/v5.0/me/skydrive",
+		"uri":"https://apis.live.net/v5.0/<id>",
 		"method":"POST",
 		"params":
 		{
@@ -52,12 +57,12 @@
 	},
 	"list_dir_request":
 	{
-		"uri":"",
+		"uri":"https://apis.live.net/v5.0/<id>/files",
 		"method":"GET"
 	},
 	"rename_request":
 	{
-		"uri":"https://apis.live.net/v5.0/<path>",
+		"uri":"https://apis.live.net/v5.0/<id>",
 		"method":"PUT",
 		"params":
 		{
@@ -66,25 +71,25 @@
 	},
 	"copy_request":
 	{
-		"uri":"https://apis.live.net/v5.0/<path_id>",
+		"uri":"https://apis.live.net/v5.0/<id>",
 		"method":"COPY",
 		"params":
 		{
-			"destination":"<folder_id>"
+			"destination":"<id>"
 		}
 	},
 	"move_request":
 	{
-		"uri":"https://apis.live.net/v5.0/<path_id>",
+		"uri":"https://apis.live.net/v5.0/<id>",
 		"method":"MOVE",
 		"params":
 		{
-			"destination":"<folder_id>"
+			"destination":"<id>"
 		}
 	},
 	"delete_request":
 	{
-		"uri":"https://apis.live.net/v5.0/<file_id>",
+		"uri":"https://apis.live.net/v5.0/<id>",
 		"method":"DELETE"
 	}
 }
