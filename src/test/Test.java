@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
-import cz.zcu.kiv.multicloud.json.AccountInfo;
-import cz.zcu.kiv.multicloud.json.AccountQuota;
+import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
 
 public class Test {
@@ -87,6 +86,7 @@ public class Test {
 
 		final MultiCloud cloud = new MultiCloud();
 		cloud.validateAccounts();
+		/*
 		try {
 			AccountInfo info = cloud.getAccountInfo("test");
 			if (info == null) {
@@ -106,6 +106,20 @@ public class Test {
 				System.out.println("Quota total: " + quota.getTotalBytes());
 				System.out.println("Quota used: " + quota.getUsedBytes());
 				System.out.println("Quota free: " + quota.getFreeBytes());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		 */
+		try {
+			FileInfo list = cloud.listFolder("test", null);
+			if (list == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("list:");
+				for (FileInfo content: list.getContent()) {
+					System.out.println(content.getType() + " :: " + content.getPath());
+				}
 			}
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
@@ -163,13 +177,13 @@ public class Test {
 
 		/*
 		try {
-			cloud.createAccount("onedrive", "OneDrive");
+			cloud.createAccount("test", "Dropbox");
 			Thread t = new Thread() {
 				@Override
 				public void run() {
 					try {
 						//cloud.authorizeAccount("test", new TestCallback());
-						cloud.authorizeAccount("onedrive", null);
+						cloud.authorizeAccount("test", null);
 						System.out.println("done");
 						//cloud.refreshAccount("test", null);
 						//System.out.println("refreshed");

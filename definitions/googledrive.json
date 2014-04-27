@@ -16,6 +16,10 @@
 	"client_secret":"ZLa85_y8DSnMoEJ1IsyW3fmm",
 	"redirect_uri":null,
 	"scope":"https://www.googleapis.com/auth/drive",
+	"root_folder":
+	{
+		"id":""
+	},
 	"account_info_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/about",

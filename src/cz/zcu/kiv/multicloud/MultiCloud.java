@@ -6,10 +6,12 @@ import java.util.List;
 
 import cz.zcu.kiv.multicloud.filesystem.AccountInfoOp;
 import cz.zcu.kiv.multicloud.filesystem.AccountQuotaOp;
+import cz.zcu.kiv.multicloud.filesystem.FolderListOp;
 import cz.zcu.kiv.multicloud.json.AccountInfo;
 import cz.zcu.kiv.multicloud.json.AccountQuota;
 import cz.zcu.kiv.multicloud.json.AccountSettings;
 import cz.zcu.kiv.multicloud.json.CloudSettings;
+import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.json.OperationError;
 import cz.zcu.kiv.multicloud.oauth2.AuthorizationCallback;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2;
@@ -261,6 +263,41 @@ public class MultiCloud {
 		settings.setCloudManager(cloudManager);
 		settings.setCredentialStore(credentialStore);
 		return settings;
+	}
+
+	public FileInfo listFolder(String name, FileInfo folder) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		return listFolder(name, folder, false);
+	}
+
+	public FileInfo listFolder(String name, FileInfo folder, boolean showDeleted) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(name);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(name, null);
+		}
+		FileInfo useFolder = settings.getRootFolder();
+		if (folder != null) {
+			useFolder = folder;
+		}
+		useFolder.setDeleted(showDeleted);
+		FolderListOp op = new FolderListOp(token, settings.getListDirRequest(), useFolder);
+		op.execute();
+		lastError = op.getError();
+		return op.getResult();
 	}
 
 	/**

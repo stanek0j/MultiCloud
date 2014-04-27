@@ -2,6 +2,7 @@ package cz.zcu.kiv.multicloud.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import cz.zcu.kiv.multicloud.filesystem.FileType;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Grant;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2GrantType;
 
@@ -50,6 +51,9 @@ public class CloudSettings {
 	private String redirectUri;
 	/** Scope for accessing the cloud storage service. */
 	private String scope;
+	/** Default root folder of the storage. */
+	@JsonProperty("root_folder")
+	private FileInfo rootFolder;
 
 	/** Account info request parameters. */
 	@JsonProperty("account_info_request")
@@ -208,6 +212,14 @@ public class CloudSettings {
 	 */
 	public CloudRequest getRenameRequest() {
 		return renameRequest;
+	}
+
+	/**
+	 * Returns the default root folder of the storage.
+	 * @return Default root folder.
+	 */
+	public FileInfo getRootFolder() {
+		return rootFolder;
 	}
 
 	/**
@@ -380,6 +392,15 @@ public class CloudSettings {
 	 */
 	public void setRenameRequest(CloudRequest renameRequest) {
 		this.renameRequest = renameRequest;
+	}
+
+	/**
+	 * Sets the default root folder of the storage.
+	 * @param rootFolder Default root folder.
+	 */
+	public void setRootFolder(FileInfo rootFolder) {
+		this.rootFolder = rootFolder;
+		this.rootFolder.setType(FileType.FOLDER);
 	}
 
 	/**

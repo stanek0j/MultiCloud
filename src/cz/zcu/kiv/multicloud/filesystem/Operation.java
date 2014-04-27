@@ -3,6 +3,7 @@ package cz.zcu.kiv.multicloud.filesystem;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -152,6 +153,93 @@ public abstract class Operation<T> {
 		authorizationParam = null;
 	}
 
+	protected JsonNode doJsonMapping(JsonNode root) {
+		for (Entry<String, String> mapping: jsonMapping.entrySet()) {
+			for (String submapping: mapping.getValue().split(JSON_MAPPING_SEPARATOR)) {
+				JsonNode node = root;
+				for (String subpath: submapping.split(JSON_PATH_SEPARATOR)) {
+					node = node.path(subpath);
+				}
+				JsonNode existing = root.path(mapping.getKey());
+				if (!node.isMissingNode()) {
+					switch (node.getNodeType()) {
+					case STRING:
+						String text = "";
+						if (!existing.isMissingNode() && existing.isTextual()) {
+							text += existing.textValue(); // prepend existing string
+						}
+						text += node.textValue();
+						((ObjectNode) root).put(mapping.getKey(), text);
+						break;
+					case NUMBER:
+						switch (node.numberType()) {
+						case INT:
+						case LONG:
+						case BIG_INTEGER:
+							long numLng = node.longValue();
+							if (!existing.isMissingNode() && existing.isNumber()) {
+								switch (existing.numberType()) {
+								case INT:
+								case LONG:
+								case BIG_INTEGER:
+									numLng += existing.longValue();
+									((ObjectNode) root).put(mapping.getKey(), numLng);
+									break;
+								case FLOAT:
+								case DOUBLE:
+								case BIG_DECIMAL:
+									double exDbl = existing.doubleValue() + numLng;
+									((ObjectNode) root).put(mapping.getKey(), exDbl);
+									break;
+								}
+							} else {
+								((ObjectNode) root).put(mapping.getKey(), numLng);
+							}
+							break;
+						case FLOAT:
+						case DOUBLE:
+						case BIG_DECIMAL:
+							double numDbl = node.doubleValue();
+							if (!existing.isMissingNode() && existing.isNumber()) {
+								numDbl += existing.doubleValue();
+								((ObjectNode) root).put(mapping.getKey(), numDbl);
+							}
+							break;
+						}
+						break;
+					case OBJECT:
+						System.out.println("object " + node.asText());
+						JsonNode mappedObjectNode = doJsonMapping(node);
+						((ObjectNode) root).put(mapping.getKey(), mappedObjectNode);
+						break;
+					case ARRAY:
+						if (!existing.isMissingNode() && existing.isArray()) {
+							((ArrayNode) node).addAll((ArrayNode) existing);
+						}
+						JsonNode mappedArrayNode = doJsonMapping(node);
+						ArrayNode deeplyMappedArrayNode = new ArrayNode(json.getMapper().getNodeFactory());
+						Iterator<JsonNode> it = ((ArrayNode) mappedArrayNode).elements();
+						while (it.hasNext()) {
+							JsonNode element = it.next();
+							deeplyMappedArrayNode.add(doJsonMapping(element));
+						}
+						((ObjectNode) root).put(mapping.getKey(), deeplyMappedArrayNode);
+						break;
+					case BOOLEAN:
+						((ObjectNode) root).put(mapping.getKey(), node.booleanValue());
+						break;
+					case NULL:
+					default:
+						break;
+					}
+				} else {
+					System.out.println("mapping \"" + submapping + "\" not found");
+				}
+			}
+		}
+		return root;
+	}
+
 	/**
 	 * Finds all non-generic strings and replaces them with corresponding values.
 	 * @param source The string to replace these properties in.
@@ -168,8 +256,8 @@ public abstract class Operation<T> {
 			if (!find.endsWith(">")) {
 				find += ">";
 			}
-			Matcher matcher = pattern.matcher(mapping.getValue());
-			if (!matcher.find()) {
+			Matcher matcher = pattern.matcher(result);
+			if (matcher.find()) {
 				result = result.replaceAll(find, mapping.getValue());
 			}
 		}
@@ -292,80 +380,7 @@ public abstract class Operation<T> {
 		ObjectMapper mapper = json.getMapper();
 		JsonNode root = mapper.readTree(response.getEntity().getContent());
 		/* mapping JSON values to different field names */
-		for (Entry<String, String> mapping: jsonMapping.entrySet()) {
-			for (String submapping: mapping.getValue().split(JSON_MAPPING_SEPARATOR)) {
-				JsonNode node = root;
-				for (String subpath: submapping.split(JSON_PATH_SEPARATOR)) {
-					node = node.path(subpath);
-				}
-				JsonNode existing = root.path(mapping.getKey());
-				if (!node.isMissingNode()) {
-					switch (node.getNodeType()) {
-					case STRING:
-						String text = "";
-						if (!existing.isMissingNode() && existing.isTextual()) {
-							text += existing.textValue(); // prepend existing string
-						}
-						text += node.textValue();
-						((ObjectNode) root).put(mapping.getKey(), text);
-						break;
-					case NUMBER:
-						switch (node.numberType()) {
-						case INT:
-						case LONG:
-						case BIG_INTEGER:
-							long numLng = node.longValue();
-							if (!existing.isMissingNode() && existing.isNumber()) {
-								switch (existing.numberType()) {
-								case INT:
-								case LONG:
-								case BIG_INTEGER:
-									numLng += existing.longValue();
-									((ObjectNode) root).put(mapping.getKey(), numLng);
-									break;
-								case FLOAT:
-								case DOUBLE:
-								case BIG_DECIMAL:
-									double exDbl = existing.doubleValue() + numLng;
-									((ObjectNode) root).put(mapping.getKey(), exDbl);
-									break;
-								}
-							} else {
-								((ObjectNode) root).put(mapping.getKey(), numLng);
-							}
-							break;
-						case FLOAT:
-						case DOUBLE:
-						case BIG_DECIMAL:
-							double numDbl = node.doubleValue();
-							if (!existing.isMissingNode() && existing.isNumber()) {
-								numDbl += existing.doubleValue();
-								((ObjectNode) root).put(mapping.getKey(), numDbl);
-							}
-							break;
-						}
-						break;
-					case OBJECT:
-						((ObjectNode) root).put(mapping.getKey(), node);
-						break;
-					case ARRAY:
-						if (!existing.isMissingNode() && existing.isArray()) {
-							((ArrayNode) node).addAll((ArrayNode) existing);
-						}
-						((ObjectNode) root).put(mapping.getKey(), node);
-						break;
-					case BOOLEAN:
-						((ObjectNode) root).put(mapping.getKey(), node.booleanValue());
-						break;
-					case NULL:
-					default:
-						break;
-					}
-				} else {
-					System.out.println("mapping \"" + submapping + "\" not found");
-				}
-			}
-		}
+		root = doJsonMapping(root);
 		return root;
 	}
 
@@ -399,6 +414,10 @@ public abstract class Operation<T> {
 		HttpUriRequest request = null;
 		String uri = doPropertyMapping(uriTemplate);
 		if (!requestParams.isEmpty()) {
+			for (Entry<String, String> param: requestParams.entrySet()) {
+				String update = doPropertyMapping(param.getValue());
+				requestParams.put(param.getKey(), update);
+			}
 			uri += "?" + URLEncodedUtils.format(Utils.mapToList(requestParams), Charset.forName("utf-8"));
 		}
 		switch (method) {

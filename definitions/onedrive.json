@@ -16,6 +16,10 @@
 	"client_secret":"GlPTCgir1pn35eaXlqe29avCnVmSNg5i",
 	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
 	"scope":"wl.skydrive_update,wl.offline_access",
+	"root_folder":
+	{
+		"id":"me/skydrive"
+	},
 	"account_info_request":
 	{
 		"uri":"https://apis.live.net/v5.0/me",
@@ -40,7 +44,7 @@
 	{
 		"uri":"https://apis.live.net/v5.0/<id>/files/<name>",
 		"method":"PUT",
-		"auth_param":"access_token"
+		"auth_param":"access_token",
 		"params":
 		{
 			"overwrite":"<overwrite>"

@@ -12,10 +12,14 @@
 		"method":"POST"
 	},
 	"grant_type":"AUTHORIZATION_CODE_GRANT",
-	"client_id":"hq3ir6cgpeynus1",
-	"client_secret":"q20xd395442f54b",
+	"client_id":"x61bhol33tnk2h5",
+	"client_secret":"t1bt2kfaodgl1q1",
 	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
 	"scope":null,
+	"root_folder":
+	{
+		"path":""
+	},
 	"account_info_request":
 	{
 		"uri":"https://api.dropbox.com/1/account/info",
