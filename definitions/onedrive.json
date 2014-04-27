@@ -62,7 +62,13 @@
 	"list_dir_request":
 	{
 		"uri":"https://apis.live.net/v5.0/<id>/files",
-		"method":"GET"
+		"method":"GET",
+		"mapping":
+		{
+			"content":"data",
+			"parent":"parent_id",
+			"stringFileType":"type"
+		}
 	},
 	"rename_request":
 	{

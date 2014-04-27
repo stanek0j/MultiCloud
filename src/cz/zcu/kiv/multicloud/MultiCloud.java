@@ -265,11 +265,45 @@ public class MultiCloud {
 		return settings;
 	}
 
+	/**
+	 * List the contents of the supplied folder.
+	 * @param name Name of the user account.
+	 * @param folder Folder to be listed.
+	 * @return Folder contents.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 */
 	public FileInfo listFolder(String name, FileInfo folder) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		return listFolder(name, folder, false);
+		return listFolder(name, folder, false, false);
 	}
 
+	/**
+	 * List the contents of the supplied folder.
+	 * @param name Name of the user account.
+	 * @param folder Folder to be listed.
+	 * @param showDeleted If deleted content should be listed.
+	 * @return Folder contents.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 */
 	public FileInfo listFolder(String name, FileInfo folder, boolean showDeleted) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		return listFolder(name, folder, showDeleted, false);
+	}
+
+	/**
+	 * List the contents of the supplied folder.
+	 * @param name Name of the user account.
+	 * @param folder Folder to be listed.
+	 * @param showDeleted If deleted content should be listed.
+	 * @param showShared If files shared with the user should be listed.
+	 * @return Folder contents.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 */
+	public FileInfo listFolder(String name, FileInfo folder, boolean showDeleted, boolean showShared) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
 		AccountSettings account = accountManager.getAccountSettings(name);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -293,11 +327,31 @@ public class MultiCloud {
 		if (folder != null) {
 			useFolder = folder;
 		}
-		useFolder.setDeleted(showDeleted);
-		FolderListOp op = new FolderListOp(token, settings.getListDirRequest(), useFolder);
+		FolderListOp op = new FolderListOp(token, settings.getListDirRequest(), useFolder, showDeleted);
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		FileInfo info = op.getResult();
+		/* remove shared files from the result */
+		if (!showShared) {
+			List<FileInfo> remove = new ArrayList<>();
+			for (FileInfo content: info.getContent()) {
+				if (content.isShared()) {
+					remove.add(content);
+				}
+			}
+			info.getContent().removeAll(remove);
+		}
+		/* remove deleted files from the result */
+		if (!showDeleted) {
+			List<FileInfo> remove = new ArrayList<>();
+			for (FileInfo content: info.getContent()) {
+				if (content.isDeleted()) {
+					remove.add(content);
+				}
+			}
+			info.getContent().removeAll(remove);
+		}
+		return info;
 	}
 
 	/**

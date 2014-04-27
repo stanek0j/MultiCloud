@@ -28,12 +28,13 @@ public class FolderListOp extends Operation<FileInfo> {
 	 * @param token Access token for the storage service.
 	 * @param request Parameters of the request.
 	 * @param folder Folder to be listed.
+	 * @param showDeleted If deleted content should be listed.
 	 */
-	public FolderListOp(OAuth2Token token, CloudRequest request, FileInfo folder) {
+	public FolderListOp(OAuth2Token token, CloudRequest request, FileInfo folder, boolean showDeleted) {
 		super(OperationType.FOLDER_LIST, token, request);
 		addPropertyMapping("id", folder.getId());
 		addPropertyMapping("path", folder.getPath());
-		addPropertyMapping("deleted", folder.isDeleted() ? "true" : "false");
+		addPropertyMapping("deleted", showDeleted ? "true" : "false");
 	}
 
 	/**
@@ -50,7 +51,6 @@ public class FolderListOp extends Operation<FileInfo> {
 	@Override
 	protected void operationExecute() throws MultiCloudException {
 		HttpUriRequest request = prepareRequest(null);
-		System.out.println("prepared");
 		try {
 			setResult(executeRequest(request, new ResponseProcessor<FileInfo>() {
 				/**
@@ -58,21 +58,6 @@ public class FolderListOp extends Operation<FileInfo> {
 				 */
 				@Override
 				public FileInfo processResponse(HttpResponse response) {
-					/*
-					try {
-						BufferedReader bfr = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-						String line = null;
-						while ((line = bfr.readLine()) != null) {
-							System.out.println(line);
-						}
-					} catch (IllegalStateException | IOException e1) {
-						e1.printStackTrace();
-					}
-					System.out.println("Code: " + response.getStatusLine().getStatusCode());
-					for (Entry<String, String> header: responseHeaders.entrySet()) {
-						System.out.println(header.getKey() + ": " + header.getValue());
-					}
-					 */
 					FileInfo info = null;
 					try {
 						if (response.getStatusLine().getStatusCode() >= 400) {
@@ -80,10 +65,13 @@ public class FolderListOp extends Operation<FileInfo> {
 						} else {
 							JsonNode tree = parseJsonResponse(response);
 							info = json.getMapper().treeToValue(tree, FileInfo.class);
+							info.fillMissing();
+							for (FileInfo content: info.getContent()) {
+								content.fillMissing();
+							}
 						}
 					} catch (IllegalStateException | IOException e) {
 						/* return null value instead of throwing exception */
-						e.printStackTrace(); // debug
 					}
 					return info;
 				}

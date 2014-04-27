@@ -153,6 +153,11 @@ public abstract class Operation<T> {
 		authorizationParam = null;
 	}
 
+	/**
+	 * Recursive JSON value mapping.
+	 * @param root Relative root of the tree.
+	 * @return Tree with mapped values.
+	 */
 	protected JsonNode doJsonMapping(JsonNode root) {
 		for (Entry<String, String> mapping: jsonMapping.entrySet()) {
 			for (String submapping: mapping.getValue().split(JSON_MAPPING_SEPARATOR)) {
@@ -182,13 +187,13 @@ public abstract class Operation<T> {
 								case INT:
 								case LONG:
 								case BIG_INTEGER:
-									numLng += existing.longValue();
+									numLng += existing.longValue(); // add numbers
 									((ObjectNode) root).put(mapping.getKey(), numLng);
 									break;
 								case FLOAT:
 								case DOUBLE:
 								case BIG_DECIMAL:
-									double exDbl = existing.doubleValue() + numLng;
+									double exDbl = existing.doubleValue() + numLng; // add numbers
 									((ObjectNode) root).put(mapping.getKey(), exDbl);
 									break;
 								}
@@ -201,27 +206,26 @@ public abstract class Operation<T> {
 						case BIG_DECIMAL:
 							double numDbl = node.doubleValue();
 							if (!existing.isMissingNode() && existing.isNumber()) {
-								numDbl += existing.doubleValue();
+								numDbl += existing.doubleValue(); // add numbers
 								((ObjectNode) root).put(mapping.getKey(), numDbl);
 							}
 							break;
 						}
 						break;
 					case OBJECT:
-						System.out.println("object " + node.asText());
-						JsonNode mappedObjectNode = doJsonMapping(node);
+						JsonNode mappedObjectNode = doJsonMapping(node); // map JSON values
 						((ObjectNode) root).put(mapping.getKey(), mappedObjectNode);
 						break;
 					case ARRAY:
 						if (!existing.isMissingNode() && existing.isArray()) {
-							((ArrayNode) node).addAll((ArrayNode) existing);
+							((ArrayNode) node).addAll((ArrayNode) existing); // append array values
 						}
-						JsonNode mappedArrayNode = doJsonMapping(node);
+						JsonNode mappedArrayNode = doJsonMapping(node); // map JSON values
 						ArrayNode deeplyMappedArrayNode = new ArrayNode(json.getMapper().getNodeFactory());
 						Iterator<JsonNode> it = ((ArrayNode) mappedArrayNode).elements();
 						while (it.hasNext()) {
 							JsonNode element = it.next();
-							deeplyMappedArrayNode.add(doJsonMapping(element));
+							deeplyMappedArrayNode.add(doJsonMapping(element)); // map values inside the array
 						}
 						((ObjectNode) root).put(mapping.getKey(), deeplyMappedArrayNode);
 						break;
@@ -232,8 +236,6 @@ public abstract class Operation<T> {
 					default:
 						break;
 					}
-				} else {
-					System.out.println("mapping \"" + submapping + "\" not found");
 				}
 			}
 		}

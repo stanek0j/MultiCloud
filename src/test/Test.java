@@ -5,7 +5,9 @@ import com.fasterxml.jackson.core.JsonFactory;
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.json.FileInfo;
+import cz.zcu.kiv.multicloud.json.ParentInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
+import cz.zcu.kiv.multicloud.utils.Utils;
 
 public class Test {
 
@@ -116,9 +118,12 @@ public class Test {
 			if (list == null) {
 				System.out.println(cloud.getLastError());
 			} else {
-				System.out.println("list:");
+				System.out.println("list of " + list.getPath() + ":");
 				for (FileInfo content: list.getContent()) {
-					System.out.println(content.getType() + " :: " + content.getPath());
+					System.out.println(content.getFileType() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					for (ParentInfo parent: content.getParents()) {
+						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath());
+					}
 				}
 			}
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {

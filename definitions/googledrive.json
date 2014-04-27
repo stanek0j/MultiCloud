@@ -74,6 +74,13 @@
 		"params":
 		{
 			"trashed":"<deleted>"
+		},
+		"mapping":
+		{
+			"content":"items",
+			"deleted":"labels/trashed",
+			"size":"quotaBytesUsed",
+			"name":"title"
 		}
 	},
 	"rename_request":

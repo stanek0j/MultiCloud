@@ -400,7 +400,7 @@ public class CloudSettings {
 	 */
 	public void setRootFolder(FileInfo rootFolder) {
 		this.rootFolder = rootFolder;
-		this.rootFolder.setType(FileType.FOLDER);
+		this.rootFolder.setFileType(FileType.FOLDER);
 	}
 
 	/**

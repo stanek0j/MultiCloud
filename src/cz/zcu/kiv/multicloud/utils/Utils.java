@@ -24,6 +24,51 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Settings;
 public class Utils {
 
 	/**
+	 * cz.zcu.kiv.multicloud.utils/Utils.java
+	 *
+	 * List of supported size formattings.
+	 *
+	 * @author Jaromír Staněk
+	 * @version 1.0
+	 *
+	 */
+	public static enum UnitsFormat {
+		DECIMAL,
+		BINARY
+	}
+
+	/** List of decimal based file size units. */
+	public static final String[] SIZE_DECIMAL_UNITS = {
+		"B",
+		"kB",
+		"MB",
+		"GB",
+		"TB",
+		"PB",
+		"EB",
+		"ZB",
+		"YB",
+		"?B"
+	};
+	/** List of binary based file size units. */
+	public static final String[] SIZE_BINARY_UNITS = {
+		"B",
+		"KiB",
+		"MiB",
+		"GiB",
+		"TiB",
+		"PiB",
+		"EiB",
+		"ZiB",
+		"YiB",
+		"?iB"
+	};
+	/** Division step for decimal file size units. */
+	public static final int SIZE_DECIMAL_STEP = 1000;
+	/** Division step for binary file size units. */
+	public static final int SIZE_BINARY_STEP = 1024;
+
+	/**
 	 * Extracts {@link cz.zcu.kiv.multicloud.oauth2.OAuth2Settings} from {@link cz.zcu.kiv.multicloud.json.CloudSettings}.
 	 * @param settings Cloud settings.
 	 * @return Authorization settings.
@@ -62,6 +107,41 @@ public class Utils {
 		out.setUsername(settings.getUsername());
 		out.setPassword(settings.getPassword());
 		return out;
+	}
+
+	/**
+	 * Formats the file size to human readable string. Final number resolution is to two decimal places.
+	 * @param size File size to be formated.
+	 * @param format Formatting used to format the size.
+	 * @return Human readable string.
+	 */
+	public static String formatSize(long size, UnitsFormat format) {
+		String s = null;
+		double decimalSize = size;
+		int index = 0;
+		switch (format) {
+		case DECIMAL:
+			while (decimalSize >= SIZE_DECIMAL_STEP) {
+				decimalSize /= SIZE_DECIMAL_STEP;
+				index++;
+			}
+			if (index >= SIZE_DECIMAL_UNITS.length) {
+				index = SIZE_DECIMAL_UNITS.length - 1;
+			}
+			s = String.format("%.2f %s", decimalSize, SIZE_DECIMAL_UNITS[index]);
+			break;
+		case BINARY:
+			while (decimalSize >= SIZE_BINARY_STEP) {
+				decimalSize /= SIZE_BINARY_STEP;
+				index++;
+			}
+			if (index >= SIZE_BINARY_UNITS.length) {
+				index = SIZE_BINARY_UNITS.length - 1;
+			}
+			s = String.format("%.2f %s", decimalSize, SIZE_BINARY_UNITS[index]);
+			break;
+		}
+		return s;
 	}
 
 	/**
