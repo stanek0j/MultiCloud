@@ -6,6 +6,7 @@ import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.json.AccountInfo;
 import cz.zcu.kiv.multicloud.json.AccountQuota;
+import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
 
 public class Test {
 
@@ -88,49 +89,73 @@ public class Test {
 		cloud.validateAccounts();
 		try {
 			AccountInfo info = cloud.getAccountInfo("test");
-			System.out.println("User id: " + info.getId());
-			System.out.println("User name: " + info.getName());
-		} catch (MultiCloudException e1) {
+			if (info == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("User id: " + info.getId());
+				System.out.println("User name: " + info.getName());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
 		try {
 			AccountQuota quota = cloud.getAccountQuota("test");
-			System.out.println("Quota total: " + quota.getTotalBytes());
-			System.out.println("Quota used: " + quota.getUsedBytes());
-			System.out.println("Quota free: " + quota.getFreeBytes());
-		} catch (MultiCloudException e1) {
+			if (quota == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("Quota total: " + quota.getTotalBytes());
+				System.out.println("Quota used: " + quota.getUsedBytes());
+				System.out.println("Quota free: " + quota.getFreeBytes());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
 
 		try {
 			AccountInfo info = cloud.getAccountInfo("googledrive");
-			System.out.println("User id: " + info.getId());
-			System.out.println("User name: " + info.getName());
-		} catch (MultiCloudException e1) {
+			if (info == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("User id: " + info.getId());
+				System.out.println("User name: " + info.getName());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
 		try {
 			AccountQuota quota = cloud.getAccountQuota("googledrive");
-			System.out.println("Quota total: " + quota.getTotalBytes());
-			System.out.println("Quota used: " + quota.getUsedBytes());
-			System.out.println("Quota free: " + quota.getFreeBytes());
-		} catch (MultiCloudException e1) {
+			if (quota == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("Quota total: " + quota.getTotalBytes());
+				System.out.println("Quota used: " + quota.getUsedBytes());
+				System.out.println("Quota free: " + quota.getFreeBytes());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
 
 		try {
 			AccountInfo info = cloud.getAccountInfo("onedrive");
-			System.out.println("User id: " + info.getId());
-			System.out.println("User name: " + info.getName());
-		} catch (MultiCloudException e1) {
+			if (info == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("User id: " + info.getId());
+				System.out.println("User name: " + info.getName());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
 		try {
 			AccountQuota quota = cloud.getAccountQuota("onedrive");
-			System.out.println("Quota total: " + quota.getTotalBytes());
-			System.out.println("Quota used: " + quota.getUsedBytes());
-			System.out.println("Quota free: " + quota.getFreeBytes());
-		} catch (MultiCloudException e1) {
+			if (quota == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("Quota total: " + quota.getTotalBytes());
+				System.out.println("Quota used: " + quota.getUsedBytes());
+				System.out.println("Quota free: " + quota.getFreeBytes());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
 
@@ -160,7 +185,6 @@ public class Test {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (MultiCloudException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		 */

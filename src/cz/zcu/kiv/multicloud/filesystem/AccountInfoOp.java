@@ -53,12 +53,32 @@ public class AccountInfoOp extends Operation<AccountInfo> {
 				 */
 				@Override
 				public AccountInfo processResponse(HttpResponse response) {
+					/*
+					try {
+						BufferedReader bfr = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+						String line = null;
+						while ((line = bfr.readLine()) != null) {
+							System.out.println(line);
+						}
+					} catch (IllegalStateException | IOException e1) {
+						e1.printStackTrace();
+					}
+					System.out.println("Code: " + response.getStatusLine().getStatusCode());
+					for (Entry<String, String> header: responseHeaders.entrySet()) {
+						System.out.println(header.getKey() + ": " + header.getValue());
+					}
+					 */
 					AccountInfo info = null;
 					try {
-						JsonNode tree = parseJsonResponse(response);
-						info = json.getMapper().treeToValue(tree, AccountInfo.class);
+						if (response.getStatusLine().getStatusCode() >= 400) {
+							parseOperationError(response);
+						} else {
+							JsonNode tree = parseJsonResponse(response);
+							info = json.getMapper().treeToValue(tree, AccountInfo.class);
+						}
 					} catch (IllegalStateException | IOException e) {
 						/* return null value instead of throwing exception */
+						e.printStackTrace();
 					}
 					return info;
 				}

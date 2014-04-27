@@ -36,6 +36,7 @@ import cz.zcu.kiv.multicloud.http.HttpCopy;
 import cz.zcu.kiv.multicloud.http.HttpMove;
 import cz.zcu.kiv.multicloud.json.CloudRequest;
 import cz.zcu.kiv.multicloud.json.Json;
+import cz.zcu.kiv.multicloud.json.OperationError;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 import cz.zcu.kiv.multicloud.utils.HttpMethod;
 import cz.zcu.kiv.multicloud.utils.Utils;
@@ -67,6 +68,8 @@ public abstract class Operation<T> {
 	private String authorizationParam;
 	/** Result of the operation. */
 	private T result;
+	/** Error that occurred during the operation. */
+	private OperationError error;
 
 	/** JSON factory and Object mapper. */
 	protected final Json json;
@@ -98,6 +101,7 @@ public abstract class Operation<T> {
 		this.propertyMapping = new HashMap<>();
 		this.authorizationParam = null;
 		this.result = null;
+		this.error = null;
 
 		json = Json.getInstance();
 
@@ -218,6 +222,14 @@ public abstract class Operation<T> {
 		response.close();
 		client.close();
 		return result;
+	}
+
+	/**
+	 * Returns the error that occurred during the operation.
+	 * @return Error occurred.
+	 */
+	public OperationError getError() {
+		return error;
 	}
 
 	/**
@@ -355,6 +367,27 @@ public abstract class Operation<T> {
 			}
 		}
 		return root;
+	}
+
+	/**
+	 * Parses the {@link org.apache.http.HttpResponse} as a JSON string and saves the error message it contains.
+	 * @param response Response to be parsed.
+	 * @throws IOException If something failed.
+	 */
+	protected void parseOperationError(HttpResponse response) throws IOException {
+		ObjectMapper mapper = json.getMapper();
+		JsonNode root = mapper.readTree(response.getEntity().getContent());
+		JsonNode node = root.path("error");
+		if (node.isObject()) {
+			error = mapper.treeToValue(node, OperationError.class);
+			if (error.getCode() == -1) {
+				error.setCode(response.getStatusLine().getStatusCode());
+			}
+		} else if (!node.isMissingNode()) {
+			error = new OperationError();
+			error.setCode(response.getStatusLine().getStatusCode());
+			error.setMessage(node.textValue());
+		}
 	}
 
 	/**

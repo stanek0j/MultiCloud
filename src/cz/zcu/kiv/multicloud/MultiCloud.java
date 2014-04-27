@@ -10,6 +10,7 @@ import cz.zcu.kiv.multicloud.json.AccountInfo;
 import cz.zcu.kiv.multicloud.json.AccountQuota;
 import cz.zcu.kiv.multicloud.json.AccountSettings;
 import cz.zcu.kiv.multicloud.json.CloudSettings;
+import cz.zcu.kiv.multicloud.json.OperationError;
 import cz.zcu.kiv.multicloud.oauth2.AuthorizationCallback;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Error;
@@ -43,6 +44,8 @@ public class MultiCloud {
 	private CredentialStore credentialStore;
 	/** User account manager. */
 	private AccountManager accountManager;
+	/** Last error that occurred during any operation. */
+	private OperationError lastError;
 
 	/**
 	 * Empty ctor.
@@ -63,6 +66,7 @@ public class MultiCloud {
 			e.printStackTrace();
 		}
 		accountManager = um;
+		lastError = null;
 	}
 
 	/**
@@ -96,6 +100,7 @@ public class MultiCloud {
 		} else {
 			accountManager = settings.getAccountManager();
 		}
+		lastError = null;
 	}
 
 	/**
@@ -170,7 +175,15 @@ public class MultiCloud {
 		accountManager.removeAccountSettings(name);
 	}
 
-	public AccountInfo getAccountInfo(String name) throws MultiCloudException {
+	/**
+	 * Retrieve basic information about the user. Information consists of user name and identifier.
+	 * @param name Name of the user account.
+	 * @return Information about the user.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 */
+	public AccountInfo getAccountInfo(String name) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
 		AccountSettings account = accountManager.getAccountSettings(name);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -186,13 +199,25 @@ public class MultiCloud {
 		if (token == null) {
 			account.setTokenId(null);
 			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(name, null);
 		}
 		AccountInfoOp op = new AccountInfoOp(token, settings.getAccountInfoRequest());
 		op.execute();
+		lastError = op.getError();
 		return op.getResult();
 	}
 
-	public AccountQuota getAccountQuota(String name) throws MultiCloudException {
+	/**
+	 * Retrieve information about the quota associated with the user account.
+	 * @param name Name of the user account.
+	 * @return Quota information.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 */
+	public AccountQuota getAccountQuota(String name) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
 		AccountSettings account = accountManager.getAccountSettings(name);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -209,9 +234,21 @@ public class MultiCloud {
 			account.setTokenId(null);
 			throw new MultiCloudException("Access token not found.");
 		}
+		if (token.isExpired()) {
+			refreshAccount(name, null);
+		}
 		AccountQuotaOp op = new AccountQuotaOp(token, settings.getAccountQuotaRequest());
 		op.execute();
+		lastError = op.getError();
 		return op.getResult();
+	}
+
+	/**
+	 * Returns the last error that occurred during any operation.
+	 * @return Last error occurred.
+	 */
+	public OperationError getLastError() {
+		return lastError;
 	}
 
 	/**
