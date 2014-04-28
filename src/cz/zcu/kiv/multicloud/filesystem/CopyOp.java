@@ -47,8 +47,6 @@ public class CopyOp extends Operation<FileInfo> {
 	 */
 	public CopyOp(OAuth2Token token, CloudRequest request, FileInfo source, FileInfo destination, String destinationName) {
 		super(OperationType.COPY, token, request);
-		System.out.println(source.getId());
-		System.out.println(destination.getId());
 		addPropertyMapping("id", source.getId());
 		addPropertyMapping("path", source.getPath());
 		addPropertyMapping("source_id", source.getId());

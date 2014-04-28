@@ -1,12 +1,16 @@
 package cz.zcu.kiv.multicloud.filesystem;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.json.CloudRequest;
@@ -24,8 +28,14 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
  */
 public class MoveOp extends Operation<FileInfo> {
 
+	/** File or folder name to be renamed to. */
+	private final String name;
+	/** File type of the original file or folder. */
+	private final FileType type;
+	/** JSON body represented as a map. */
 	private final Map<String, Object> jsonBody;
-	private final String body;
+	/** Body of the request. */
+	private String body;
 
 	/**
 	 * Ctor with necessary parameters.
@@ -59,6 +69,14 @@ public class MoveOp extends Operation<FileInfo> {
 			}
 		}
 		addPropertyMapping("destination_path", path);
+		if (destinationName != null) {
+			addPropertyMapping("name", destinationName);
+			name = destinationName;
+		} else {
+			addPropertyMapping("name", source.getName());
+			name = source.getName();
+		}
+		type = source.getFileType();
 		jsonBody = request.getJsonBody();
 		body = request.getBody();
 	}
@@ -78,6 +96,19 @@ public class MoveOp extends Operation<FileInfo> {
 	protected void operationExecute() throws MultiCloudException {
 		HttpUriRequest request = prepareRequest(null);
 		try {
+			if (jsonBody != null) {
+				ObjectMapper mapper = json.getMapper();
+				body = mapper.writeValueAsString(jsonBody);
+			}
+			if (body != null) {
+				request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+			} else {
+				request = prepareRequest(null);
+			}
+		} catch (UnsupportedEncodingException | JsonProcessingException e1) {
+			throw new MultiCloudException("Failed to prepare request.");
+		}
+		try {
 			setResult(executeRequest(request, new ResponseProcessor<FileInfo>() {
 				/**
 				 * {@inheritDoc}
@@ -96,6 +127,10 @@ public class MoveOp extends Operation<FileInfo> {
 								for (FileInfo content: info.getContent()) {
 									content.fillMissing();
 								}
+							} else {
+								info = new FileInfo();
+								info.setName(name);
+								info.setFileType(type);
 							}
 						}
 					} catch (IllegalStateException | IOException e) {

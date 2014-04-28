@@ -11,6 +11,7 @@ import cz.zcu.kiv.multicloud.filesystem.DeleteOp;
 import cz.zcu.kiv.multicloud.filesystem.FileType;
 import cz.zcu.kiv.multicloud.filesystem.FolderCreateOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderListOp;
+import cz.zcu.kiv.multicloud.filesystem.MoveOp;
 import cz.zcu.kiv.multicloud.filesystem.RenameOp;
 import cz.zcu.kiv.multicloud.json.AccountInfo;
 import cz.zcu.kiv.multicloud.json.AccountQuota;
@@ -489,6 +490,53 @@ public class MultiCloud {
 			}
 			info.getContent().removeAll(remove);
 		}
+		return info;
+	}
+
+	/**
+	 * Move existing file or folder to new destination.
+	 * @param accountName Name of the user account.
+	 * @param file Original file or folder to be moved.
+	 * @param destination Folder to move the source to.
+	 * @param destinationName File or folder name in the destination location. Null to retain original.
+	 * @return File or folder information after moving.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public FileInfo move(String accountName, FileInfo file, FileInfo destination, String destinationName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
+		}
+		if (file == null) {
+			throw new MultiCloudException("File or folder must be supplied.");
+		}
+		if (destination == null) {
+			throw new MultiCloudException("Destination folder must be supplied.");
+		}
+		if (destination.getFileType() != FileType.FOLDER) {
+			throw new MultiCloudException("Destination must be a folder.");
+		}
+		MoveOp op = new MoveOp(token, settings.getMoveRequest(), file, destination, destinationName);
+		op.execute();
+		lastError = op.getError();
+		FileInfo info = op.getResult();
 		return info;
 	}
 

@@ -114,12 +114,11 @@ public class Test {
 		}
 		 */
 
-		//String drive = "test";
-		String drive = "googledrive";
+		String drive = "test";
+		//String drive = "googledrive";
 		//String drive = "onedrive";
 
 		FileInfo folder = null;
-		/*
 		try {
 			folder = cloud.createFolder(drive, "test", null);
 			if (folder == null) {
@@ -140,7 +139,6 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		 */
 		FileInfo target = null;
 		try {
 			FileInfo list = cloud.listFolder(drive, null);
@@ -165,15 +163,16 @@ public class Test {
 			e1.printStackTrace();
 		}
 		try {
-			FileInfo list = cloud.copy(drive, folder, target, null);
-			if (list == null) {
+			folder = cloud.move(drive, folder, target, null);
+			if (folder == null) {
 				System.out.println(cloud.getLastError());
 			} else {
-				System.out.println("folder copied: " + list.getName());
+				System.out.println("folder moved: " + folder.getName());
 			}
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		/*
 		try {
 			FileInfo list = cloud.delete(drive, folder);
 			if (list == null) {
@@ -184,6 +183,7 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		 */
 
 		/*
 		try {
