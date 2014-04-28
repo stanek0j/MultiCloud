@@ -27,6 +27,11 @@ public class CloudRequest {
 	private Map<String, String> headers;
 	/** Mapping of the returned JSON parameters to object properties. */
 	private Map<String, String> mapping;
+	/** Body of the request. */
+	private String body;
+	/** JSON body of the request. Empty parameters are omitted in the final request. */
+	@JsonProperty("json_body")
+	private Map<String, Object> jsonBody;
 	/** Authorization parameter for accessing protected resources. Null or empty to disable. */
 	@JsonProperty("auth_param")
 	private String authorizationParam;
@@ -40,11 +45,27 @@ public class CloudRequest {
 	}
 
 	/**
+	 * Returns the body of the request.
+	 * @return Body of the request.
+	 */
+	public String getBody() {
+		return body;
+	}
+
+	/**
 	 * Returns the headers for the request.
 	 * @return Headers.
 	 */
 	public Map<String, String> getHeaders() {
 		return headers;
+	}
+
+	/**
+	 * Returns the JSON body of the request.
+	 * @return JSON body of the request.
+	 */
+	public Map<String, Object> getJsonBody() {
+		return jsonBody;
 	}
 
 	/**
@@ -88,11 +109,27 @@ public class CloudRequest {
 	}
 
 	/**
+	 * Sets the body of the request.
+	 * @param body Body of the request.
+	 */
+	public void setBody(String body) {
+		this.body = body;
+	}
+
+	/**
 	 * Sets the headers for the request.
 	 * @param headers Headers.
 	 */
 	public void setHeaders(Map<String, String> headers) {
 		this.headers = headers;
+	}
+
+	/**
+	 * Sets the JSON body of the request.
+	 * @param jsonBody JSON body of the request.
+	 */
+	public void setJsonBody(Map<String, Object> jsonBody) {
+		this.jsonBody = jsonBody;
 	}
 
 	/**

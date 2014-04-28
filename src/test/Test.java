@@ -113,18 +113,45 @@ public class Test {
 			e1.printStackTrace();
 		}
 		 */
+
+		String drive = "test";
+
+		FileInfo folder = null;
 		try {
-			FileInfo list = cloud.listFolder("test", null);
+			folder = cloud.createFolder(drive, "test", null);
+			if (folder == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("folder created: " + folder.getName());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			FileInfo list = cloud.listFolder(drive, null);
 			if (list == null) {
 				System.out.println(cloud.getLastError());
 			} else {
 				System.out.println("list of " + list.getPath() + ":");
 				for (FileInfo content: list.getContent()) {
-					System.out.println(content.getFileType() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					if (content.getName().equals("test")) {
+						folder = content;
+					}
 					for (ParentInfo parent: content.getParents()) {
 						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath());
 					}
 				}
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			FileInfo list = cloud.delete(drive, folder);
+			if (list == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("folder deleted: " + list.getName());
 			}
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();

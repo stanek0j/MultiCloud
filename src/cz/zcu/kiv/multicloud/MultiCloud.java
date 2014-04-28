@@ -6,6 +6,9 @@ import java.util.List;
 
 import cz.zcu.kiv.multicloud.filesystem.AccountInfoOp;
 import cz.zcu.kiv.multicloud.filesystem.AccountQuotaOp;
+import cz.zcu.kiv.multicloud.filesystem.DeleteOp;
+import cz.zcu.kiv.multicloud.filesystem.FileType;
+import cz.zcu.kiv.multicloud.filesystem.FolderCreateOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderListOp;
 import cz.zcu.kiv.multicloud.json.AccountInfo;
 import cz.zcu.kiv.multicloud.json.AccountQuota;
@@ -159,6 +162,89 @@ public class MultiCloud {
 		account.setUserId(name);
 		account.setSettingsId(cloudStorage);
 		accountManager.addAccountSettings(account);
+	}
+
+	/**
+	 * Creates new folder in the specified location.
+	 * @param name Name of the user account.
+	 * @param folderName Name of the folder.
+	 * @param parent Parent folder.
+	 * @return Newly created folder.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 */
+	public FileInfo createFolder(String name, String folderName, FileInfo parent) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(name);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(name, null);
+		}
+		FileInfo useFolder = settings.getRootFolder();
+		if (parent != null) {
+			useFolder = parent;
+		}
+		if (useFolder.getFileType() != FileType.FOLDER) {
+			throw new MultiCloudException("Supplied file instead of folder.");
+		}
+		FolderCreateOp op = new FolderCreateOp(token, settings.getCreateDirRequest(), folderName, useFolder);
+		op.execute();
+		lastError = op.getError();
+		FileInfo info = op.getResult();
+		return info;
+	}
+
+	/**
+	 * Deletes the specified file or folder.
+	 * @param name Name of the user account.
+	 * @param file File or folder to be deleted.
+	 * @return File information about the deleted file or folder.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 */
+	public FileInfo delete(String name, FileInfo file) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(name);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(name, null);
+		}
+		if (file == null) {
+			throw new MultiCloudException("File or folder must be supplied.");
+		}
+		DeleteOp op = new DeleteOp(token, settings.getDeleteRequest(), file);
+		op.execute();
+		lastError = op.getError();
+		FileInfo info = op.getResult();
+		return info;
 	}
 
 	/**
@@ -326,6 +412,9 @@ public class MultiCloud {
 		FileInfo useFolder = settings.getRootFolder();
 		if (folder != null) {
 			useFolder = folder;
+		}
+		if (useFolder.getFileType() != FileType.FOLDER) {
+			throw new MultiCloudException("Supplied file instead of folder.");
 		}
 		FolderListOp op = new FolderListOp(token, settings.getListDirRequest(), useFolder, showDeleted);
 		op.execute();

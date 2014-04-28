@@ -379,11 +379,15 @@ public abstract class Operation<T> {
 	 * @throws IOException If something failed.
 	 */
 	protected JsonNode parseJsonResponse(HttpResponse response) throws IOException {
-		ObjectMapper mapper = json.getMapper();
-		JsonNode root = mapper.readTree(response.getEntity().getContent());
-		/* mapping JSON values to different field names */
-		root = doJsonMapping(root);
-		return root;
+		if (response.getEntity() != null) {
+			ObjectMapper mapper = json.getMapper();
+			JsonNode root = mapper.readTree(response.getEntity().getContent());
+			/* mapping JSON values to different field names */
+			root = doJsonMapping(root);
+			return root;
+		} else {
+			return null;
+		}
 	}
 
 	/**

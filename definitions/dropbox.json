@@ -62,6 +62,13 @@
 		{
 			"root":"dropbox",
 			"path":"<path>"
+		},
+		"mapping":
+		{
+			"content":"contents",
+			"deleted":"is_deleted",
+			"size":"bytes",
+			"mimeType":"mime_type"
 		}
 	},
 	"list_dir_request":
@@ -83,9 +90,21 @@
 	},
 	"rename_request":
 	{
-		"uri":"",
-		"method":"PUT",
-		"params":null
+		"uri":"https://api.dropbox.com/1/fileops/move",
+		"method":"POST",
+		"params":
+		{
+			"root":"dropbox",
+			"from_path":"<source_path>",
+			"to_path":"<destination_path>"
+		},
+		"mapping":
+		{
+			"content":"contents",
+			"deleted":"is_deleted",
+			"size":"bytes",
+			"mimeType":"mime_type"
+		}
 	},	
 	"copy_request":
 	{
@@ -94,8 +113,15 @@
 		"params":
 		{
 			"root":"dropbox",
-			"from_path":"<path>",
-			"to_path":"<path>"
+			"from_path":"<source_path>",
+			"to_path":"<destination_path>"
+		},
+		"mapping":
+		{
+			"content":"contents",
+			"deleted":"is_deleted",
+			"size":"bytes",
+			"mimeType":"mime_type"
 		}
 	},
 	"move_request":
@@ -105,8 +131,15 @@
 		"params":
 		{
 			"root":"dropbox",
-			"from_path":"<path>",
-			"to_path":"<path>"
+			"from_path":"<source_path>",
+			"to_path":"<destination_path>"
+		},
+		"mapping":
+		{
+			"content":"contents",
+			"deleted":"is_deleted",
+			"size":"bytes",
+			"mimeType":"mime_type"
 		}
 	},
 	"delete_request":
@@ -117,6 +150,13 @@
 		{
 			"root":"dropbox",
 			"path":"<path>"
+		},
+		"mapping":
+		{
+			"content":"contents",
+			"deleted":"is_deleted",
+			"size":"bytes",
+			"mimeType":"mime_type"
 		}
 	}
 }

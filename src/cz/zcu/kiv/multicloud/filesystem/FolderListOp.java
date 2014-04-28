@@ -64,10 +64,12 @@ public class FolderListOp extends Operation<FileInfo> {
 							parseOperationError(response);
 						} else {
 							JsonNode tree = parseJsonResponse(response);
-							info = json.getMapper().treeToValue(tree, FileInfo.class);
-							info.fillMissing();
-							for (FileInfo content: info.getContent()) {
-								content.fillMissing();
+							if (tree != null) {
+								info = json.getMapper().treeToValue(tree, FileInfo.class);
+								info.fillMissing();
+								for (FileInfo content: info.getContent()) {
+									content.fillMissing();
+								}
 							}
 						}
 					} catch (IllegalStateException | IOException e) {
