@@ -108,17 +108,74 @@
 	"rename_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
-		"method":"PUT"
+		"method":"PUT",
+		"headers":
+		{
+			"Content-Type":"application/json"
+		},
+		"mapping":
+		{
+			"content":"items",
+			"deleted":"labels/trashed",
+			"size":"quotaBytesUsed",
+			"name":"title"
+		},
+		"json_body":
+		{
+			"title":"<name>"
+		}
 	},	
 	"copy_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files/<id>/copy",
-		"method":"POST"
+		"method":"POST",
+		"headers":
+		{
+			"Content-Type":"application/json"
+		},
+		"mapping":
+		{
+			"content":"items",
+			"deleted":"labels/trashed",
+			"size":"quotaBytesUsed",
+			"name":"title"
+		},
+		"json_body":
+		{
+			"title":"<name>",
+			"parents":
+			[
+				{
+					"id":"<destination_id>"
+				}
+			]
+		}
+		
 	},
 	"move_request":
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
-		"method":"PUT"
+		"method":"PUT",
+		"headers":
+		{
+			"Content-Type":"application/json"
+		},
+		"mapping":
+		{
+			"content":"items",
+			"deleted":"labels/trashed",
+			"size":"quotaBytesUsed",
+			"name":"title"
+		},
+		"json_body":
+		{
+			"parents":
+			[
+				{
+					"id":"<destination_id>"
+				}
+			],
+		}
 	},
 	"delete_request":
 	{

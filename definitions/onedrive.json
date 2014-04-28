@@ -78,7 +78,11 @@
 	{
 		"uri":"https://apis.live.net/v5.0/<id>",
 		"method":"PUT",
-		"params":
+		"headers":
+		{
+			"Content-Type":"application/json"
+		},
+		"json_body":
 		{
 			"name":"<name>"
 		}
@@ -87,7 +91,11 @@
 	{
 		"uri":"https://apis.live.net/v5.0/<source_id>",
 		"method":"COPY",
-		"params":
+		"headers":
+		{
+			"Content-Type":"application/json"
+		},
+		"json_body":
 		{
 			"destination":"<destination_id>"
 		}
@@ -96,7 +104,11 @@
 	{
 		"uri":"https://apis.live.net/v5.0/<source_id>",
 		"method":"MOVE",
-		"params":
+		"headers":
+		{
+			"Content-Type":"application/json"
+		},
+		"json_body":
 		{
 			"destination":"<destination_id>"
 		}

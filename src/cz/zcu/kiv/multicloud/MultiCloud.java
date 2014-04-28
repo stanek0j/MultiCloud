@@ -6,10 +6,12 @@ import java.util.List;
 
 import cz.zcu.kiv.multicloud.filesystem.AccountInfoOp;
 import cz.zcu.kiv.multicloud.filesystem.AccountQuotaOp;
+import cz.zcu.kiv.multicloud.filesystem.CopyOp;
 import cz.zcu.kiv.multicloud.filesystem.DeleteOp;
 import cz.zcu.kiv.multicloud.filesystem.FileType;
 import cz.zcu.kiv.multicloud.filesystem.FolderCreateOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderListOp;
+import cz.zcu.kiv.multicloud.filesystem.RenameOp;
 import cz.zcu.kiv.multicloud.json.AccountInfo;
 import cz.zcu.kiv.multicloud.json.AccountQuota;
 import cz.zcu.kiv.multicloud.json.AccountSettings;
@@ -109,16 +111,84 @@ public class MultiCloud {
 	}
 
 	/**
+	 * Retrieve basic information about the user. Information consists of user name and identifier.
+	 * @param accountName Name of the user account.
+	 * @return Information about the user.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public AccountInfo accountInfo(String accountName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
+		}
+		AccountInfoOp op = new AccountInfoOp(token, settings.getAccountInfoRequest());
+		op.execute();
+		lastError = op.getError();
+		return op.getResult();
+	}
+
+	/**
+	 * Retrieve information about the quota associated with the user account.
+	 * @param accountName Name of the user account.
+	 * @return Quota information.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public AccountQuota accountQuota(String accountName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
+		}
+		AccountQuotaOp op = new AccountQuotaOp(token, settings.getAccountQuotaRequest());
+		op.execute();
+		lastError = op.getError();
+		return op.getResult();
+	}
+
+	/**
 	 * Runs the authorization process for the specified user account.
 	 * For certain authorization flows, this operation is blocking.
-	 * @param name Name of the user account.
+	 * @param accountName Name of the user account.
 	 * @param callback Callback from the authorization process, if necessary.
 	 * @throws MultiCloudException If some parameters were wrong.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the authorization process was interrupted.
 	 */
-	public void authorizeAccount(String name, AuthorizationCallback callback) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		AccountSettings account = accountManager.getAccountSettings(name);
+	public void authorizeAccount(String accountName, AuthorizationCallback callback) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
 		}
@@ -145,37 +215,8 @@ public class MultiCloud {
 		accountManager.saveAccountSettings();
 	}
 
-	/**
-	 * Creates new user account and stores it in the account manager.
-	 * @param name Name for the user account.
-	 * @param cloudStorage Name of the cloud storage service provider.
-	 * @throws MultiCloudException If the given parameters were wrong.
-	 */
-	public void createAccount(String name, String cloudStorage) throws MultiCloudException {
-		if (accountManager.getAccountSettings(name) != null) {
-			throw new MultiCloudException("User account already exists.");
-		}
-		if (cloudManager.getCloudSettings(cloudStorage) == null) {
-			throw new MultiCloudException("Cloud storage settings not found.");
-		}
-		AccountSettings account = new AccountSettings();
-		account.setUserId(name);
-		account.setSettingsId(cloudStorage);
-		accountManager.addAccountSettings(account);
-	}
-
-	/**
-	 * Creates new folder in the specified location.
-	 * @param name Name of the user account.
-	 * @param folderName Name of the folder.
-	 * @param parent Parent folder.
-	 * @return Newly created folder.
-	 * @throws MultiCloudException If the operation failed.
-	 * @throws InterruptedException If the token refreshing process was interrupted.
-	 * @throws OAuth2SettingsException If the authorization failed.
-	 */
-	public FileInfo createFolder(String name, String folderName, FileInfo parent) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		AccountSettings account = accountManager.getAccountSettings(name);
+	public FileInfo copy(String accountName, FileInfo file, String fileName, FileInfo destination) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
 		}
@@ -192,7 +233,72 @@ public class MultiCloud {
 			throw new MultiCloudException("Access token not found.");
 		}
 		if (token.isExpired()) {
-			refreshAccount(name, null);
+			refreshAccount(accountName, null);
+		}
+		if (file == null) {
+			throw new MultiCloudException("File or folder must be supplied.");
+		}
+		if (destination == null) {
+			throw new MultiCloudException("Destination folder must be supplied.");
+		}
+		if (destination.getFileType() != FileType.FOLDER) {
+			throw new MultiCloudException("Destination must be a folder.");
+		}
+		CopyOp op = new CopyOp(token, settings.getCopyRequest(), file, destination, fileName);
+		op.execute();
+		lastError = op.getError();
+		FileInfo info = op.getResult();
+		return info;
+	}
+
+	/**
+	 * Creates new user account and stores it in the account manager.
+	 * @param accountName Name for the user account.
+	 * @param cloudStorage Name of the cloud storage service provider.
+	 * @throws MultiCloudException If the given parameters were wrong.
+	 */
+	public void createAccount(String accountName, String cloudStorage) throws MultiCloudException {
+		if (accountManager.getAccountSettings(accountName) != null) {
+			throw new MultiCloudException("User account already exists.");
+		}
+		if (cloudManager.getCloudSettings(cloudStorage) == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		AccountSettings account = new AccountSettings();
+		account.setUserId(accountName);
+		account.setSettingsId(cloudStorage);
+		accountManager.addAccountSettings(account);
+	}
+
+	/**
+	 * Creates new folder in the specified location.
+	 * @param accountName Name of the user account.
+	 * @param folderName Name of the folder.
+	 * @param parent Parent folder.
+	 * @return Newly created folder.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 */
+	public FileInfo createFolder(String accountName, String folderName, FileInfo parent) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
 		}
 		FileInfo useFolder = settings.getRootFolder();
 		if (parent != null) {
@@ -210,15 +316,15 @@ public class MultiCloud {
 
 	/**
 	 * Deletes the specified file or folder.
-	 * @param name Name of the user account.
+	 * @param accountName Name of the user account.
 	 * @param file File or folder to be deleted.
 	 * @return File information about the deleted file or folder.
 	 * @throws MultiCloudException If the operation failed.
-	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
-	public FileInfo delete(String name, FileInfo file) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		AccountSettings account = accountManager.getAccountSettings(name);
+	public FileInfo delete(String accountName, FileInfo file) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
 		}
@@ -235,7 +341,7 @@ public class MultiCloud {
 			throw new MultiCloudException("Access token not found.");
 		}
 		if (token.isExpired()) {
-			refreshAccount(name, null);
+			refreshAccount(accountName, null);
 		}
 		if (file == null) {
 			throw new MultiCloudException("File or folder must be supplied.");
@@ -249,86 +355,18 @@ public class MultiCloud {
 
 	/**
 	 * Delete previously created user account, including associated token in the store.
-	 * @param name Name of the user account.
+	 * @param accountName Name of the user account.
 	 * @throws MultiCloudException If the given parameter was wrong.
 	 */
-	public void deleteAccount(String name) throws MultiCloudException {
-		AccountSettings account = accountManager.getAccountSettings(name);
+	public void deleteAccount(String accountName) throws MultiCloudException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account does not exist.");
 		}
 		if (account.isAuthorized()) {
 			credentialStore.deleteCredential(account.getTokenId());
 		}
-		accountManager.removeAccountSettings(name);
-	}
-
-	/**
-	 * Retrieve basic information about the user. Information consists of user name and identifier.
-	 * @param name Name of the user account.
-	 * @return Information about the user.
-	 * @throws MultiCloudException If the operation failed.
-	 * @throws InterruptedException If the token refreshing process was interrupted.
-	 * @throws OAuth2SettingsException If the authorization failed.
-	 */
-	public AccountInfo getAccountInfo(String name) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		AccountSettings account = accountManager.getAccountSettings(name);
-		if (account == null) {
-			throw new MultiCloudException("User account not found.");
-		}
-		if (!account.isAuthorized()) {
-			throw new MultiCloudException("User account not authorized.");
-		}
-		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
-		if (settings == null) {
-			throw new MultiCloudException("Cloud storage settings not found.");
-		}
-		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
-		if (token == null) {
-			account.setTokenId(null);
-			throw new MultiCloudException("Access token not found.");
-		}
-		if (token.isExpired()) {
-			refreshAccount(name, null);
-		}
-		AccountInfoOp op = new AccountInfoOp(token, settings.getAccountInfoRequest());
-		op.execute();
-		lastError = op.getError();
-		return op.getResult();
-	}
-
-	/**
-	 * Retrieve information about the quota associated with the user account.
-	 * @param name Name of the user account.
-	 * @return Quota information.
-	 * @throws MultiCloudException if the operation failed.
-	 * @throws InterruptedException If the token refreshing process was interrupted.
-	 * @throws OAuth2SettingsException If the authorization failed.
-	 */
-	public AccountQuota getAccountQuota(String name) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		AccountSettings account = accountManager.getAccountSettings(name);
-		if (account == null) {
-			throw new MultiCloudException("User account not found.");
-		}
-		if (!account.isAuthorized()) {
-			throw new MultiCloudException("User account not authorized.");
-		}
-		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
-		if (settings == null) {
-			throw new MultiCloudException("Cloud storage settings not found.");
-		}
-		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
-		if (token == null) {
-			account.setTokenId(null);
-			throw new MultiCloudException("Access token not found.");
-		}
-		if (token.isExpired()) {
-			refreshAccount(name, null);
-		}
-		AccountQuotaOp op = new AccountQuotaOp(token, settings.getAccountQuotaRequest());
-		op.execute();
-		lastError = op.getError();
-		return op.getResult();
+		accountManager.removeAccountSettings(accountName);
 	}
 
 	/**
@@ -353,44 +391,44 @@ public class MultiCloud {
 
 	/**
 	 * List the contents of the supplied folder.
-	 * @param name Name of the user account.
+	 * @param accountName Name of the user account.
 	 * @param folder Folder to be listed.
 	 * @return Folder contents.
 	 * @throws MultiCloudException if the operation failed.
-	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
-	public FileInfo listFolder(String name, FileInfo folder) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		return listFolder(name, folder, false, false);
+	public FileInfo listFolder(String accountName, FileInfo folder) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		return listFolder(accountName, folder, false, false);
 	}
 
 	/**
 	 * List the contents of the supplied folder.
-	 * @param name Name of the user account.
+	 * @param accountName Name of the user account.
 	 * @param folder Folder to be listed.
 	 * @param showDeleted If deleted content should be listed.
 	 * @return Folder contents.
 	 * @throws MultiCloudException if the operation failed.
-	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
-	public FileInfo listFolder(String name, FileInfo folder, boolean showDeleted) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		return listFolder(name, folder, showDeleted, false);
+	public FileInfo listFolder(String accountName, FileInfo folder, boolean showDeleted) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		return listFolder(accountName, folder, showDeleted, false);
 	}
 
 	/**
 	 * List the contents of the supplied folder.
-	 * @param name Name of the user account.
+	 * @param accountName Name of the user account.
 	 * @param folder Folder to be listed.
 	 * @param showDeleted If deleted content should be listed.
 	 * @param showShared If files shared with the user should be listed.
 	 * @return Folder contents.
 	 * @throws MultiCloudException if the operation failed.
-	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
-	public FileInfo listFolder(String name, FileInfo folder, boolean showDeleted, boolean showShared) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		AccountSettings account = accountManager.getAccountSettings(name);
+	public FileInfo listFolder(String accountName, FileInfo folder, boolean showDeleted, boolean showShared) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
 		}
@@ -407,7 +445,7 @@ public class MultiCloud {
 			throw new MultiCloudException("Access token not found.");
 		}
 		if (token.isExpired()) {
-			refreshAccount(name, null);
+			refreshAccount(accountName, null);
 		}
 		FileInfo useFolder = settings.getRootFolder();
 		if (folder != null) {
@@ -446,14 +484,14 @@ public class MultiCloud {
 	/**
 	 * Runs the process for access token refreshing.
 	 * Should be used only if the {@link cz.zcu.kiv.multicloud.oauth2.OAuth2Token} contains refresh token, otherwise it fails.
-	 * @param name Name of the user account.
+	 * @param accountName Name of the user account.
 	 * @param callback Callback from the authorization process, if necessary.
 	 * @throws MultiCloudException If some parameters were wrong.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the authorization process was interrupted.
 	 */
-	public void refreshAccount(String name, AuthorizationCallback callback) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		AccountSettings account = accountManager.getAccountSettings(name);
+	public void refreshAccount(String accountName, AuthorizationCallback callback) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
 		}
@@ -473,6 +511,46 @@ public class MultiCloud {
 			throw new MultiCloudException("Refreshing token failed.");
 		}
 		accountManager.saveAccountSettings();
+	}
+
+	/**
+	 * Renames the supplied file or folder.
+	 * @param accountName Name of the user account.
+	 * @param file File or folder to be renamed.
+	 * @param fileName New file or folder name.
+	 * @return File or folder information after renaming.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public FileInfo rename(String accountName, FileInfo file, String fileName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
+		}
+		if (file == null) {
+			throw new MultiCloudException("File or folder must be supplied.");
+		}
+		RenameOp op = new RenameOp(token, settings.getRenameRequest(), file, fileName);
+		op.execute();
+		lastError = op.getError();
+		FileInfo info = op.getResult();
+		return info;
 	}
 
 	/**

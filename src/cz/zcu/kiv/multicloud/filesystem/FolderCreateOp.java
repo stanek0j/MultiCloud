@@ -30,9 +30,12 @@ import cz.zcu.kiv.multicloud.utils.Utils;
  */
 public class FolderCreateOp extends Operation<FileInfo> {
 
-	private final Map<String, Object> jsonBody;
-	private String body;
+	/** Name of the folder to be created. */
 	private final String name;
+	/** JSON body represented as a map. */
+	private final Map<String, Object> jsonBody;
+	/** Body of the request. */
+	private String body;
 
 	/**
 	 * Ctor with necessary parameters.
@@ -43,7 +46,6 @@ public class FolderCreateOp extends Operation<FileInfo> {
 	 */
 	public FolderCreateOp(OAuth2Token token, CloudRequest request, String folderName, FileInfo parent) {
 		super(OperationType.FOLDER_CREATE, token, request);
-		name = folderName;
 		addPropertyMapping("name", folderName);
 		addPropertyMapping("id", parent.getId());
 		String path = parent.getPath();
@@ -55,6 +57,7 @@ public class FolderCreateOp extends Operation<FileInfo> {
 			}
 		}
 		addPropertyMapping("path", path);
+		name = folderName;
 		jsonBody = request.getJsonBody();
 		body = request.getBody();
 		if (jsonBody != null) {

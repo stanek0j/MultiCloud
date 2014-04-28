@@ -114,7 +114,7 @@ public class Test {
 		}
 		 */
 
-		String drive = "test";
+		String drive = "googledrive";
 
 		FileInfo folder = null;
 		try {
@@ -123,6 +123,16 @@ public class Test {
 				System.out.println(cloud.getLastError());
 			} else {
 				System.out.println("folder created: " + folder.getName());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			folder = cloud.rename(drive, folder, "testtest");
+			if (folder == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("folder renamed: " + folder.getName());
 			}
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
