@@ -28,7 +28,13 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
  */
 public class CopyOp extends Operation<FileInfo> {
 
+	/** File or folder name to be renamed to. */
+	private final String name;
+	/** File type of the original file or folder. */
+	private final FileType type;
+	/** JSON body represented as a map. */
 	private final Map<String, Object> jsonBody;
+	/** Body of the request. */
 	private String body;
 
 	/**
@@ -41,6 +47,8 @@ public class CopyOp extends Operation<FileInfo> {
 	 */
 	public CopyOp(OAuth2Token token, CloudRequest request, FileInfo source, FileInfo destination, String destinationName) {
 		super(OperationType.COPY, token, request);
+		System.out.println(source.getId());
+		System.out.println(destination.getId());
 		addPropertyMapping("id", source.getId());
 		addPropertyMapping("path", source.getPath());
 		addPropertyMapping("source_id", source.getId());
@@ -63,6 +71,14 @@ public class CopyOp extends Operation<FileInfo> {
 			}
 		}
 		addPropertyMapping("destination_path", path);
+		if (destinationName != null) {
+			addPropertyMapping("name", destinationName);
+			name = destinationName;
+		} else {
+			addPropertyMapping("name", source.getName());
+			name = source.getName();
+		}
+		type = source.getFileType();
 		jsonBody = request.getJsonBody();
 		body = request.getBody();
 	}
@@ -113,6 +129,10 @@ public class CopyOp extends Operation<FileInfo> {
 								for (FileInfo content: info.getContent()) {
 									content.fillMissing();
 								}
+							} else {
+								info = new FileInfo();
+								info.setName(name);
+								info.setFileType(type);
 							}
 						}
 					} catch (IllegalStateException | IOException e) {

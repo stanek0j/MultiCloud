@@ -215,7 +215,18 @@ public class MultiCloud {
 		accountManager.saveAccountSettings();
 	}
 
-	public FileInfo copy(String accountName, FileInfo file, String fileName, FileInfo destination) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+	/**
+	 * Copy existing file or folder to new destination.
+	 * @param accountName Name of the user account.
+	 * @param file Original file or folder to be copied.
+	 * @param destination Folder to copy the source to.
+	 * @param destinationName File or folder name in the destination location. Null to retain original.
+	 * @return File or folder information after copying.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public FileInfo copy(String accountName, FileInfo file, FileInfo destination, String destinationName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -244,7 +255,7 @@ public class MultiCloud {
 		if (destination.getFileType() != FileType.FOLDER) {
 			throw new MultiCloudException("Destination must be a folder.");
 		}
-		CopyOp op = new CopyOp(token, settings.getCopyRequest(), file, destination, fileName);
+		CopyOp op = new CopyOp(token, settings.getCopyRequest(), file, destination, destinationName);
 		op.execute();
 		lastError = op.getError();
 		FileInfo info = op.getResult();

@@ -127,7 +127,7 @@
 	},	
 	"copy_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files/<id>/copy",
+		"uri":"https://www.googleapis.com/drive/v2/files/<source_id>/copy",
 		"method":"POST",
 		"headers":
 		{
@@ -154,7 +154,7 @@
 	},
 	"move_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
+		"uri":"https://www.googleapis.com/drive/v2/files/<source_id>",
 		"method":"PUT",
 		"headers":
 		{
@@ -174,7 +174,7 @@
 				{
 					"id":"<destination_id>"
 				}
-			],
+			]
 		}
 	},
 	"delete_request":
