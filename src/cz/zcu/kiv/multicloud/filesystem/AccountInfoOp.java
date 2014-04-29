@@ -53,21 +53,6 @@ public class AccountInfoOp extends Operation<AccountInfo> {
 				 */
 				@Override
 				public AccountInfo processResponse(HttpResponse response) {
-					/*
-					try {
-						BufferedReader bfr = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-						String line = null;
-						while ((line = bfr.readLine()) != null) {
-							System.out.println(line);
-						}
-					} catch (IllegalStateException | IOException e1) {
-						e1.printStackTrace();
-					}
-					System.out.println("Code: " + response.getStatusLine().getStatusCode());
-					for (Entry<String, String> header: responseHeaders.entrySet()) {
-						System.out.println(header.getKey() + ": " + header.getValue());
-					}
-					 */
 					AccountInfo info = null;
 					try {
 						if (response.getStatusLine().getStatusCode() >= 400) {
@@ -78,7 +63,6 @@ public class AccountInfoOp extends Operation<AccountInfo> {
 						}
 					} catch (IllegalStateException | IOException e) {
 						/* return null value instead of throwing exception */
-						e.printStackTrace(); // debug
 					}
 					return info;
 				}

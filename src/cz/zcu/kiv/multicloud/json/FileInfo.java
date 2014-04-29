@@ -51,6 +51,21 @@ public class FileInfo {
 	private boolean isRoot;
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof FileInfo)) {
+			return false;
+		}
+		FileInfo cmp = (FileInfo) obj;
+		return (cmp.getName().equals(name) && cmp.getSize() == size);
+	}
+
+	/**
 	 * Method for filling missing parameters based on already supplied ones.
 	 */
 	public void fillMissing() {
@@ -213,6 +228,14 @@ public class FileInfo {
 	}
 
 	/**
+	 * Sets if the resource is root folder.
+	 * @param isRoot If the resource is root folder.
+	 */
+	public void setIsRoot(boolean isRoot) {
+		this.isRoot = isRoot;
+	}
+
+	/**
 	 * Sets the mime type of the resource.
 	 * @param mimeType Resource mime type.
 	 */
@@ -255,14 +278,6 @@ public class FileInfo {
 	 */
 	public void setPath(String path) {
 		this.path = path;
-	}
-
-	/**
-	 * Sets if the resource is root folder.
-	 * @param isRoot If the resource is root folder.
-	 */
-	public void setIsRoot(boolean isRoot) {
-		this.isRoot = isRoot;
 	}
 
 	/**

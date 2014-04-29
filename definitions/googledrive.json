@@ -43,7 +43,7 @@
 	},
 	"download_file_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
+		"uri":"https://content.googleapis.com/drive/v2/files/<id>",
 		"method":"GET"
 	},
 	"upload_file_begin_request":

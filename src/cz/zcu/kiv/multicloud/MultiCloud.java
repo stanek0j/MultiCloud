@@ -13,6 +13,7 @@ import cz.zcu.kiv.multicloud.filesystem.AccountInfoOp;
 import cz.zcu.kiv.multicloud.filesystem.AccountQuotaOp;
 import cz.zcu.kiv.multicloud.filesystem.CopyOp;
 import cz.zcu.kiv.multicloud.filesystem.DeleteOp;
+import cz.zcu.kiv.multicloud.filesystem.FileCloudPair;
 import cz.zcu.kiv.multicloud.filesystem.FileDownloadOp;
 import cz.zcu.kiv.multicloud.filesystem.FileType;
 import cz.zcu.kiv.multicloud.filesystem.FileUploadOp;
@@ -421,7 +422,11 @@ public class MultiCloud {
 		} catch (IOException e) {
 			throw new MultiCloudException("Failed to create the target file.");
 		}
-		FileDownloadOp op = new FileDownloadOp(token, settings.getDownloadFileRequest(), target);
+		List<FileCloudPair> sources = new ArrayList<>();
+		sources.add(new FileCloudPair(sourceFile, settings.getDownloadFileRequest()));
+		sources.add(new FileCloudPair(sourceFile, settings.getDownloadFileRequest()));
+		sources.add(new FileCloudPair(sourceFile, settings.getDownloadFileRequest()));
+		FileDownloadOp op = new FileDownloadOp(token, sources, target);
 		op.execute();
 		lastError = op.getError();
 		return op.getResult();
