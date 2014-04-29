@@ -63,6 +63,18 @@ public class FileUploadOp extends Operation<FileInfo> {
 	/** Byte buffer of the last chunk. */
 	private byte[] buffer;
 
+	/**
+	 * Ctor with necessary parameters.
+	 * @param token Access token for the storage service.
+	 * @param beginRequest Parameters of the request to start the upload.
+	 * @param execRequest Parameters of the request to upload the data.
+	 * @param finishRequest Parameters of the request to finish the upload.
+	 * @param destination Destination file or folder to be moved to.
+	 * @param destinationName New name at the destination location.
+	 * @param overwrite If the destination file should be overwritten.
+	 * @param data Data stream of the uploaded file.
+	 * @param size Size of the uploaded file.
+	 */
 	public FileUploadOp(
 			OAuth2Token token,
 			CloudRequest beginRequest,
