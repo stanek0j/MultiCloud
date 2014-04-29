@@ -51,6 +51,12 @@ public class CloudSettings {
 	private String redirectUri;
 	/** Scope for accessing the cloud storage service. */
 	private String scope;
+	/** If chunked upload is supported. */
+	@JsonProperty("chunked_upload")
+	private boolean chunkedUpload;
+	/** If chunked download is supported. */
+	@JsonProperty("chunked_download")
+	private boolean chunkedDownload;
 	/** Default root folder of the storage. */
 	@JsonProperty("root_folder")
 	private FileInfo rootFolder;
@@ -64,9 +70,15 @@ public class CloudSettings {
 	/** File download request parameters. */
 	@JsonProperty("download_file_request")
 	private CloudRequest downloadFileRequest;
+	/** File upload beginning parameters. */
+	@JsonProperty("upload_file_begin_request")
+	private CloudRequest uploadFileBeginRequest;
 	/** File upload request parameters. */
 	@JsonProperty("upload_file_request")
 	private CloudRequest uploadFileRequest;
+	/** File upload finishing parameters. */
+	@JsonProperty("upload_file_finish_request")
+	private CloudRequest uploadFileFinishRequest;
 	/** Folder create request parameters. */
 	@JsonProperty("create_dir_request")
 	private CloudRequest createDirRequest;
@@ -255,6 +267,22 @@ public class CloudSettings {
 	}
 
 	/**
+	 * Returns the request to begin file upload.
+	 * @return File upload begin request.
+	 */
+	public CloudRequest getUploadFileBeginRequest() {
+		return uploadFileBeginRequest;
+	}
+
+	/**
+	 * Returns the request to finish file upload.
+	 * @return File upload finish request.
+	 */
+	public CloudRequest getUploadFileFinishRequest() {
+		return uploadFileFinishRequest;
+	}
+
+	/**
 	 * Returns the file upload request parameters.
 	 * @return File upload request parameters.
 	 */
@@ -268,6 +296,22 @@ public class CloudSettings {
 	 */
 	public String getUsername() {
 		return username;
+	}
+
+	/**
+	 * Returns if chunked download is enabled.
+	 * @return If chunked download is enabled.
+	 */
+	public boolean isChunkedDownload() {
+		return chunkedDownload;
+	}
+
+	/**
+	 * Returns if chunked upload is enabled.
+	 * @return If chunked upload is enabled.
+	 */
+	public boolean isChunkedUpload() {
+		return chunkedUpload;
 	}
 
 	/**
@@ -355,6 +399,22 @@ public class CloudSettings {
 	}
 
 	/**
+	 * Sets if chunked download is enabled.
+	 * @param chunkedDownload If chunked download is enabled.
+	 */
+	public void setChunkedDownload(boolean chunkedDownload) {
+		this.chunkedDownload = chunkedDownload;
+	}
+
+	/**
+	 * Sets if chunked upload is enabled.
+	 * @param chunkedUpload If chunked upload is enabled.
+	 */
+	public void setChunkedUpload(boolean chunkedUpload) {
+		this.chunkedUpload = chunkedUpload;
+	}
+
+	/**
 	 * Sets the folder list request parameters.
 	 * @param listDirRequest Folder list request parameters.
 	 */
@@ -433,6 +493,22 @@ public class CloudSettings {
 	 */
 	public void setTokenRequest(CloudRequest tokenRequest) {
 		this.tokenRequest = tokenRequest;
+	}
+
+	/**
+	 * Sets the request to begin file upload.
+	 * @param uploadFileBeginRequest File upload begin request.
+	 */
+	public void setUploadFileBeginRequest(CloudRequest uploadFileBeginRequest) {
+		this.uploadFileBeginRequest = uploadFileBeginRequest;
+	}
+
+	/**
+	 * Sets the request to finish file upload.
+	 * @param uploadFileFinishRequest File upload finish request.
+	 */
+	public void setUploadFileFinishRequest(CloudRequest uploadFileFinishRequest) {
+		this.uploadFileFinishRequest = uploadFileFinishRequest;
 	}
 
 	/**

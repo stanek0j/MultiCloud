@@ -16,6 +16,8 @@
 	"client_secret":"t1bt2kfaodgl1q1",
 	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
 	"scope":null,
+	"chunked_upload":true,
+	"chunked_download":true,
 	"root_folder":
 	{
 		"path":""
@@ -45,13 +47,46 @@
 		"uri":"https://api-content.dropbox.com/1/files/dropbox/<path>",
 		"method":"GET"
 	},
-	"upload_file_request":
+	"upload_file_begin_request":
 	{
-		"uri":"https://api-content.dropbox.com/1/files/dropbox/<path>",
+		"uri":"https://api-content.dropbox.com/1/chunked_upload",
 		"method":"PUT",
 		"params":
 		{
-			"overwrite":"<overwrite>"
+			"offset":"<offset>"
+		},
+		"mapping":
+		{
+			"session":"upload_id"
+		},
+		"body":"<data>"
+	},
+	"upload_file_request":
+	{
+		"uri":"https://api-content.dropbox.com/1/chunked_upload",
+		"method":"PUT",
+		"params":
+		{
+			"offset":"<offset>",
+			"upload_id":"<session>"
+		},
+		"body":"<data>"
+	},
+	"upload_file_finish_request":
+	{
+		"uri":"https://api-content.dropbox.com/1/commit_chunked_upload/dropbox/<path>",
+		"method":"POST",
+		"params":
+		{
+			"overwrite":"<overwrite>",
+			"upload_id":"<session>"
+		},
+		"mapping":
+		{
+			"content":"contents",
+			"deleted":"is_deleted",
+			"size":"bytes",
+			"mimeType":"mime_type"
 		}
 	},
 	"create_dir_request":

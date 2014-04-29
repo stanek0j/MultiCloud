@@ -16,6 +16,8 @@
 	"client_secret":"ZLa85_y8DSnMoEJ1IsyW3fmm",
 	"redirect_uri":null,
 	"scope":"https://www.googleapis.com/auth/drive",
+	"chunked_upload":true,
+	"chunked_download":true,
 	"root_folder":
 	{
 		"id":""
@@ -44,7 +46,7 @@
 		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
 		"method":"GET"
 	},
-	"upload_file_request":
+	"upload_file_begin_request":
 	{
 		"uri":"https://www.googleapis.com/upload/drive/v2/files",
 		"method":"POST",
@@ -54,13 +56,33 @@
 		},
 		"mapping":
 		{
-			"sessionId":"upload_id"
+			"session":"upload_id"
 		},
 		"headers":
 		{
+			"Content-Type":"application/json",
 			"X-Upload-Content-Type":"application/octet-stream",
 			"X-Upload-Content-Length":"<size>"
+		},
+		"json_body":
+		{
+			"title":"<name>"
 		}
+	},
+	"upload_file_request":
+	{
+		"uri":"https://www.googleapis.com/upload/drive/v2/files",
+		"method":"PUT",
+		"params":
+		{
+			"uploadType":"resumable",
+			"upload_id":"<session>"
+		},
+		"headers":
+		{
+			"Content-Type":"application/octet-stream"
+		},
+		"body":"<data>"
 	},
 	"create_dir_request":
 	{

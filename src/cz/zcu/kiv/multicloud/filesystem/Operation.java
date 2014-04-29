@@ -2,8 +2,10 @@ package cz.zcu.kiv.multicloud.filesystem;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -79,8 +81,6 @@ public abstract class Operation<T> {
 	protected HttpMethod method;
 	/** URI template of the request. */
 	protected String uriTemplate;
-	/** Mapping of the JSON values in the response. */
-	protected Map<String, String> jsonMapping;
 	/** Headers of the request. */
 	protected Map<String, String> requestHeaders;
 	/** Parameters of the request. */
@@ -89,6 +89,8 @@ public abstract class Operation<T> {
 	protected Map<String, String> responseHeaders;
 	/** Parameters of the response. */
 	protected Map<String, String> responseParams;
+	/** Mapping of the values in the response. */
+	protected Map<String, String> responseMapping;
 
 	/**
 	 * Ctor with necessary parameters.
@@ -106,25 +108,7 @@ public abstract class Operation<T> {
 
 		json = Json.getInstance();
 
-		method = request.getMethod();
-		uriTemplate = request.getUri();
-		jsonMapping = request.getMapping();
-		if (jsonMapping == null) {
-			jsonMapping = new HashMap<>();
-		}
-		requestHeaders = request.getHeaders();
-		if (requestHeaders == null) {
-			requestHeaders = new HashMap<>();
-		}
-		requestParams = request.getParams();
-		if (requestParams == null) {
-			requestParams = new HashMap<>();
-		}
-		if (!Utils.isNullOrEmpty(request.getAuthorizationParam())) {
-			enableAuthorizationParam(request.getAuthorizationParam());
-		} else {
-			enableAuthorizationHeader();
-		}
+		setRequest(request);
 		responseHeaders = new HashMap<>();
 		responseParams = new HashMap<>();
 	}
@@ -158,8 +142,8 @@ public abstract class Operation<T> {
 	 * @param root Relative root of the tree.
 	 * @return Tree with mapped values.
 	 */
-	protected JsonNode doJsonMapping(JsonNode root) {
-		for (Entry<String, String> mapping: jsonMapping.entrySet()) {
+	private JsonNode doJsonMapping(JsonNode root) {
+		for (Entry<String, String> mapping: responseMapping.entrySet()) {
 			for (String submapping: mapping.getValue().split(JSON_MAPPING_SEPARATOR)) {
 				JsonNode node = root;
 				for (String subpath: submapping.split(JSON_PATH_SEPARATOR)) {
@@ -267,6 +251,29 @@ public abstract class Operation<T> {
 	}
 
 	/**
+	 * Mapping of the response parameters.
+	 */
+	protected void doResponseParamsMapping() {
+		Map<String, String> add = new HashMap<>();
+		List<String> remove = new ArrayList<>();
+		for (Entry<String, String> param: responseParams.entrySet()) {
+			for (Entry<String, String> mapping: responseMapping.entrySet()) {
+				if (param.getKey().equals(mapping.getValue())) {
+					add.put(mapping.getKey(), param.getValue());
+					if (!param.getKey().equals(mapping.getKey())) {
+						remove.add(param.getKey());
+					}
+					break;
+				}
+			}
+		}
+		responseParams.putAll(add);
+		for (String key: remove) {
+			responseParams.remove(key);
+		}
+	}
+
+	/**
 	 * Adds the header for holding access token in the request.
 	 */
 	protected void enableAuthorizationHeader() {
@@ -305,6 +312,7 @@ public abstract class Operation<T> {
 		/* send the request and process the response */
 		CloseableHttpClient client = HttpClients.createDefault();
 		CloseableHttpResponse response = client.execute(request);
+		System.out.println(request.getRequestLine());
 		for (Header header: response.getAllHeaders()) {
 			responseHeaders.put(header.getName(), header.getValue());
 		}
@@ -375,16 +383,19 @@ public abstract class Operation<T> {
 	/**
 	 * Parses the {@link org.apache.http.HttpResponse} as a JSON string and returns the root of the tree. Also performs the response JSON values mapping.
 	 * @param response Response to be parsed.
-	 * @return Root of the parsed tree.
-	 * @throws IOException If something failed.
+	 * @return Root of the parsed tree. Null on failed parsing.
 	 */
-	protected JsonNode parseJsonResponse(HttpResponse response) throws IOException {
+	protected JsonNode parseJsonResponse(HttpResponse response) {
 		if (response.getEntity() != null) {
 			ObjectMapper mapper = json.getMapper();
-			JsonNode root = mapper.readTree(response.getEntity().getContent());
-			/* mapping JSON values to different field names */
-			root = doJsonMapping(root);
-			return root;
+			try {
+				JsonNode root = mapper.readTree(response.getEntity().getContent());
+				/* mapping JSON values to different field names */
+				root = doJsonMapping(root);
+				return root;
+			} catch (IOException e) {
+				return null;
+			}
 		} else {
 			return null;
 		}
@@ -459,12 +470,46 @@ public abstract class Operation<T> {
 			break;
 		}
 		for (Entry<String, String> header: requestHeaders.entrySet()) {
-			request.addHeader(header.getKey(), header.getValue());
+			request.addHeader(header.getKey(), doPropertyMapping(header.getValue()));
 		}
 		if (request instanceof HttpEntityEnclosingRequestBase) {
 			((HttpEntityEnclosingRequestBase) request).setEntity(requestData);
 		}
 		return request;
+	}
+
+	/**
+	 * Sets the parameters of the request.
+	 * @param request Parameters of the request.
+	 */
+	protected void setRequest(CloudRequest request) {
+		if (request != null) {
+			method = request.getMethod();
+			uriTemplate = request.getUri();
+			requestHeaders = new HashMap<>();
+			if (request.getHeaders() != null) {
+				requestHeaders.putAll(request.getHeaders());
+			}
+			requestParams = new HashMap<>();
+			if (request.getParams() != null) {
+				requestParams.putAll(request.getParams());
+			}
+			responseMapping = new HashMap<>();
+			if (request.getMapping() != null) {
+				responseMapping.putAll(request.getMapping());
+			}
+			if (!Utils.isNullOrEmpty(request.getAuthorizationParam())) {
+				enableAuthorizationParam(request.getAuthorizationParam());
+			} else {
+				enableAuthorizationHeader();
+			}
+		} else {
+			method = HttpMethod.GET;
+			uriTemplate = null;
+			responseMapping = new HashMap<>();
+			requestHeaders = new HashMap<>();
+			requestParams = new HashMap<>();
+		}
 	}
 
 	/**

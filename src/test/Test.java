@@ -1,5 +1,7 @@
 package test;
 
+import java.io.File;
+
 import com.fasterxml.jackson.core.JsonFactory;
 
 import cz.zcu.kiv.multicloud.MultiCloud;
@@ -119,6 +121,7 @@ public class Test {
 		//String drive = "onedrive";
 
 		FileInfo folder = null;
+		/*
 		try {
 			folder = cloud.createFolder(drive, "test", null);
 			if (folder == null) {
@@ -139,6 +142,7 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		 */
 		FileInfo target = null;
 		try {
 			FileInfo list = cloud.listFolder(drive, null);
@@ -163,6 +167,17 @@ public class Test {
 			e1.printStackTrace();
 		}
 		try {
+			FileInfo info = cloud.uploadFile(drive, folder, "test-file.mp3", true, new File("test-file.mp3"));
+			if (info == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("file uploaded: " + info.getName());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		/*
+		try {
 			folder = cloud.move(drive, folder, target, null);
 			if (folder == null) {
 				System.out.println(cloud.getLastError());
@@ -172,7 +187,6 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		/*
 		try {
 			FileInfo list = cloud.delete(drive, folder);
 			if (list == null) {

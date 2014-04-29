@@ -67,6 +67,10 @@ public class FileInfo {
 		return content;
 	}
 
+	public FileType getFileType() {
+		return fileType;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -91,10 +95,6 @@ public class FileInfo {
 		return size;
 	}
 
-	public FileType getFileType() {
-		return fileType;
-	}
-
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -109,6 +109,10 @@ public class FileInfo {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public void setFileType(FileType fileType) {
+		this.fileType = fileType;
 	}
 
 	public void setId(String id) {
@@ -150,10 +154,6 @@ public class FileInfo {
 
 	public void setStringFileType(String fileType) {
 		this.fileType = FileType.fromString(fileType);
-	}
-
-	public void setFileType(FileType fileType) {
-		this.fileType = fileType;
 	}
 
 }

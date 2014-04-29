@@ -1,11 +1,15 @@
 package cz.zcu.kiv.multicloud.utils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
 import cz.zcu.kiv.multicloud.json.CloudSettings;
@@ -110,6 +114,26 @@ public class Utils {
 	}
 
 	/**
+	 * Parses the supplied string and obtains URI query parameters.
+	 * @param uri URI to be parsed.
+	 * @return Obtained parameters.
+	 */
+	public static Map<String, String> extractParams(String s) {
+		Map<String, String> params = new HashMap<>();
+		URI uri;
+		try {
+			uri = new URI(s);
+			List<NameValuePair> list = URLEncodedUtils.parse(uri, "UTF-8");
+			for (NameValuePair pair: list) {
+				params.put(pair.getName(), pair.getValue());
+			}
+		} catch (URISyntaxException e) {
+			/* do nothing if the string doesn't match the URI syntax */
+		}
+		return params;
+	}
+
+	/**
 	 * Formats the file size to human readable string. Final number resolution is to two decimal places.
 	 * @param size File size to be formated.
 	 * @param format Formatting used to format the size.
@@ -189,12 +213,12 @@ public class Utils {
 
 	/**
 	 * Converts a {@link java.util.Map} to a {@link java.util.List} of {@link org.apache.http.NameValuePair} objects.
-	 * @param requestParams Map to be converted.
+	 * @param map Map to be converted.
 	 * @return List of NameValuePair objects.
 	 */
-	public static List<NameValuePair> mapToList(Map<String, String> requestParams) {
+	public static List<NameValuePair> mapToList(Map<String, String> map) {
 		List<NameValuePair> list = new LinkedList<>();
-		for (Entry<String, String> entry: requestParams.entrySet()) {
+		for (Entry<String, String> entry: map.entrySet()) {
 			list.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 		}
 		return list;

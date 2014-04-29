@@ -1,6 +1,10 @@
 package cz.zcu.kiv.multicloud;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +13,7 @@ import cz.zcu.kiv.multicloud.filesystem.AccountQuotaOp;
 import cz.zcu.kiv.multicloud.filesystem.CopyOp;
 import cz.zcu.kiv.multicloud.filesystem.DeleteOp;
 import cz.zcu.kiv.multicloud.filesystem.FileType;
+import cz.zcu.kiv.multicloud.filesystem.FileUploadOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderCreateOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderListOp;
 import cz.zcu.kiv.multicloud.filesystem.MoveOp;
@@ -606,6 +611,49 @@ public class MultiCloud {
 			throw new MultiCloudException("File or folder must be supplied.");
 		}
 		RenameOp op = new RenameOp(token, settings.getRenameRequest(), file, fileName);
+		op.execute();
+		lastError = op.getError();
+		FileInfo info = op.getResult();
+		return info;
+	}
+
+	public FileInfo uploadFile(String accountName, FileInfo destination, String destinationName, boolean overwrite, File data) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		InputStream stream;
+		try {
+			stream = new FileInputStream(data);
+		} catch (FileNotFoundException e) {
+			throw new MultiCloudException("File not found.");
+		}
+		return uploadFile(accountName, destination, destinationName, overwrite, stream, data.length());
+	}
+
+	public FileInfo uploadFile(String accountName, FileInfo destination, String destinationName, boolean overwrite, InputStream data, long size) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
+		}
+		if (destination == null) {
+			throw new MultiCloudException("Destination folder must be supplied.");
+		}
+		if (destination.getFileType() != FileType.FOLDER) {
+			throw new MultiCloudException("Destination must be a folder.");
+		}
+		FileUploadOp op = new FileUploadOp(token, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), destination, destinationName, overwrite, data, size);
 		op.execute();
 		lastError = op.getError();
 		FileInfo info = op.getResult();

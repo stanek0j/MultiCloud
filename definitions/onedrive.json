@@ -16,6 +16,8 @@
 	"client_secret":"GlPTCgir1pn35eaXlqe29avCnVmSNg5i",
 	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
 	"scope":"wl.skydrive_update,wl.offline_access",
+	"chunked_upload":false,
+	"chunked_download":true,
 	"root_folder":
 	{
 		"id":"me/skydrive"
@@ -40,7 +42,7 @@
 		"uri":"https://apis.live.net/v5.0/<id>/content",
 		"method":"GET"
 	},
-	"upload_file_request":
+	"upload_file_finish_request":
 	{
 		"uri":"https://apis.live.net/v5.0/<id>/files/<name>",
 		"method":"PUT",
@@ -48,7 +50,8 @@
 		"params":
 		{
 			"overwrite":"<overwrite>"
-		}
+		},
+		"body":"<data>"
 	},
 	"create_dir_request":
 	{
