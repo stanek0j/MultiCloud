@@ -475,25 +475,27 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		FileInfo info = op.getResult();
-		/* remove shared files from the result */
-		if (!showShared) {
-			List<FileInfo> remove = new ArrayList<>();
-			for (FileInfo content: info.getContent()) {
-				if (content.isShared()) {
-					remove.add(content);
+		if (info != null) {
+			/* remove shared files from the result */
+			if (!showShared) {
+				List<FileInfo> remove = new ArrayList<>();
+				for (FileInfo content: info.getContent()) {
+					if (content.isShared()) {
+						remove.add(content);
+					}
 				}
+				info.getContent().removeAll(remove);
 			}
-			info.getContent().removeAll(remove);
-		}
-		/* remove deleted files from the result */
-		if (!showDeleted) {
-			List<FileInfo> remove = new ArrayList<>();
-			for (FileInfo content: info.getContent()) {
-				if (content.isDeleted()) {
-					remove.add(content);
+			/* remove deleted files from the result */
+			if (!showDeleted) {
+				List<FileInfo> remove = new ArrayList<>();
+				for (FileInfo content: info.getContent()) {
+					if (content.isDeleted()) {
+						remove.add(content);
+					}
 				}
+				info.getContent().removeAll(remove);
 			}
-			info.getContent().removeAll(remove);
 		}
 		return info;
 	}

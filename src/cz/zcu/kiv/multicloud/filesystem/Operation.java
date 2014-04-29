@@ -312,7 +312,6 @@ public abstract class Operation<T> {
 		/* send the request and process the response */
 		CloseableHttpClient client = HttpClients.createDefault();
 		CloseableHttpResponse response = client.execute(request);
-		System.out.println(request.getRequestLine());
 		for (Header header: response.getAllHeaders()) {
 			responseHeaders.put(header.getName(), header.getValue());
 		}

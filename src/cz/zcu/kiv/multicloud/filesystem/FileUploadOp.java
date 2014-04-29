@@ -198,9 +198,8 @@ public class FileUploadOp extends Operation<FileInfo> {
 			while (transferred < size) {
 				setRequest(execRequest);
 				jsonBody = execRequest.getJsonBody();
-				body = beginRequest.getBody();
+				body = execRequest.getBody();
 				addPropertyMapping("offset", String.valueOf(transferred));
-				System.out.println("transferred: " + transferred);
 				HttpUriRequest request = prepareRequest(null);
 				try {
 					if (jsonBody != null) {
@@ -212,6 +211,8 @@ public class FileUploadOp extends Operation<FileInfo> {
 							if (body.equals(DATA_MAPPING)) {
 								ByteArrayInputStream data = readData();
 								transferred += buffer.length;
+								System.out.println(transferred);
+								addPropertyMapping("offsetbuffer", String.valueOf(transferred - 1));
 								request = prepareRequest(new InputStreamEntity(data, buffer.length));
 							} else {
 								request = prepareRequest(new StringEntity(doPropertyMapping(body)));
@@ -245,7 +246,6 @@ public class FileUploadOp extends Operation<FileInfo> {
 				}
 			}
 		}
-		System.out.println("transferred: " + transferred);
 	}
 
 	/**
@@ -316,6 +316,13 @@ public class FileUploadOp extends Operation<FileInfo> {
 			} catch (IOException e) {
 				throw new MultiCloudException("Failed to upload the file.");
 			}
+		} else {
+			if (getError() == null && getResult() == null) {
+				FileInfo info = new FileInfo();
+				info.setName(name);
+				info.setFileType(FileType.FILE);
+				setResult(info);
+			}
 		}
 		/* close the stream when the file is uploaded */
 		try {
@@ -338,7 +345,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 		try {
 			data.read(buffer, 0, (int) size);
 		} catch (IOException e) {
-			e.printStackTrace();
+			/* returns empty buffer */
 		}
 		return new ByteArrayInputStream(buffer);
 	}
