@@ -35,7 +35,7 @@ import cz.zcu.kiv.multicloud.utils.Utils;
 public class FileUploadOp extends Operation<FileInfo> {
 
 	/** Size of a chunk for file download. Default value is set to 4 MiB. */
-	public static final long CHUNK_SIZE = 256 * 1024;
+	public static final long CHUNK_SIZE = 4 * 1024 * 1024;
 	/** String to indicate that the body of the request should contain upload data. */
 	public static final String DATA_MAPPING = "<data>";
 
