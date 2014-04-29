@@ -64,7 +64,7 @@ public abstract class Operation<T> {
 	/** Type of operation. */
 	private final OperationType type;
 	/** Access token for the user account storage service. */
-	private final OAuth2Token token;
+	private OAuth2Token token;
 	/** Mapping of non-generic string values. */
 	private final Map<String, String> propertyMapping;
 	/** Name of the URI parameter containing access token. */
@@ -517,6 +517,14 @@ public abstract class Operation<T> {
 	 */
 	protected void setResult(T result) {
 		this.result = result;
+	}
+
+	/**
+	 * Sets the access token for the storage service.
+	 * @param token Access token for the storage service.
+	 */
+	protected void setToken(OAuth2Token token) {
+		this.token = token;
 	}
 
 }

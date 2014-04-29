@@ -9,7 +9,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import cz.zcu.kiv.multicloud.MultiCloudException;
-import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
  * cz.zcu.kiv.multicloud.filesystem/FileDownloadOp.java
@@ -22,19 +21,29 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
  */
 public class FileDownloadOp extends Operation<File> {
 
-	/** Size of a chunk for file download. */
-	public static final long CHUNK_SIZE = 4 * 128 * 1024;
+	/** Size of a chunk for file download. Default value is set to 4 MiB. */
+	public static final long CHUNK_SIZE = 4 * 1024 * 1024;
 
-	private final List<FileCloudPair> sources;
+	/** List of sources used to download the file. */
+	private final List<FileCloudSource> sources;
+	/** Destination to save the file to. */
 	private final File destination;
+	/** Thread pool of worker threads. */
 	private final List<FileDownloadThread> pool;
+	/** Queue with chunks for the workers. */
 	private final BlockingQueue<DataChunk> queue;
+	/** File writer. */
 	private FileDownloadWriter writer;
 
-	public FileDownloadOp(OAuth2Token token, List<FileCloudPair> sources, File destination) {
-		super(OperationType.FILE_DOWNLOAD, token, null);
+	/**
+	 * Ctor with necessary parameters.
+	 * @param sources List of sources used to download the file.
+	 * @param destination Destination to save the file to.
+	 */
+	public FileDownloadOp(List<FileCloudSource> sources, File destination) {
+		super(OperationType.FILE_DOWNLOAD, null, null);
 		this.sources = new ArrayList<>();
-		for (FileCloudPair pair: sources) {
+		for (FileCloudSource pair: sources) {
 			if (pair.getFile() != null && pair.getRequest() != null) {
 				this.sources.add(pair);
 			}
@@ -59,12 +68,12 @@ public class FileDownloadOp extends Operation<File> {
 	protected void operationExecute() throws MultiCloudException {
 		if (sources.size() > 0) {
 			/* remove inconsistent files */
-			FileCloudPair base = sources.get(0);
-			List<FileCloudPair> remove = new ArrayList<>();
-			for (FileCloudPair pair: sources) {
-				if (!pair.equals(base)) {
-					if (!base.getFile().equals(pair.getFile())) {
-						remove.add(pair);
+			FileCloudSource base = sources.get(0);
+			List<FileCloudSource> remove = new ArrayList<>();
+			for (FileCloudSource source: sources) {
+				if (!source.equals(base)) {
+					if (!base.getFile().equals(source.getFile())) {
+						remove.add(source);
 					}
 				}
 			}
@@ -81,10 +90,11 @@ public class FileDownloadOp extends Operation<File> {
 			/* open file for writing */
 			writer = new FileDownloadWriter(destination);
 			/* create threads and start them */
-			for (FileCloudPair pair: sources) {
-				setRequest(pair.getRequest());
-				addPropertyMapping("id", pair.getFile().getId());
-				addPropertyMapping("path", pair.getFile().getPath());
+			for (FileCloudSource source: sources) {
+				setToken(source.getToken());
+				setRequest(source.getRequest());
+				addPropertyMapping("id", source.getFile().getId());
+				addPropertyMapping("path", source.getFile().getPath());
 				HttpUriRequest request = prepareRequest(null);
 				pool.add(new FileDownloadThread(queue, request, writer));
 			}

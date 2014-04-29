@@ -13,7 +13,7 @@ import cz.zcu.kiv.multicloud.filesystem.AccountInfoOp;
 import cz.zcu.kiv.multicloud.filesystem.AccountQuotaOp;
 import cz.zcu.kiv.multicloud.filesystem.CopyOp;
 import cz.zcu.kiv.multicloud.filesystem.DeleteOp;
-import cz.zcu.kiv.multicloud.filesystem.FileCloudPair;
+import cz.zcu.kiv.multicloud.filesystem.FileCloudSource;
 import cz.zcu.kiv.multicloud.filesystem.FileDownloadOp;
 import cz.zcu.kiv.multicloud.filesystem.FileType;
 import cz.zcu.kiv.multicloud.filesystem.FileUploadOp;
@@ -62,6 +62,8 @@ public class MultiCloud {
 	private AccountManager accountManager;
 	/** Last error that occurred during any operation. */
 	private OperationError lastError;
+	/** List of sources for douwloading a file from. */
+	private List<FileCloudSource> fileMultiDownloadSources;
 
 	/**
 	 * Empty ctor.
@@ -83,6 +85,7 @@ public class MultiCloud {
 		}
 		accountManager = um;
 		lastError = null;
+		fileMultiDownloadSources = new ArrayList<>();
 	}
 
 	/**
@@ -157,7 +160,7 @@ public class MultiCloud {
 	 * Retrieve information about the quota associated with the user account.
 	 * @param accountName Name of the user account.
 	 * @return Quota information.
-	 * @throws MultiCloudException if the operation failed.
+	 * @throws MultiCloudException If the operation failed.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
@@ -185,6 +188,32 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		return op.getResult();
+	}
+
+	/**
+	 * Adds a new source for download from multiple cloud storage services.
+	 * @param accountName Name of the user account.
+	 * @param sourceFile File to be downloaded.
+	 * @throws MultiCloudException If the operation failed.
+	 */
+	public void addDownloadSource(String accountName, FileInfo sourceFile) throws MultiCloudException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		fileMultiDownloadSources.add(new FileCloudSource(accountName, sourceFile, settings.getDownloadFileRequest(), token));
 	}
 
 	/**
@@ -231,7 +260,7 @@ public class MultiCloud {
 	 * @param destination Folder to copy the source to.
 	 * @param destinationName File or folder name in the destination location. Null to retain original.
 	 * @return File or folder information after copying.
-	 * @throws MultiCloudException if the operation failed.
+	 * @throws MultiCloudException If the operation failed.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
@@ -386,6 +415,17 @@ public class MultiCloud {
 		accountManager.removeAccountSettings(accountName);
 	}
 
+	/**
+	 * Download file from a single destination.
+	 * @param accountName Name of the user account.
+	 * @param sourceFile File to be downloaded.
+	 * @param destination Location to save the file to.
+	 * @param overwrite If existing files should be overwritten.
+	 * @return File downloaded.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
 	public File downloadFile(String accountName, FileInfo sourceFile, File destination, boolean overwrite) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
@@ -422,18 +462,82 @@ public class MultiCloud {
 		} catch (IOException e) {
 			throw new MultiCloudException("Failed to create the target file.");
 		}
-		List<FileCloudPair> sources = new ArrayList<>();
-		sources.add(new FileCloudPair(sourceFile, settings.getDownloadFileRequest()));
-		sources.add(new FileCloudPair(sourceFile, settings.getDownloadFileRequest()));
-		sources.add(new FileCloudPair(sourceFile, settings.getDownloadFileRequest()));
-		FileDownloadOp op = new FileDownloadOp(token, sources, target);
+		List<FileCloudSource> sources = new ArrayList<>();
+		sources.add(new FileCloudSource(accountName, sourceFile, settings.getDownloadFileRequest(), token));
+		FileDownloadOp op = new FileDownloadOp(sources, target);
 		op.execute();
 		lastError = op.getError();
 		return op.getResult();
 	}
 
+	/**
+	 * Download file from a single destination.
+	 * @param accountName Name of the user account.
+	 * @param sourceFile File to be downloaded.
+	 * @param destination Location to save the file to.
+	 * @param overwrite If existing files should be overwritten.
+	 * @return File downloaded.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
 	public File downloadFile(String accountName, FileInfo sourceFile, String destination, boolean overwrite) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
 		return downloadFile(accountName, sourceFile, new File(destination), overwrite);
+	}
+
+	/**
+	 * Download file from multiple cloud storage services.
+	 * @param destination Location to save the file to.
+	 * @param overwrite If existing files should be overwritten.
+	 * @return File downloaded.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public File downloadMultiFile(File destination, boolean overwrite) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		if (fileMultiDownloadSources.size() == 0) {
+			throw new MultiCloudException("No sources supplied.");
+		}
+		FileInfo sourceFile = fileMultiDownloadSources.get(0).getFile();
+		File target = destination;
+		if (destination.isDirectory()) {
+			target = new File(destination, sourceFile.getName());
+		}
+		try {
+			if (destination.exists() && !overwrite) {
+				throw new MultiCloudException("Target file already exists.");
+			} else {
+				target.createNewFile();
+			}
+			RandomAccessFile raf = new RandomAccessFile(target, "rw");
+			raf.setLength(sourceFile.getSize());
+			raf.close();
+		} catch (IOException e) {
+			throw new MultiCloudException("Failed to create the target file.");
+		}
+		for (FileCloudSource source: fileMultiDownloadSources) {
+			if (source.getToken().isExpired()) {
+				refreshAccount(source.getAccountName(), null);
+			}
+		}
+		FileDownloadOp op = new FileDownloadOp(fileMultiDownloadSources, target);
+		op.execute();
+		fileMultiDownloadSources.clear();
+		lastError = op.getError();
+		return op.getResult();
+	}
+
+	/**
+	 * Download file from multiple cloud storage services.
+	 * @param destination Location to save the file to.
+	 * @param overwrite If existing files should be overwritten.
+	 * @return File downloaded.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public File downloadMultiFile(String destination, boolean overwrite) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		return downloadMultiFile(new File(destination), overwrite);
 	}
 
 	/**
@@ -461,7 +565,7 @@ public class MultiCloud {
 	 * @param accountName Name of the user account.
 	 * @param folder Folder to be listed.
 	 * @return Folder contents.
-	 * @throws MultiCloudException if the operation failed.
+	 * @throws MultiCloudException If the operation failed.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
@@ -475,7 +579,7 @@ public class MultiCloud {
 	 * @param folder Folder to be listed.
 	 * @param showDeleted If deleted content should be listed.
 	 * @return Folder contents.
-	 * @throws MultiCloudException if the operation failed.
+	 * @throws MultiCloudException If the operation failed.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
@@ -490,7 +594,7 @@ public class MultiCloud {
 	 * @param showDeleted If deleted content should be listed.
 	 * @param showShared If files shared with the user should be listed.
 	 * @return Folder contents.
-	 * @throws MultiCloudException if the operation failed.
+	 * @throws MultiCloudException If the operation failed.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
@@ -557,7 +661,7 @@ public class MultiCloud {
 	 * @param destination Folder to move the source to.
 	 * @param destinationName File or folder name in the destination location. Null to retain original.
 	 * @return File or folder information after moving.
-	 * @throws MultiCloudException if the operation failed.
+	 * @throws MultiCloudException If the operation failed.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
@@ -634,7 +738,7 @@ public class MultiCloud {
 	 * @param file File or folder to be renamed.
 	 * @param fileName New file or folder name.
 	 * @return File or folder information after renaming.
-	 * @throws MultiCloudException if the operation failed.
+	 * @throws MultiCloudException If the operation failed.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
@@ -675,7 +779,7 @@ public class MultiCloud {
 	 * @param overwrite If the destination file should be overwritten.
 	 * @param data File to be uploaded.
 	 * @return File information about the uploaded file.
-	 * @throws MultiCloudException if the operation failed.
+	 * @throws MultiCloudException If the operation failed.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
@@ -709,7 +813,7 @@ public class MultiCloud {
 	 * @param data Data stream of the uploaded file.
 	 * @param size Size of the uploaded file.
 	 * @return File information about the uploaded file.
-	 * @throws MultiCloudException if the operation failed.
+	 * @throws MultiCloudException If the operation failed.
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */

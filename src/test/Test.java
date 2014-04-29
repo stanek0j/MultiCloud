@@ -175,6 +175,7 @@ public class Test {
 					}
 					if (content.getName().equals("test-file.mp3")) {
 						target = content;
+						cloud.addDownloadSource(drive, target);
 					}
 					for (ParentInfo parent: content.getParents()) {
 						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath() + " :: " + parent.isRoot());
@@ -184,6 +185,93 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+
+		drive = "googledrive";
+		try {
+			FileInfo list = cloud.listFolder(drive, null);
+			if (list == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("list of " + list.getPath() + " / " + list.getName() + " :: " + list.getId() + " :");
+				for (FileInfo content: list.getContent()) {
+					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					if (content.getName().equals("test")) {
+						folder = content;
+					}
+					if (content.getName().equals("target")) {
+						target = content;
+					}
+					for (ParentInfo parent: content.getParents()) {
+						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath() + " :: " + parent.isRoot());
+					}
+				}
+			}
+			list = cloud.listFolder(drive, folder);
+			if (list == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("list of " + list.getPath() + " / " + list.getName() + " :: " + list.getId() + " :");
+				for (FileInfo content: list.getContent()) {
+					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					if (content.getName().equals("test")) {
+						folder = content;
+					}
+					if (content.getName().equals("test-file.mp3")) {
+						target = content;
+						cloud.addDownloadSource(drive, target);
+					}
+					for (ParentInfo parent: content.getParents()) {
+						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath() + " :: " + parent.isRoot());
+					}
+				}
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+		drive = "onedrive";
+		try {
+			FileInfo list = cloud.listFolder(drive, null);
+			if (list == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("list of " + list.getPath() + " / " + list.getName() + " :: " + list.getId() + " :");
+				for (FileInfo content: list.getContent()) {
+					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					if (content.getName().equals("test")) {
+						folder = content;
+					}
+					if (content.getName().equals("target")) {
+						target = content;
+					}
+					for (ParentInfo parent: content.getParents()) {
+						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath() + " :: " + parent.isRoot());
+					}
+				}
+			}
+			list = cloud.listFolder(drive, folder);
+			if (list == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("list of " + list.getPath() + " / " + list.getName() + " :: " + list.getId() + " :");
+				for (FileInfo content: list.getContent()) {
+					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					if (content.getName().equals("test")) {
+						folder = content;
+					}
+					if (content.getName().equals("test-file.mp3")) {
+						target = content;
+						cloud.addDownloadSource(drive, target);
+					}
+					for (ParentInfo parent: content.getParents()) {
+						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath() + " :: " + parent.isRoot());
+					}
+				}
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
 		/*
 		try {
 			FileInfo info = cloud.uploadFile(drive, folder, "test-file.mp3", true, new File("test-file.mp3"));
@@ -196,8 +284,10 @@ public class Test {
 			e1.printStackTrace();
 		}
 		 */
+		long start = System.currentTimeMillis();
 		try {
-			File file = cloud.downloadFile(drive, target, "test.mp3", true);
+			//File file = cloud.downloadFile(drive, target, "test.mp3", true);
+			File file = cloud.downloadMultiFile("test.mp3", true);
 			if (file == null) {
 				System.out.println(cloud.getLastError());
 			} else {
@@ -206,6 +296,8 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		long time = System.currentTimeMillis() - start;
+		System.out.println("time: " + (time / 1000.0) + "s");
 		/*
 		try {
 			folder = cloud.move(drive, folder, target, null);
