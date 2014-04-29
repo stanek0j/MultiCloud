@@ -2,6 +2,7 @@ package cz.zcu.kiv.multicloud.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
 import cz.zcu.kiv.multicloud.json.CloudSettings;
+import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2GrantType;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Settings;
 
@@ -166,6 +168,33 @@ public class Utils {
 			break;
 		}
 		return s;
+	}
+
+	/**
+	 * Removes files that are not visible from the folder listing.
+	 * @param contents Folder listing.
+	 * @param visible Visible files.
+	 * @return Visible folder listing.
+	 */
+	public static FileInfo formVisibilityTree(FileInfo contents, FileInfo visible) {
+		if (contents == null || visible == null) {
+			return contents;
+		}
+		List<FileInfo> remove = new ArrayList<>();
+		for (FileInfo file: contents.getContent()) {
+			boolean found = false;
+			for (FileInfo v: visible.getContent()) {
+				if (file.getId().equals(v.getId())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				remove.add(file);
+			}
+		}
+		contents.getContent().removeAll(remove);
+		return contents;
 	}
 
 	/**

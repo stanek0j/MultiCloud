@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import cz.zcu.kiv.multicloud.filesystem.AccountInfoOp;
 import cz.zcu.kiv.multicloud.filesystem.AccountQuotaOp;
 import cz.zcu.kiv.multicloud.filesystem.CopyOp;
 import cz.zcu.kiv.multicloud.filesystem.DeleteOp;
+import cz.zcu.kiv.multicloud.filesystem.FileDownloadOp;
 import cz.zcu.kiv.multicloud.filesystem.FileType;
 import cz.zcu.kiv.multicloud.filesystem.FileUploadOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderCreateOp;
@@ -264,8 +266,7 @@ public class MultiCloud {
 		CopyOp op = new CopyOp(token, settings.getCopyRequest(), file, destination, destinationName);
 		op.execute();
 		lastError = op.getError();
-		FileInfo info = op.getResult();
-		return info;
+		return op.getResult();
 	}
 
 	/**
@@ -327,8 +328,7 @@ public class MultiCloud {
 		FolderCreateOp op = new FolderCreateOp(token, settings.getCreateDirRequest(), folderName, useFolder);
 		op.execute();
 		lastError = op.getError();
-		FileInfo info = op.getResult();
-		return info;
+		return op.getResult();
 	}
 
 	/**
@@ -366,8 +366,7 @@ public class MultiCloud {
 		DeleteOp op = new DeleteOp(token, settings.getDeleteRequest(), file);
 		op.execute();
 		lastError = op.getError();
-		FileInfo info = op.getResult();
-		return info;
+		return op.getResult();
 	}
 
 	/**
@@ -384,6 +383,52 @@ public class MultiCloud {
 			credentialStore.deleteCredential(account.getTokenId());
 		}
 		accountManager.removeAccountSettings(accountName);
+	}
+
+	public File downloadFile(String accountName, FileInfo sourceFile, File destination, boolean overwrite) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
+		}
+		File target = destination;
+		if (destination.isDirectory()) {
+			target = new File(destination, sourceFile.getName());
+		}
+		try {
+			if (destination.exists() && !overwrite) {
+				throw new MultiCloudException("Target file already exists.");
+			} else {
+				target.createNewFile();
+			}
+			RandomAccessFile raf = new RandomAccessFile(target, "rw");
+			raf.setLength(sourceFile.getSize());
+			raf.close();
+		} catch (IOException e) {
+			throw new MultiCloudException("Failed to create the target file.");
+		}
+		FileDownloadOp op = new FileDownloadOp(token, settings.getDownloadFileRequest(), target);
+		op.execute();
+		lastError = op.getError();
+		return op.getResult();
+	}
+
+	public File downloadFile(String accountName, FileInfo sourceFile, String destination, boolean overwrite) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		return downloadFile(accountName, sourceFile, new File(destination), overwrite);
 	}
 
 	/**
@@ -471,7 +516,7 @@ public class MultiCloud {
 		if (useFolder.getFileType() != FileType.FOLDER) {
 			throw new MultiCloudException("Supplied file instead of folder.");
 		}
-		FolderListOp op = new FolderListOp(token, settings.getListDirRequest(), useFolder, showDeleted);
+		FolderListOp op = new FolderListOp(token, settings.getListDirBeginRequest(), settings.getListDirRequest(), useFolder, showDeleted);
 		op.execute();
 		lastError = op.getError();
 		FileInfo info = op.getResult();
@@ -543,8 +588,7 @@ public class MultiCloud {
 		MoveOp op = new MoveOp(token, settings.getMoveRequest(), file, destination, destinationName);
 		op.execute();
 		lastError = op.getError();
-		FileInfo info = op.getResult();
-		return info;
+		return op.getResult();
 	}
 
 	/**
@@ -615,20 +659,55 @@ public class MultiCloud {
 		RenameOp op = new RenameOp(token, settings.getRenameRequest(), file, fileName);
 		op.execute();
 		lastError = op.getError();
-		FileInfo info = op.getResult();
+		return op.getResult();
+	}
+
+	/**
+	 * 
+	 * @param accountName Name of the user account.
+	 * @param destination Destination file or folder to be moved to.
+	 * @param destinationName New name at the destination location.
+	 * @param overwrite If the destination file should be overwritten.
+	 * @param data File to be uploaded.
+	 * @return File information about the uploaded file.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public FileInfo uploadFile(String accountName, FileInfo destination, String destinationName, boolean overwrite, File data) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		InputStream stream = null;
+		FileInfo info = null;
+		try {
+			stream = new FileInputStream(data);
+			info = uploadFile(accountName, destination, destinationName, overwrite, stream, data.length());
+		} catch (FileNotFoundException e) {
+			throw new MultiCloudException("File not found.");
+		} finally {
+			/* close the stream when the file is uploaded */
+			try {
+				if (stream != null) {
+					stream.close();
+				}
+			} catch (IOException e) {
+				/* ignore exception */
+			}
+		}
 		return info;
 	}
 
-	public FileInfo uploadFile(String accountName, FileInfo destination, String destinationName, boolean overwrite, File data) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
-		InputStream stream;
-		try {
-			stream = new FileInputStream(data);
-		} catch (FileNotFoundException e) {
-			throw new MultiCloudException("File not found.");
-		}
-		return uploadFile(accountName, destination, destinationName, overwrite, stream, data.length());
-	}
-
+	/**
+	 * 
+	 * @param accountName Name of the user account.
+	 * @param destination Destination file or folder to be moved to.
+	 * @param destinationName New name at the destination location.
+	 * @param overwrite If the destination file should be overwritten.
+	 * @param data Data stream of the uploaded file.
+	 * @param size Size of the uploaded file.
+	 * @return File information about the uploaded file.
+	 * @throws MultiCloudException if the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
 	public FileInfo uploadFile(String accountName, FileInfo destination, String destinationName, boolean overwrite, InputStream data, long size) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
@@ -658,8 +737,7 @@ public class MultiCloud {
 		FileUploadOp op = new FileUploadOp(token, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), destination, destinationName, overwrite, data, size);
 		op.execute();
 		lastError = op.getError();
-		FileInfo info = op.getResult();
-		return info;
+		return op.getResult();
 	}
 
 	/**

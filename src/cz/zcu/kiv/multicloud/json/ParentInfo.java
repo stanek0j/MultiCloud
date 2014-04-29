@@ -13,8 +13,10 @@ public class ParentInfo {
 
 	/** Identifier of the parent. */
 	private String id;
-	/** Pathe to the parent. */
+	/** Path to the parent. */
 	private String path;
+	/** If the parent is root folder. */
+	private boolean isRoot;
 
 	/**
 	 * Returns the identifier of the parent.
@@ -33,6 +35,14 @@ public class ParentInfo {
 	}
 
 	/**
+	 * Returns true if the parent is root folder.
+	 * @return If the parent is root folder.
+	 */
+	public boolean isRoot() {
+		return isRoot;
+	}
+
+	/**
 	 * Sets the identifier of the parent.
 	 * @param id Parent identifier.
 	 */
@@ -46,6 +56,14 @@ public class ParentInfo {
 	 */
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	/**
+	 * Sets if the parent is root folder.
+	 * @param isRoot If the parent is root folder.
+	 */
+	public void setIsRoot(boolean isRoot) {
+		this.isRoot = isRoot;
 	}
 
 }

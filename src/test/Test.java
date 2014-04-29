@@ -117,8 +117,8 @@ public class Test {
 		 */
 
 		//String drive = "test";
-		//String drive = "googledrive";
-		String drive = "onedrive";
+		String drive = "googledrive";
+		//String drive = "onedrive";
 
 		FileInfo folder = null;
 		/*
@@ -149,7 +149,7 @@ public class Test {
 			if (list == null) {
 				System.out.println(cloud.getLastError());
 			} else {
-				System.out.println("list of " + list.getPath() + ":");
+				System.out.println("list of " + list.getPath() + " / " + list.getName() + " :: " + list.getId() + " :");
 				for (FileInfo content: list.getContent()) {
 					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
 					if (content.getName().equals("test")) {
@@ -159,19 +159,49 @@ public class Test {
 						target = content;
 					}
 					for (ParentInfo parent: content.getParents()) {
-						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath());
+						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath() + " :: " + parent.isRoot());
+					}
+				}
+			}
+			list = cloud.listFolder(drive, folder);
+			if (list == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("list of " + list.getPath() + " / " + list.getName() + " :: " + list.getId() + " :");
+				for (FileInfo content: list.getContent()) {
+					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					if (content.getName().equals("test")) {
+						folder = content;
+					}
+					if (content.getName().equals("test-file.mp3")) {
+						target = content;
+					}
+					for (ParentInfo parent: content.getParents()) {
+						System.out.println("  parent: " + parent.getId() + " :: " + parent.getPath() + " :: " + parent.isRoot());
 					}
 				}
 			}
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		/*
 		try {
 			FileInfo info = cloud.uploadFile(drive, folder, "test-file.mp3", true, new File("test-file.mp3"));
 			if (info == null) {
 				System.out.println(cloud.getLastError());
 			} else {
 				System.out.println("file uploaded: " + info.getName());
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		 */
+		try {
+			File file = cloud.downloadFile(drive, target, "test.mp3", true);
+			if (file == null) {
+				System.out.println(cloud.getLastError());
+			} else {
+				System.out.println("file downloaded: " + file.getPath());
 			}
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();

@@ -82,6 +82,9 @@ public class CloudSettings {
 	/** Folder create request parameters. */
 	@JsonProperty("create_dir_request")
 	private CloudRequest createDirRequest;
+	/** Folder list preparation request parameters. */
+	@JsonProperty("list_dir_begin_request")
+	private CloudRequest listDirBeginRequest;
 	/** Folder list request parameters. */
 	@JsonProperty("list_dir_request")
 	private CloudRequest listDirRequest;
@@ -184,6 +187,14 @@ public class CloudSettings {
 	 */
 	public OAuth2GrantType getGrantType() {
 		return grantType;
+	}
+
+	/**
+	 * Returns the folder list preparation request parameters.
+	 * @return Folder list preparation request parameters.
+	 */
+	public CloudRequest getListDirBeginRequest() {
+		return listDirBeginRequest;
 	}
 
 	/**
@@ -415,6 +426,14 @@ public class CloudSettings {
 	}
 
 	/**
+	 * Sets the folder list preparation request parameters.
+	 * @param listDirBeginRequest Folder list preparation request parameters.
+	 */
+	public void setListDirBeginRequest(CloudRequest listDirBeginRequest) {
+		this.listDirBeginRequest = listDirBeginRequest;
+	}
+
+	/**
 	 * Sets the folder list request parameters.
 	 * @param listDirRequest Folder list request parameters.
 	 */
@@ -461,6 +480,7 @@ public class CloudSettings {
 	public void setRootFolder(FileInfo rootFolder) {
 		this.rootFolder = rootFolder;
 		this.rootFolder.setFileType(FileType.FOLDER);
+		this.rootFolder.setIsRoot(true);
 	}
 
 	/**

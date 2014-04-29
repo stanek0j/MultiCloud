@@ -223,7 +223,6 @@ public class FileUploadOp extends Operation<FileInfo> {
 							if (body.equals(DATA_MAPPING)) {
 								ByteArrayInputStream data = readData();
 								transferred += buffer.length;
-								System.out.println(transferred);
 								addPropertyMapping("offsetbuffer", String.valueOf(transferred - 1));
 								request = prepareRequest(new InputStreamEntity(data, buffer.length));
 							} else {
@@ -335,12 +334,6 @@ public class FileUploadOp extends Operation<FileInfo> {
 				info.setFileType(FileType.FILE);
 				setResult(info);
 			}
-		}
-		/* close the stream when the file is uploaded */
-		try {
-			data.close();
-		} catch (IOException e) {
-			/* if already closed, ignore */
 		}
 	}
 

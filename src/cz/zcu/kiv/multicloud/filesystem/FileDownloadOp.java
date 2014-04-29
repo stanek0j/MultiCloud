@@ -1,8 +1,9 @@
 package cz.zcu.kiv.multicloud.filesystem;
 
+import java.io.File;
+
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.json.CloudRequest;
-import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
@@ -14,12 +15,14 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
  * @version 1.0
  *
  */
-public class FileDownloadOp extends Operation<FileInfo> {
+public class FileDownloadOp extends Operation<File> {
 
 	/** Size of a chunk for file download. */
 	public static final long CHUNK_SIZE = 4 *1024 * 1024;
 
-	public FileDownloadOp(OAuth2Token token, CloudRequest request) {
+
+
+	public FileDownloadOp(OAuth2Token token, CloudRequest request, File destination) {
 		super(OperationType.FILE_DOWNLOAD, token, request);
 	}
 
@@ -28,8 +31,7 @@ public class FileDownloadOp extends Operation<FileInfo> {
 	 */
 	@Override
 	protected void operationBegin() throws MultiCloudException {
-		// TODO Auto-generated method stub
-
+		/* no preparation necessary */
 	}
 
 	/**
@@ -37,7 +39,6 @@ public class FileDownloadOp extends Operation<FileInfo> {
 	 */
 	@Override
 	protected void operationExecute() throws MultiCloudException {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -46,8 +47,7 @@ public class FileDownloadOp extends Operation<FileInfo> {
 	 */
 	@Override
 	protected void operationFinish() throws MultiCloudException {
-		// TODO Auto-generated method stub
-
+		/* no preparation necessary */
 	}
 
 }

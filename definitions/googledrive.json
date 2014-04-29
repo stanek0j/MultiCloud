@@ -20,7 +20,7 @@
 	"chunked_download":true,
 	"root_folder":
 	{
-		"id":""
+		"id":"root"
 	},
 	"account_info_request":
 	{
@@ -119,9 +119,21 @@
 			"mimeType":"application/vnd.google-apps.folder"
 		}
 	},
+	"list_dir_begin_request":
+	{
+		"uri":"https://www.googleapis.com/drive/v2/files/<id>/children",
+		"method":"GET",
+		"mapping":
+		{
+			"content":"items",
+			"deleted":"labels/trashed",
+			"size":"quotaBytesUsed",
+			"name":"title"
+		}
+	},
 	"list_dir_request":
 	{
-		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
+		"uri":"https://www.googleapis.com/drive/v2/files",
 		"method":"GET",
 		"params":
 		{
