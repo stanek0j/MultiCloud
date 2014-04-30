@@ -3,7 +3,7 @@ package cz.zcu.kiv.multicloud.json;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
- * cz.zcu.kiv.multicloud.json/OperationError.java
+ * cz.zcu.kiv.multicloud.json/OperationError.java			<br /><br />
  *
  * Bean for holding error message that occured during {@link cz.zcu.kiv.multicloud.filesystem.Operation}.
  *

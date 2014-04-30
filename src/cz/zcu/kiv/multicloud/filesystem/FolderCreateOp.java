@@ -20,7 +20,7 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/FolderCreateOp.java
+ * cz.zcu.kiv.multicloud.filesystem/FolderCreateOp.java			<br /><br />
  *
  * Operation for creating a new folder in the specified location of the storage.
  *

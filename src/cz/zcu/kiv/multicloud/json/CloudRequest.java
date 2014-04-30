@@ -4,10 +4,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import cz.zcu.kiv.multicloud.utils.HttpMethod;
+import cz.zcu.kiv.multicloud.http.HttpMethod;
 
 /**
- * cz.zcu.kiv.multicloud.json/CloudRequest.java
+ * cz.zcu.kiv.multicloud.json/CloudRequest.java			<br /><br />
  *
  * Bean for holding basic information about a request to the cloud storage.
  *

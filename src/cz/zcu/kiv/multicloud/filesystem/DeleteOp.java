@@ -13,7 +13,7 @@ import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/DeleteOp.java
+ * cz.zcu.kiv.multicloud.filesystem/DeleteOp.java			<br /><br />
  *
  * Operation for deleting specified file or folder from the storage.
  *

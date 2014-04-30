@@ -21,7 +21,7 @@ import org.simpleframework.transport.connect.SocketConnection;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.oauth2/RedirectServer.java
+ * cz.zcu.kiv.multicloud.oauth2/RedirectServer.java			<br /><br />
  *
  * Simple HTTP server listening for OAuth 2.0 authorization code redirect. Its behavior fits the step C of figure 3 of section 4.1. of RFC 6749.
  *

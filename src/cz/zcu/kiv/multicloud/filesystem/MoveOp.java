@@ -18,7 +18,7 @@ import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/MoveOp.java
+ * cz.zcu.kiv.multicloud.filesystem/MoveOp.java			<br /><br />
  *
  * Operation for moving a file or folder to the specified location, including renaming.
  *

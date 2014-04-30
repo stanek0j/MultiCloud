@@ -7,7 +7,7 @@ import java.util.Set;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.utils/CredentialStore.java
+ * cz.zcu.kiv.multicloud.utils/CredentialStore.java			<br /><br />
  *
  * Basic interface of the credential store. It is recommended to implement a custom credential store as a singleton and pass it along to each of {@link cz.zcu.kiv.multicloud.oauth2.OAuth2} instances.
  *

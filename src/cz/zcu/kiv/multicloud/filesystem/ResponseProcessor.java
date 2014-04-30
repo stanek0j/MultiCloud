@@ -3,7 +3,7 @@ package cz.zcu.kiv.multicloud.filesystem;
 import org.apache.http.HttpResponse;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/ResponseProcessor.java
+ * cz.zcu.kiv.multicloud.filesystem/ResponseProcessor.java			<br /><br />
  *
  * Interface for processing {@link org.apache.http.HttpResponse} in a custom way and returning a defined result type.
  *

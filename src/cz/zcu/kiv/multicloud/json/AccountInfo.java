@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.json;
 
 /**
- * cz.zcu.kiv.multicloud.json/AccountInfo.java
+ * cz.zcu.kiv.multicloud.json/AccountInfo.java			<br /><br />
  *
  * Bean for storing information about the user of the user account.
  *

@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.json;
 
 /**
- * cz.zcu.kiv.multicloud.json/AccountQuota.java
+ * cz.zcu.kiv.multicloud.json/AccountQuota.java			<br /><br />
  *
  * Bean for holding information about user account quota.
  *

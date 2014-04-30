@@ -44,7 +44,7 @@ import cz.zcu.kiv.multicloud.utils.SecureFileCredentialStore;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud/MultiCloud.java
+ * cz.zcu.kiv.multicloud/MultiCloud.java			<br /><br />
  *
  * The MultiCloud library.
  * All methods are synchronous. For asynchronous usage, external threading should be used.
@@ -54,6 +54,21 @@ import cz.zcu.kiv.multicloud.utils.Utils;
  *
  */
 public class MultiCloud {
+
+	/** Version of the library. */
+	public static final String VERSION = "1.0";
+
+	/**
+	 * Main method to return the version of the library.
+	 * @param args Arguments passed.
+	 */
+	public static void main(String[] args) {
+		System.out.println("====================");
+		System.out.println(" MultiCloud library ");
+		System.out.println("====================");
+		System.out.println("   Version: " + VERSION);
+		System.exit(1);
+	}
 
 	/** Cloud settings manager. */
 	private CloudManager cloudManager;
@@ -65,6 +80,7 @@ public class MultiCloud {
 	private OperationError lastError;
 	/** List of sources for douwloading a file from. */
 	private List<FileCloudSource> fileMultiDownloadSources;
+
 	/** Listener of the transfer progress. */
 	private ProgressListener listener;
 

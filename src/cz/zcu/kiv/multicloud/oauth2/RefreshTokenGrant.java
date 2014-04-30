@@ -19,7 +19,7 @@ import cz.zcu.kiv.multicloud.json.Json;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.oauth2/RefreshTokenGrant.java
+ * cz.zcu.kiv.multicloud.oauth2/RefreshTokenGrant.java			<br /><br />
  *
  * Implementation of the <a href="http://tools.ietf.org/html/rfc6749#section-6">Refreshing an Access Token</a> section of the OAuth 2.0 specification.
  * For easier use, it implements the {@link cz.zcu.kiv.multicloud.oauth2.OAuth2Grant}.

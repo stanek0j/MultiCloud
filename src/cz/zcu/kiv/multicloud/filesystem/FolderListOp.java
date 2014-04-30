@@ -14,7 +14,7 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/FolderListOp.java
+ * cz.zcu.kiv.multicloud.filesystem/FolderListOp.java			<br /><br />
  *
  * Operation for getting the list of folders and files inside the specified folder of the storage space.
  *

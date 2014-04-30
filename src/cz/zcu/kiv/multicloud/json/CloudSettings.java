@@ -7,7 +7,7 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Grant;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2GrantType;
 
 /**
- * cz.zcu.kiv.multicloud.json/CloudSettings.java
+ * cz.zcu.kiv.multicloud.json/CloudSettings.java			<br /><br />
  *
  * Bean for holding complete information about how to communicate with a cloud storage.
  *

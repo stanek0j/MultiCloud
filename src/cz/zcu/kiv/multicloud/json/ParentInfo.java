@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.json;
 
 /**
- * cz.zcu.kiv.multicloud.json/ParentInfo.java
+ * cz.zcu.kiv.multicloud.json/ParentInfo.java			<br /><br />
  *
  * Bean for holding the basic information about file or folder parent.
  *
@@ -51,19 +51,19 @@ public class ParentInfo {
 	}
 
 	/**
-	 * Sets the path to the parent.
-	 * @param path Parent path.
-	 */
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	/**
 	 * Sets if the parent is root folder.
 	 * @param isRoot If the parent is root folder.
 	 */
 	public void setIsRoot(boolean isRoot) {
 		this.isRoot = isRoot;
+	}
+
+	/**
+	 * Sets the path to the parent.
+	 * @param path Parent path.
+	 */
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 }

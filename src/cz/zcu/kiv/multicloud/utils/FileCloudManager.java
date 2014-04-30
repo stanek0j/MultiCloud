@@ -16,7 +16,7 @@ import cz.zcu.kiv.multicloud.json.CloudSettings;
 import cz.zcu.kiv.multicloud.json.Json;
 
 /**
- * cz.zcu.kiv.multicloud.utils/FileCloudManager.java
+ * cz.zcu.kiv.multicloud.utils/FileCloudManager.java			<br /><br />
  *
  * Class for managing settings for different cloud storage service providers.
  *

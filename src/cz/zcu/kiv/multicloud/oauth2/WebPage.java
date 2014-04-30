@@ -7,7 +7,7 @@ import java.util.Map;
 import org.simpleframework.http.Status;
 
 /**
- * cz.zcu.kiv.multicloud.oauth2/WebPage.java
+ * cz.zcu.kiv.multicloud.oauth2/WebPage.java			<br /><br />
  *
  * Abstract class defining basic structure of a web page returned by the {@link cz.zcu.kiv.multicloud.oauth2.RedirectServer} after the redirect from an external authorization site.
  *

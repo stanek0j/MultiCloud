@@ -3,7 +3,7 @@ package cz.zcu.kiv.multicloud.utils;
 import cz.zcu.kiv.multicloud.json.CloudSettings;
 
 /**
- * cz.zcu.kiv.multicloud.utils/CloudManager.java
+ * cz.zcu.kiv.multicloud.utils/CloudManager.java			<br /><br />
  *
  * Interface for loading settings for different cloud storage service providers.
  *

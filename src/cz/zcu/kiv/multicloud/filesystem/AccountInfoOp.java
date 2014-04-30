@@ -13,7 +13,7 @@ import cz.zcu.kiv.multicloud.json.CloudRequest;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/AccountInfoOp.java
+ * cz.zcu.kiv.multicloud.filesystem/AccountInfoOp.java			<br /><br />
  *
  * Operation for getting the user name and user identifier for the user account.
  *

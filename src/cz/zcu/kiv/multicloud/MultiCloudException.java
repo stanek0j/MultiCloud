@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud;
 
 /**
- * cz.zcu.kiv.multicloud/MultiCloudException.java
+ * cz.zcu.kiv.multicloud/MultiCloudException.java			<br /><br />
  *
  * Exception thrown when a problem occurs in the library.
  *

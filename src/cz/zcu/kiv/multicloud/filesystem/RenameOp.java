@@ -18,7 +18,7 @@ import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/RenameOp.java
+ * cz.zcu.kiv.multicloud.filesystem/RenameOp.java			<br /><br />
  *
  * Operation for renaming file or folder in the storage.
  *

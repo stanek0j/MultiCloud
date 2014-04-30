@@ -4,7 +4,7 @@ import java.io.Closeable;
 
 
 /**
- * cz.zcu.kiv.multicloud.oauth2/OAuth2Grant.java
+ * cz.zcu.kiv.multicloud.oauth2/OAuth2Grant.java			<br /><br />
  *
  * Basic interface for implementing OAuth 2.0 grant.
  *

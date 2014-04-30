@@ -5,7 +5,7 @@ import java.util.Collection;
 import cz.zcu.kiv.multicloud.json.AccountSettings;
 
 /**
- * cz.zcu.kiv.multicloud.utils/AccountManager.java
+ * cz.zcu.kiv.multicloud.utils/AccountManager.java			<br /><br />
  *
  * Interface for storing user accounts for different cloud storage services.
  *

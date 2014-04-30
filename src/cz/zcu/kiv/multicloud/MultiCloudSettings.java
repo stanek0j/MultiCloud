@@ -5,7 +5,7 @@ import cz.zcu.kiv.multicloud.utils.CloudManager;
 import cz.zcu.kiv.multicloud.utils.CredentialStore;
 
 /**
- * cz.zcu.kiv.multicloud/MultiCloudSettings.java
+ * cz.zcu.kiv.multicloud/MultiCloudSettings.java			<br /><br />
  *
  * Class for accumulating custom settings for the MultiCloud library.
  *

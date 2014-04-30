@@ -5,7 +5,7 @@ import java.net.URI;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 
 /**
- * cz.zcu.kiv.multicloud.http/HttpMove.java
+ * cz.zcu.kiv.multicloud.http/HttpMove.java			<br /><br />
  *
  * Implementation of the HTTP MOVE method for use in OneDrive storage service.
  *

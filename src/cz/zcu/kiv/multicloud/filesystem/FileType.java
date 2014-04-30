@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.filesystem;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/FileType.java
+ * cz.zcu.kiv.multicloud.filesystem/FileType.java			<br /><br />
  *
  * File type used in {@link cz.zcu.kiv.multicloud.json.FileInfo} to determine if the metadata belongs to a folder or a file.
  *

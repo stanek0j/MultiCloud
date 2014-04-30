@@ -6,7 +6,7 @@ import java.util.List;
 import cz.zcu.kiv.multicloud.filesystem.FileType;
 
 /**
- * cz.zcu.kiv.multicloud.json/FileInfo.java
+ * cz.zcu.kiv.multicloud.json/FileInfo.java			<br /><br />
  *
  * Bean for holding information about a file or folder.
  *

@@ -18,7 +18,7 @@ import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/CopyOp.java
+ * cz.zcu.kiv.multicloud.filesystem/CopyOp.java			<br /><br />
  *
  * Operation for copying file or folder to the specified location, including renaming.
  *

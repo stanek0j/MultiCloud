@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * cz.zcu.kiv.multicloud.json/AccountSettings.java
+ * cz.zcu.kiv.multicloud.json/AccountSettings.java			<br /><br />
  *
  * Bean for holding information about user account registered by a cloud storage service provider. No user credentials are stored here.
  *

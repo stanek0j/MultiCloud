@@ -19,7 +19,7 @@ import cz.zcu.kiv.multicloud.json.Json;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.oauth2/ClientCredGrant.java
+ * cz.zcu.kiv.multicloud.oauth2/ClientCredGrant.java			<br /><br />
  *
  * Implementation of the <a href="http://tools.ietf.org/html/rfc6749#section-4.4">OAuth 2.0 Client Credentials Grant</a>.
  *

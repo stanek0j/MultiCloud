@@ -10,7 +10,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/FileDownloadThread.java
+ * cz.zcu.kiv.multicloud.filesystem/FileDownloadThread.java			<br /><br />
  *
  * Worker thread for downloading partial file content from the storage.
  *

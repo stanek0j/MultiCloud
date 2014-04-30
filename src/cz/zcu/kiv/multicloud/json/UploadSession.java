@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.json;
 
 /**
- * cz.zcu.kiv.multicloud.json/UploadSession.java
+ * cz.zcu.kiv.multicloud.json/UploadSession.java			<br /><br />
  *
  * Bean for holding information about chunked upload session.
  *

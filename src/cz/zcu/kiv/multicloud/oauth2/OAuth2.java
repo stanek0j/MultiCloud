@@ -6,7 +6,7 @@ import cz.zcu.kiv.multicloud.utils.CredentialStore;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.oauth2/OAuth2.java
+ * cz.zcu.kiv.multicloud.oauth2/OAuth2.java			<br /><br />
  *
  * Implementation of the <a href="http://tools.ietf.org/html/rfc6749">OAuth 2.0 authorization framework</a>.
  * This implementation is specifically designed for the use with cloud storage services, but it also might be suitable for other uses.

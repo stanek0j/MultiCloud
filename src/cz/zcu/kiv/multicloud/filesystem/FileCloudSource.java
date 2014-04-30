@@ -5,7 +5,7 @@ import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/FileCloudSource.java
+ * cz.zcu.kiv.multicloud.filesystem/FileCloudSource.java			<br /><br />
  *
  * Class for holding file information, access token and the settings for downloading it from a cloud storage service.
  *

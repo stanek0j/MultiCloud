@@ -5,7 +5,7 @@ import java.net.URI;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 
 /**
- * cz.zcu.kiv.multicloud.http/HttpCopy.java
+ * cz.zcu.kiv.multicloud.http/HttpCopy.java			<br /><br />
  *
  * Implementation of the HTTP COPY method for use in OneDrive storage service.
  *

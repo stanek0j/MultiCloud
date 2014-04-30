@@ -36,16 +36,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.http.HttpCopy;
+import cz.zcu.kiv.multicloud.http.HttpMethod;
 import cz.zcu.kiv.multicloud.http.HttpMove;
 import cz.zcu.kiv.multicloud.json.CloudRequest;
 import cz.zcu.kiv.multicloud.json.Json;
 import cz.zcu.kiv.multicloud.json.OperationError;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
-import cz.zcu.kiv.multicloud.utils.HttpMethod;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/Operation.java
+ * cz.zcu.kiv.multicloud.filesystem/Operation.java			<br /><br />
  *
  * Generic template for implementing any operation with the user account storage.
  *

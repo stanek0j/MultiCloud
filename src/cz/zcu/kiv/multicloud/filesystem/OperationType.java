@@ -1,7 +1,7 @@
 package cz.zcu.kiv.multicloud.filesystem;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/OperationType.java
+ * cz.zcu.kiv.multicloud.filesystem/OperationType.java			<br /><br />
  *
  * List of all operation types enabled by the library.
  *

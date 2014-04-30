@@ -11,7 +11,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
- * cz.zcu.kiv.multicloud.oauth2/ImplicitGrant.java
+ * cz.zcu.kiv.multicloud.oauth2/ImplicitGrant.java			<br /><br />
  *
  * Implementation of the <a href="http://tools.ietf.org/html/rfc6749#section-4.2">OAuth 2.0 Implicit Grant</a>.
  *

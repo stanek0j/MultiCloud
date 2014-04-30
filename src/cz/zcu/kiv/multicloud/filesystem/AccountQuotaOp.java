@@ -13,7 +13,7 @@ import cz.zcu.kiv.multicloud.json.CloudRequest;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 
 /**
- * cz.zcu.kiv.multicloud.filesystem/AccountQuotaOp.java
+ * cz.zcu.kiv.multicloud.filesystem/AccountQuotaOp.java			<br /><br />
  *
  * Operation for getting information about the user quota.
  *
