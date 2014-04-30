@@ -4,6 +4,7 @@ import java.io.File;
 
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
+import cz.zcu.kiv.multicloud.filesystem.ProgressListener;
 import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.json.ParentInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
@@ -17,6 +18,14 @@ public class Test {
 	public static void main(String[] args) {
 
 		MultiCloud cloud = new MultiCloud();
+
+		cloud.setListener(new ProgressListener(200) {
+			@Override
+			public void onProgress() {
+				System.out.println("progress: " + getTransferred() + " / " + getTotalSize());
+			}
+		});
+
 		cloud.validateAccounts();
 		/*
 		try {
@@ -212,6 +221,7 @@ public class Test {
 			e1.printStackTrace();
 		}
 		 */
+
 		long start = System.currentTimeMillis();
 		try {
 			//File file = cloud.downloadFile(drive, target, "test.mp3", true);
@@ -226,6 +236,7 @@ public class Test {
 		}
 		long time = System.currentTimeMillis() - start;
 		System.out.println("time: " + (time / 1000.0) + "s");
+
 		/*
 		try {
 			folder = cloud.move(drive, folder, target, null);

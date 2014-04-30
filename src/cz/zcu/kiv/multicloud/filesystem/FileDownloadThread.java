@@ -33,6 +33,8 @@ public class FileDownloadThread extends Thread {
 	private boolean terminate;
 	/** Number of failed requests. */
 	private int failCount;
+	/** Progress listener. */
+	private final ProgressListener listener;
 
 	/**
 	 * Ctor with necessary parameters.
@@ -40,10 +42,11 @@ public class FileDownloadThread extends Thread {
 	 * @param request Request to get the file data from.
 	 * @param writer File writer.
 	 */
-	public FileDownloadThread(BlockingQueue<DataChunk> queue, HttpUriRequest request, FileDownloadWriter writer) {
+	public FileDownloadThread(BlockingQueue<DataChunk> queue, HttpUriRequest request, FileDownloadWriter writer, ProgressListener listener) {
 		this.queue = queue;
 		this.request = request;
 		this.writer = writer;
+		this.listener = listener;
 		this.terminate = false;
 		this.failCount = 0;
 	}
@@ -83,6 +86,7 @@ public class FileDownloadThread extends Thread {
 						if (read == -1 || total >= buffer.length) {
 							break;
 						}
+						listener.addTransferred(1);
 						buffer[total++] = (byte) read;
 					}
 					writer.write(buffer, chunk.getBeginByte());

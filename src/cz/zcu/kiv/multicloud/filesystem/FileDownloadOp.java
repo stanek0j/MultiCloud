@@ -34,13 +34,15 @@ public class FileDownloadOp extends Operation<File> {
 	private final BlockingQueue<DataChunk> queue;
 	/** File writer. */
 	private FileDownloadWriter writer;
+	/** Progress listener. */
+	private final ProgressListener listener;
 
 	/**
 	 * Ctor with necessary parameters.
 	 * @param sources List of sources used to download the file.
 	 * @param destination Destination to save the file to.
 	 */
-	public FileDownloadOp(List<FileCloudSource> sources, File destination) {
+	public FileDownloadOp(List<FileCloudSource> sources, File destination, ProgressListener listener) {
 		super(OperationType.FILE_DOWNLOAD, null, null);
 		this.sources = new ArrayList<>();
 		for (FileCloudSource pair: sources) {
@@ -51,6 +53,7 @@ public class FileDownloadOp extends Operation<File> {
 		this.destination = destination;
 		this.pool = new ArrayList<>();
 		this.queue = new LinkedBlockingQueue<>();
+		this.listener = listener;
 	}
 
 	/**
@@ -81,6 +84,7 @@ public class FileDownloadOp extends Operation<File> {
 			/* prepare chunks */
 			long pos = 0;
 			long size = base.getFile().getSize();
+			listener.setTotalSize(size);
 			while (size > CHUNK_SIZE) {
 				queue.add(new DataChunk(pos, pos + CHUNK_SIZE));
 				pos += CHUNK_SIZE;
@@ -96,7 +100,7 @@ public class FileDownloadOp extends Operation<File> {
 				addPropertyMapping("id", source.getFile().getId());
 				addPropertyMapping("path", source.getFile().getPath());
 				HttpUriRequest request = prepareRequest(null);
-				pool.add(new FileDownloadThread(queue, request, writer));
+				pool.add(new FileDownloadThread(queue, request, writer, listener));
 			}
 			System.out.println("threads: " + pool.size());
 			for (FileDownloadThread thread: pool) {
@@ -110,6 +114,7 @@ public class FileDownloadOp extends Operation<File> {
 				}
 			}
 			/* close the file after writing all the data and set the result */
+			listener.finishTransfer();
 			writer.close();
 			if (queue.isEmpty()) {
 				setResult(destination);

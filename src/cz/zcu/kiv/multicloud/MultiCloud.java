@@ -20,6 +20,7 @@ import cz.zcu.kiv.multicloud.filesystem.FileUploadOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderCreateOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderListOp;
 import cz.zcu.kiv.multicloud.filesystem.MoveOp;
+import cz.zcu.kiv.multicloud.filesystem.ProgressListener;
 import cz.zcu.kiv.multicloud.filesystem.RenameOp;
 import cz.zcu.kiv.multicloud.json.AccountInfo;
 import cz.zcu.kiv.multicloud.json.AccountQuota;
@@ -64,6 +65,8 @@ public class MultiCloud {
 	private OperationError lastError;
 	/** List of sources for douwloading a file from. */
 	private List<FileCloudSource> fileMultiDownloadSources;
+	/** Listener of the transfer progress. */
+	private ProgressListener listener;
 
 	/**
 	 * Empty ctor.
@@ -464,7 +467,7 @@ public class MultiCloud {
 		}
 		List<FileCloudSource> sources = new ArrayList<>();
 		sources.add(new FileCloudSource(accountName, sourceFile, settings.getDownloadFileRequest(), token));
-		FileDownloadOp op = new FileDownloadOp(sources, target);
+		FileDownloadOp op = new FileDownloadOp(sources, target, listener);
 		op.execute();
 		lastError = op.getError();
 		return op.getResult();
@@ -520,7 +523,7 @@ public class MultiCloud {
 				refreshAccount(source.getAccountName(), null);
 			}
 		}
-		FileDownloadOp op = new FileDownloadOp(fileMultiDownloadSources, target);
+		FileDownloadOp op = new FileDownloadOp(fileMultiDownloadSources, target, listener);
 		op.execute();
 		fileMultiDownloadSources.clear();
 		lastError = op.getError();
@@ -546,6 +549,14 @@ public class MultiCloud {
 	 */
 	public OperationError getLastError() {
 		return lastError;
+	}
+
+	/**
+	 * Returns the progress listener.
+	 * @return Progress listener.
+	 */
+	public ProgressListener getListener() {
+		return listener;
 	}
 
 	/**
@@ -772,6 +783,14 @@ public class MultiCloud {
 	}
 
 	/**
+	 * Sets the progress listener.
+	 * @param listener Listener.
+	 */
+	public void setListener(ProgressListener listener) {
+		this.listener = listener;
+	}
+
+	/**
 	 * 
 	 * @param accountName Name of the user account.
 	 * @param destination Destination file or folder to be moved to.
@@ -843,7 +862,7 @@ public class MultiCloud {
 		if (destination.getFileType() != FileType.FOLDER) {
 			throw new MultiCloudException("Destination must be a folder.");
 		}
-		FileUploadOp op = new FileUploadOp(token, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), destination, destinationName, overwrite, data, size);
+		FileUploadOp op = new FileUploadOp(token, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), destination, destinationName, overwrite, data, size, listener);
 		op.execute();
 		lastError = op.getError();
 		return op.getResult();

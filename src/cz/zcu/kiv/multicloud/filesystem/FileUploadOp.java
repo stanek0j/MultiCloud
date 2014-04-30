@@ -55,6 +55,8 @@ public class FileUploadOp extends Operation<FileInfo> {
 	private final long size;
 	/** File data to be uploaded. */
 	private final InputStream data;
+	/** Progress listener. */
+	private final ProgressListener listener;
 
 	/** Number of bytes already sent to the server. */
 	private long transferred;
@@ -74,6 +76,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 	 * @param overwrite If the destination file should be overwritten.
 	 * @param data Data stream of the uploaded file.
 	 * @param size Size of the uploaded file.
+	 * @param listener Progress listener.
 	 */
 	public FileUploadOp(
 			OAuth2Token token,
@@ -84,14 +87,19 @@ public class FileUploadOp extends Operation<FileInfo> {
 			String destinationName,
 			boolean overwrite,
 			InputStream data,
-			long size) {
+			long size,
+			ProgressListener listener) {
 		super(OperationType.FILE_UPLOAD, token, beginRequest);
 		this.beginRequest = beginRequest;
 		this.execRequest = execRequest;
 		this.finishRequest = finishRequest;
 		this.size = size;
 		this.data = data;
+		this.listener = listener;
 
+		if (this.listener != null) {
+			this.listener.setTotalSize(size);
+		}
 		addPropertyMapping("id", destination.getId());
 		addPropertyMapping("destination_id", destination.getId());
 		String path = destination.getPath();
@@ -142,7 +150,8 @@ public class FileUploadOp extends Operation<FileInfo> {
 						if (body.equals(DATA_MAPPING)) {
 							ByteArrayInputStream data = readData();
 							transferred = buffer.length;
-							request = prepareRequest(new InputStreamEntity(data, buffer.length));
+							System.out.println("chunk size: " + buffer.length);
+							request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), buffer.length));
 						} else {
 							request = prepareRequest(new StringEntity(doPropertyMapping(body)));
 						}
@@ -224,7 +233,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 								ByteArrayInputStream data = readData();
 								transferred += buffer.length;
 								addPropertyMapping("offsetbuffer", String.valueOf(transferred - 1));
-								request = prepareRequest(new InputStreamEntity(data, buffer.length));
+								request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), buffer.length));
 							} else {
 								request = prepareRequest(new StringEntity(doPropertyMapping(body)));
 							}
@@ -282,7 +291,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 					if (body != null) {
 						if (body.equals(DATA_MAPPING)) {
 							transferred = size;
-							request = prepareRequest(new InputStreamEntity(data, size));
+							request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), size));
 						} else {
 							request = prepareRequest(new StringEntity(doPropertyMapping(body)));
 						}
