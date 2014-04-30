@@ -4,14 +4,12 @@
 	"authorize":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
 	},
 	"token":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
 	},
 	"grant_type":"",
 	"grant_class":"",
@@ -21,64 +19,89 @@
 	"password":"",
 	"redirect_uri":"",
 	"scope":"",
+	"chunked_upload":true,
+	"chunked_download":true,
+	"root_folder":
+	{
+		"id":""
+		"path":""
+	},
 	"account_info_request":
 	{
 		"uri":"",
 		"method":"",
-		"params":null
+		"params":
+		{
+			"parameter":"value"
+		},
+		"mapping":
+		{
+			"property":"mapping"
+		},
+		"body":null,
+		"json_body":
+		{
+			"property":"value"
+		}
 	},
 	"account_quota_request":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
 	},
 	"download_file_request":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
+	},
+	"upload_file_begin_request":
+	{
+		"uri":"",
+		"method":""
 	},
 	"upload_file_request":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
 	},
+	"upload_file_finish_request":
+	{
+		"uri":"",
+		"method":""
+	}
 	"create_dir_request":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
+	},
+	"list_dir_begin_request":
+	{
+		"uri":"",
+		"method":""
 	},
 	"list_dir_request":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
 	},
 	"rename_request":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
 	},	
 	"copy_request":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
 	},
 	"move_request":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
 	},
 	"delete_request":
 	{
 		"uri":"",
-		"method":"",
-		"params":null
+		"method":""
 	}
 }
