@@ -18,7 +18,8 @@
 	<property name="jar.dir" value="./jar" />
 	<property name="tmp.dir" value="./tmp" />
 
-	<property name="bin.jar.file" value="MultiCloud.jar" />
+	<property name="bin.jar.file" value="MultiCloud-src.jar" />
+	<property name="bin.jar.file.compact" value="MultiCloud.jar" />
 
 	<property name="main-class" value="cz.zcu.kiv.multicloud.MultiCloud" />
 	<path id="classpath">
@@ -87,7 +88,20 @@
 				<exclude name="*.txt" />
 			</zipgroupfileset>
 		</jar>
-				
+		
+		<delete dir="${tmp.dir}/doc" />
+		<delete dir="${tmp.dir}/src" />
+
+		<!-- creates JAR file -->		
+		<jar destfile="${jar.dir}/${bin.jar.file.compact}" basedir="${tmp.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}" />
+			</manifest>
+			<zipgroupfileset dir="${lib.dir}">
+				<exclude name="*.txt" />
+			</zipgroupfileset>
+		</jar>
+
 		<delete dir="${tmp.dir}" />
 	</target>
 	
