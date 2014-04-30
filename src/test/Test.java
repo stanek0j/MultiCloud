@@ -2,8 +2,6 @@ package test;
 
 import java.io.File;
 
-import com.fasterxml.jackson.core.JsonFactory;
-
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.json.FileInfo;
@@ -18,77 +16,7 @@ public class Test {
 	 */
 	public static void main(String[] args) {
 
-		JsonFactory jsonFactory = new JsonFactory();
-
-		/*
-		try {
-			CloseableHttpClient client = HttpClients.createDefault();
-			HttpRequestBase httpRequest = new HttpGet("http://echo.jsontest.com/key/value/one/two");
-			CloseableHttpResponse response = client.execute(httpRequest);
-			System.out.println(response.getStatusLine());
-			HeaderIterator it = response.headerIterator();
-			while (it.hasNext()) {
-				System.out.println(it.next());
-			}
-			System.out.println();
-			BufferedReader br = null;
-			try {
-				HttpEntity entity = response.getEntity();
-				if (entity != null) {
-					System.out.println(entity.isChunked());
-					System.out.println(entity.isRepeatable());
-					System.out.println(entity.isStreaming());
-					System.out.println(entity.getContentLength());
-					System.out.println(entity.getContentEncoding());
-					System.out.println(entity.getContentType());
-					System.out.println(entity.getContent().available());
-					System.out.println();
-		 */
-		/*
-					InputStreamReader instream = new InputStreamReader(entity.getContent());
-					br = new BufferedReader(instream, 16384);
-					br.mark(16384);
-					System.out.println(EntityUtils.toString(entity));
-					String line = null;
-					while ((line = br.readLine()) != null) {
-						System.out.println(line);
-					}
-		 */
-		/*
-					JsonParser jp = jsonFactory.createParser(entity.getContent());
-					while (jp.nextToken() != null) {
-						JsonToken token = jp.getCurrentToken();
-						if (token == JsonToken.START_OBJECT) {
-							System.out.println("{");
-						} else if (token == JsonToken.END_OBJECT) {
-							System.out.println("}");
-						} else if (token == JsonToken.START_ARRAY) {
-							System.out.println("[");
-						} else if (token == JsonToken.END_ARRAY) {
-							System.out.println("]");
-						} else if (token == JsonToken.FIELD_NAME) {
-							System.out.print(jp.getCurrentName() + " : ");
-						} else {
-							System.out.println(jp.getValueAsString());
-						}
-					}
-					jp.close();
-				}
-			} finally {
-				if (br != null) {
-					br.close();
-				}
-			}
-			client.close();
-			response.close();
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		 */
-
-		final MultiCloud cloud = new MultiCloud();
+		MultiCloud cloud = new MultiCloud();
 		cloud.validateAccounts();
 		/*
 		try {
