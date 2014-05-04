@@ -228,7 +228,7 @@ public class ImplicitGrant implements OAuth2Grant, RedirectCallback {
 		} catch (IllegalStateException e) {
 			/* server already running - ignore */
 		} catch (IOException e) {
-			e.printStackTrace();
+			/* read or write operation failed - ignore */
 		}
 
 		/* set redirect URI if necessary */

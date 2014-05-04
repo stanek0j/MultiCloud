@@ -198,7 +198,7 @@ public class FileCredentialStore implements CredentialStore {
 					fis.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				/* ignore closing exception */
 			}
 		}
 	}
@@ -248,7 +248,7 @@ public class FileCredentialStore implements CredentialStore {
 					fos.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				/* ignore closing exception */
 			}
 		}
 	}

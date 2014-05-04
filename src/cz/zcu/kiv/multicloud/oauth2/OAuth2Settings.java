@@ -207,13 +207,14 @@ public class OAuth2Settings {
 	/**
 	 * Sets the class of the extension grant.
 	 * @param grantClass Name of the extension grant class.
+	 * @throws OAuth2SettingsException If the extension grant class was not found.
 	 */
 	@SuppressWarnings("unchecked")
-	public void setGrantClass(String grantClass) {
+	public void setGrantClass(String grantClass) throws OAuth2SettingsException {
 		try {
 			this.grantClass = (Class<? extends OAuth2Grant>) Class.forName(grantClass);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			throw new OAuth2SettingsException("Extension grant class not found.");
 		}
 	}
 

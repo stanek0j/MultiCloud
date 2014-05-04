@@ -127,7 +127,7 @@ public class SecureFileCredentialStore extends FileCredentialStore implements Cr
 					fis.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				/* ignore closing exception */
 			}
 		}
 	}
@@ -173,7 +173,7 @@ public class SecureFileCredentialStore extends FileCredentialStore implements Cr
 					fos.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				/* ignore closing exception */
 			}
 		}
 	}

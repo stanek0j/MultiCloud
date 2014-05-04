@@ -89,7 +89,7 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 				try {
 					tokenRequest.join(THREAD_JOIN_TIMEOUT);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					/* ignore interrupted exception */
 				}
 			}
 			tokenRequest = new Thread() {
@@ -212,13 +212,15 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 			jp.close();
 			response.close();
 			client.close();
-			/* notify all waiting objects */
-			synchronized (waitObject) {
-				ready = true;
-				waitObject.notifyAll();
-			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			error.setType(OAuth2ErrorType.SERVER_ERROR);
+			error.setDescription("Failed to obtain access token from server.");
+
+		}
+		/* notify all waiting objects */
+		synchronized (waitObject) {
+			ready = true;
+			waitObject.notifyAll();
 		}
 	}
 
@@ -327,7 +329,7 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 		} catch (IllegalStateException e) {
 			/* server already running - ignore */
 		} catch (IOException e) {
-			e.printStackTrace();
+			/* read or write operation failed - ignore */
 		}
 
 		/* set redirect URI if necessary */

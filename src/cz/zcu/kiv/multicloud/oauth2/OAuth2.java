@@ -136,7 +136,7 @@ public class OAuth2 {
 				try {
 					grant = settings.getGrantClass().newInstance();
 				} catch (InstantiationException | IllegalAccessException e) {
-					e.printStackTrace();
+					throw new OAuth2SettingsException("Failed to create instance of the extension grant class.");
 				}
 			}
 			break;
@@ -183,7 +183,7 @@ public class OAuth2 {
 			try {
 				grant.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				/* ignore closing exception */
 			}
 			grant = null;
 		}

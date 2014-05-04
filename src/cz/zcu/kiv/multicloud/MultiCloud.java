@@ -82,6 +82,8 @@ public class MultiCloud {
 	/** List of sources for downloading a file from. */
 	private List<FileCloudSource> fileMultiDownloadSources;
 
+	/** Currently running authorization process. */
+	private OAuth2 auth;
 	/** Listener of the transfer progress. */
 	private ProgressListener listener;
 	/** Currently running operation. */
@@ -110,6 +112,8 @@ public class MultiCloud {
 		accountManager = um;
 		lastError = null;
 		fileMultiDownloadSources = new ArrayList<>();
+		auth = null;
+		op = null;
 		lock = new Object();
 	}
 
@@ -145,7 +149,20 @@ public class MultiCloud {
 			accountManager = settings.getAccountManager();
 		}
 		lastError = null;
+		auth = null;
+		op = null;
 		lock = new Object();
+	}
+
+	/**
+	 * Aborts the currently running authorization process, if any.
+	 */
+	public void abortAuthorization() {
+		synchronized (lock) {
+			if (auth != null) {
+				auth.close();
+			}
+		}
 	}
 
 	/**
@@ -291,6 +308,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the authorization process was interrupted.
 	 */
 	public void authorizeAccount(String accountName, AuthorizationCallback callback) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (auth != null) {
+				throw new MultiCloudException("Concurrent authorization forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -302,11 +324,16 @@ public class MultiCloud {
 		if (settings == null) {
 			throw new MultiCloudException("Cloud storage settings not found.");
 		}
-		OAuth2 auth = new OAuth2(Utils.cloudSettingsToOAuth2Settings(settings), credentialStore);
+		synchronized (lock) {
+			auth = new OAuth2(Utils.cloudSettingsToOAuth2Settings(settings), credentialStore);
+		}
 		if (callback != null) {
 			auth.setAuthCallback(callback);
 		}
 		OAuth2Error error = auth.authorize(null);
+		synchronized (lock) {
+			auth = null;
+		}
 		if (error.getType() != OAuth2ErrorType.SUCCESS) {
 			throw new MultiCloudException("Authorization failed.");
 		} else {
@@ -880,6 +907,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the authorization process was interrupted.
 	 */
 	public void refreshAccount(String accountName, AuthorizationCallback callback) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (auth != null) {
+				throw new MultiCloudException("Concurrent authorization forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -891,11 +923,16 @@ public class MultiCloud {
 		if (settings == null) {
 			throw new MultiCloudException("Cloud storage settings not found.");
 		}
-		OAuth2 auth = new OAuth2(Utils.cloudSettingsToOAuth2Settings(settings), credentialStore);
+		synchronized (lock) {
+			auth = new OAuth2(Utils.cloudSettingsToOAuth2Settings(settings), credentialStore);
+		}
 		if (callback != null) {
 			auth.setAuthCallback(callback);
 		}
 		OAuth2Error error = auth.refresh(account.getTokenId());
+		synchronized (lock) {
+			auth = null;
+		}
 		if (error.getType() != OAuth2ErrorType.SUCCESS) {
 			throw new MultiCloudException("Refreshing token failed.");
 		}

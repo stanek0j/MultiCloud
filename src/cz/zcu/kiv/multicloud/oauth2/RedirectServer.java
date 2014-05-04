@@ -174,7 +174,7 @@ public class RedirectServer implements Container {
 				response.getPrintStream().close();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			/* ignore handling exception */
 		}
 	}
 

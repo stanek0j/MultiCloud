@@ -76,7 +76,7 @@ public class ClientCredGrant implements OAuth2Grant {
 				try {
 					tokenRequest.join(THREAD_JOIN_TIMEOUT);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					/* ignore interrupted exception */
 				}
 			}
 			tokenRequest = new Thread() {
@@ -199,13 +199,14 @@ public class ClientCredGrant implements OAuth2Grant {
 			jp.close();
 			response.close();
 			client.close();
-			/* notify all waiting objects */
-			synchronized (waitObject) {
-				ready = true;
-				waitObject.notifyAll();
-			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			error.setType(OAuth2ErrorType.SERVER_ERROR);
+			error.setDescription("Failed to obtain access token from server.");
+		}
+		/* notify all waiting objects */
+		synchronized (waitObject) {
+			ready = true;
+			waitObject.notifyAll();
 		}
 	}
 
