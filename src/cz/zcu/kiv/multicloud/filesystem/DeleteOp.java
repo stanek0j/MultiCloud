@@ -23,7 +23,12 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
  */
 public class DeleteOp extends Operation<FileInfo> {
 
+	/** Original file information. */
 	private final FileInfo original;
+	/** The request of the operation. */
+	private HttpUriRequest request;
+	/** Lock object for concurrent method calls. */
+	private final Object lock;
 
 	/**
 	 * Ctor with necessary parameters.
@@ -36,6 +41,20 @@ public class DeleteOp extends Operation<FileInfo> {
 		addPropertyMapping("id", file.getId());
 		addPropertyMapping("path", file.getPath());
 		original = file;
+		lock = new Object();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void abort() {
+		synchronized (lock) {
+			if (request != null) {
+				request.abort();
+				isAborted = true;
+			}
+		}
 	}
 
 	/**
@@ -51,7 +70,9 @@ public class DeleteOp extends Operation<FileInfo> {
 	 */
 	@Override
 	protected void operationExecute() throws MultiCloudException {
-		HttpUriRequest request = prepareRequest(null);
+		synchronized (lock) {
+			request = prepareRequest(null);
+		}
 		try {
 			setResult(executeRequest(request, new ResponseProcessor<FileInfo>() {
 				/**
@@ -83,7 +104,14 @@ public class DeleteOp extends Operation<FileInfo> {
 				}
 			}));
 		} catch (IOException e) {
-			throw new MultiCloudException("Failed to delete the specified file or folder.");
+			synchronized (lock) {
+				if (!isAborted) {
+					throw new MultiCloudException("Failed to delete the specified file or folder.");
+				}
+			}
+		}
+		synchronized (lock) {
+			request = null;
 		}
 	}
 

@@ -36,6 +36,8 @@ public class FileDownloadOp extends Operation<File> {
 	private FileDownloadWriter writer;
 	/** Progress listener. */
 	private final ProgressListener listener;
+	/** Lock object for concurrent method calls. */
+	private final Object lock;
 
 	/**
 	 * Ctor with necessary parameters.
@@ -54,6 +56,20 @@ public class FileDownloadOp extends Operation<File> {
 		this.pool = new ArrayList<>();
 		this.queue = new LinkedBlockingQueue<>();
 		this.listener = listener;
+		this.lock = new Object();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void abort() {
+		synchronized (lock) {
+			for (FileDownloadThread thread: pool) {
+				thread.terminate();
+			}
+			isAborted = true;
+		}
 	}
 
 	/**
@@ -102,7 +118,6 @@ public class FileDownloadOp extends Operation<File> {
 				HttpUriRequest request = prepareRequest(null);
 				pool.add(new FileDownloadThread(queue, request, writer, listener));
 			}
-			System.out.println("threads: " + pool.size());
 			for (FileDownloadThread thread: pool) {
 				thread.start();
 			}
@@ -119,7 +134,11 @@ public class FileDownloadOp extends Operation<File> {
 			if (queue.isEmpty()) {
 				setResult(destination);
 			} else {
-				throw new MultiCloudException("Failed to download the file.");
+				synchronized (lock) {
+					if (!isAborted) {
+						throw new MultiCloudException("Failed to download the file.");
+					}
+				}
 			}
 		} else {
 			throw new MultiCloudException("No sources specified.");

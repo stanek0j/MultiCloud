@@ -23,6 +23,11 @@ import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
  */
 public class AccountQuotaOp extends Operation<AccountQuota> {
 
+	/** The request of the operation. */
+	private HttpUriRequest request;
+	/** Lock object for concurrent method calls. */
+	private final Object lock;
+
 	/**
 	 * Ctor with necessary parameters.
 	 * @param token Access token for the storage service.
@@ -30,6 +35,20 @@ public class AccountQuotaOp extends Operation<AccountQuota> {
 	 */
 	public AccountQuotaOp(OAuth2Token token, CloudRequest request) {
 		super(OperationType.ACCOUNT_QUOTA, token, request);
+		lock = new Object();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void abort() {
+		synchronized (lock) {
+			if (request != null) {
+				request.abort();
+				isAborted = true;
+			}
+		}
 	}
 
 	/**
@@ -45,7 +64,9 @@ public class AccountQuotaOp extends Operation<AccountQuota> {
 	 */
 	@Override
 	protected void operationExecute() throws MultiCloudException {
-		HttpUriRequest request = prepareRequest(null);
+		synchronized (lock) {
+			request = prepareRequest(null);
+		}
 		try {
 			setResult(executeRequest(request, new ResponseProcessor<AccountQuota>() {
 				/**
@@ -68,7 +89,14 @@ public class AccountQuotaOp extends Operation<AccountQuota> {
 				}
 			}));
 		} catch (IOException e) {
-			throw new MultiCloudException("Failed to get user quota information.");
+			synchronized (lock) {
+				if (!isAborted) {
+					throw new MultiCloudException("Failed to get user quota information.");
+				}
+			}
+		}
+		synchronized (lock) {
+			request = null;
 		}
 	}
 

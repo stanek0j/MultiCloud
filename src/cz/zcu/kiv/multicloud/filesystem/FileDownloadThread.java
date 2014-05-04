@@ -67,7 +67,6 @@ public class FileDownloadThread extends Thread {
 				if (chunk.size() != buffer.length) {
 					buffer = new byte[(int) chunk.size()];
 				}
-				System.out.println("downloading range " + chunk.getBeginByte() + "-" + chunk.getEndByte());
 				request.addHeader("Range", "bytes=" + chunk.getBeginByte() + "-" + (chunk.getEndByte() - 1));
 				CloseableHttpResponse response = client.execute(request);
 				request.removeHeaders("Range");
@@ -118,6 +117,7 @@ public class FileDownloadThread extends Thread {
 	 */
 	public synchronized void terminate() {
 		terminate = true;
+		request.abort();
 		interrupt();
 	}
 

@@ -57,6 +57,10 @@ public class FileUploadOp extends Operation<FileInfo> {
 	private final InputStream data;
 	/** Progress listener. */
 	private final ProgressListener listener;
+	/** The request of the operation. */
+	private HttpUriRequest request;
+	/** Lock object for concurrent method calls. */
+	private final Object lock;
 
 	/** Number of bytes already sent to the server. */
 	private long transferred;
@@ -125,6 +129,20 @@ public class FileUploadOp extends Operation<FileInfo> {
 		addPropertyMapping("overwrite", overwrite ? "true" : "false");
 		addPropertyMapping("size", String.valueOf(size));
 		transferred = 0;
+		lock = new Object();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void abort() {
+		synchronized (lock) {
+			if (request != null) {
+				request.abort();
+				isAborted = true;
+			}
+		}
 	}
 
 	/**
@@ -139,24 +157,30 @@ public class FileUploadOp extends Operation<FileInfo> {
 			jsonBody = beginRequest.getJsonBody();
 			body = beginRequest.getBody();
 			addPropertyMapping("offset", String.valueOf(transferred));
-			HttpUriRequest request = prepareRequest(null);
 			try {
 				if (jsonBody != null) {
 					ObjectMapper mapper = json.getMapper();
 					body = mapper.writeValueAsString(jsonBody);
-					request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+					synchronized (lock) {
+						request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+					}
 				} else {
 					if (body != null) {
 						if (body.equals(DATA_MAPPING)) {
 							ByteArrayInputStream data = readData();
 							transferred = buffer.length;
-							System.out.println("chunk size: " + buffer.length);
-							request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), buffer.length));
+							synchronized (lock) {
+								request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), buffer.length));
+							}
 						} else {
-							request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+							synchronized (lock) {
+								request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+							}
 						}
 					} else {
-						request = prepareRequest(null);
+						synchronized (lock) {
+							request = prepareRequest(null);
+						}
 					}
 				}
 			} catch (UnsupportedEncodingException | JsonProcessingException e1) {
@@ -201,7 +225,14 @@ public class FileUploadOp extends Operation<FileInfo> {
 					}
 				}));
 			} catch (IOException e) {
-				throw new MultiCloudException("Failed to upload the file.");
+				synchronized (lock) {
+					if (!isAborted) {
+						throw new MultiCloudException("Failed to upload the file.");
+					}
+				}
+			}
+			synchronized (lock) {
+				request = null;
 			}
 		}
 	}
@@ -211,34 +242,45 @@ public class FileUploadOp extends Operation<FileInfo> {
 	 */
 	@Override
 	protected void operationExecute() throws MultiCloudException {
+		synchronized (lock) {
+			if (isAborted) {
+				return;
+			}
+		}
 		if (execRequest != null) {
 			if (session != null) {
 				addPropertyMapping("session", session.getSession());
 			}
-
 			while (transferred < size) {
 				setRequest(execRequest);
 				jsonBody = execRequest.getJsonBody();
 				body = execRequest.getBody();
 				addPropertyMapping("offset", String.valueOf(transferred));
-				HttpUriRequest request = prepareRequest(null);
 				try {
 					if (jsonBody != null) {
 						ObjectMapper mapper = json.getMapper();
 						body = mapper.writeValueAsString(jsonBody);
-						request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+						synchronized (lock) {
+							request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+						}
 					} else {
 						if (body != null) {
 							if (body.equals(DATA_MAPPING)) {
 								ByteArrayInputStream data = readData();
 								transferred += buffer.length;
 								addPropertyMapping("offsetbuffer", String.valueOf(transferred - 1));
-								request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), buffer.length));
+								synchronized (lock) {
+									request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), buffer.length));
+								}
 							} else {
-								request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+								synchronized (lock) {
+									request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+								}
 							}
 						} else {
-							request = prepareRequest(null);
+							synchronized (lock) {
+								request = prepareRequest(null);
+							}
 						}
 					}
 				} catch (UnsupportedEncodingException | JsonProcessingException e1) {
@@ -262,8 +304,16 @@ public class FileUploadOp extends Operation<FileInfo> {
 						}
 					}));
 				} catch (IOException e) {
-					throw new MultiCloudException("Failed to upload the file.");
+					synchronized (lock) {
+						if (!isAborted) {
+							throw new MultiCloudException("Failed to upload the file.");
+						}
+					}
 				}
+				synchronized (lock) {
+					request = null;
+				}
+
 			}
 		}
 	}
@@ -273,6 +323,11 @@ public class FileUploadOp extends Operation<FileInfo> {
 	 */
 	@Override
 	protected void operationFinish() throws MultiCloudException {
+		synchronized (lock) {
+			if (isAborted) {
+				return;
+			}
+		}
 		if (finishRequest != null) {
 			setRequest(finishRequest);
 			jsonBody = finishRequest.getJsonBody();
@@ -281,22 +336,29 @@ public class FileUploadOp extends Operation<FileInfo> {
 				addPropertyMapping("session", session.getSession());
 			}
 			addPropertyMapping("offset", String.valueOf(transferred));
-			HttpUriRequest request = prepareRequest(null);
 			try {
 				if (jsonBody != null) {
 					ObjectMapper mapper = json.getMapper();
 					body = mapper.writeValueAsString(jsonBody);
-					request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+					synchronized (lock) {
+						request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+					}
 				} else {
 					if (body != null) {
 						if (body.equals(DATA_MAPPING)) {
 							transferred = size;
-							request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), size));
+							synchronized (lock) {
+								request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), size));
+							}
 						} else {
-							request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+							synchronized (lock) {
+								request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+							}
 						}
 					} else {
-						request = prepareRequest(null);
+						synchronized (lock) {
+							request = prepareRequest(null);
+						}
 					}
 				}
 			} catch (UnsupportedEncodingException | JsonProcessingException e1) {
@@ -334,7 +396,14 @@ public class FileUploadOp extends Operation<FileInfo> {
 					}
 				}));
 			} catch (IOException e) {
-				throw new MultiCloudException("Failed to upload the file.");
+				synchronized (lock) {
+					if (!isAborted) {
+						throw new MultiCloudException("Failed to upload the file.");
+					}
+				}
+			}
+			synchronized (lock) {
+				request = null;
 			}
 		} else {
 			if (getError() == null && getResult() == null) {

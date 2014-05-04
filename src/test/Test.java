@@ -17,7 +17,7 @@ public class Test {
 	 */
 	public static void main(String[] args) {
 
-		MultiCloud cloud = new MultiCloud();
+		final MultiCloud cloud = new MultiCloud();
 
 		cloud.setListener(new ProgressListener(200) {
 			@Override
@@ -210,6 +210,19 @@ public class Test {
 		}
 
 		/*
+		Thread stopper = new Thread() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				cloud.abortOperation();
+			};
+		};
+		stopper.start();
+
 		try {
 			FileInfo info = cloud.uploadFile(drive, folder, "test-file.mp3", true, new File("test-file.mp3"));
 			if (info == null) {
@@ -221,6 +234,19 @@ public class Test {
 			e1.printStackTrace();
 		}
 		 */
+
+		Thread stopper = new Thread() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				cloud.abortOperation();
+			};
+		};
+		stopper.start();
 
 		long start = System.currentTimeMillis();
 		try {

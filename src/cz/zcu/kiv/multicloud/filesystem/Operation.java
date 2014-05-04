@@ -91,6 +91,8 @@ public abstract class Operation<T> {
 	protected Map<String, String> responseParams;
 	/** Mapping of the values in the response. */
 	protected Map<String, String> responseMapping;
+	/** If the operation was aborted. */
+	protected boolean isAborted;
 
 	/**
 	 * Ctor with necessary parameters.
@@ -112,6 +114,11 @@ public abstract class Operation<T> {
 		responseHeaders = new HashMap<>();
 		responseParams = new HashMap<>();
 	}
+
+	/**
+	 * Aborts the operation.
+	 */
+	public abstract void abort();
 
 	/**
 	 * Adds new mapping of non-generic string values.
@@ -343,6 +350,14 @@ public abstract class Operation<T> {
 	 */
 	public OperationType getType() {
 		return type;
+	}
+
+	/**
+	 * Returns if the operation was aborted.
+	 * @return If the operation was aborted.
+	 */
+	public boolean isAborted() {
+		return isAborted;
 	}
 
 	/**

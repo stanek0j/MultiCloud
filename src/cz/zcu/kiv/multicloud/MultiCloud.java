@@ -20,6 +20,7 @@ import cz.zcu.kiv.multicloud.filesystem.FileUploadOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderCreateOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderListOp;
 import cz.zcu.kiv.multicloud.filesystem.MoveOp;
+import cz.zcu.kiv.multicloud.filesystem.Operation;
 import cz.zcu.kiv.multicloud.filesystem.ProgressListener;
 import cz.zcu.kiv.multicloud.filesystem.RenameOp;
 import cz.zcu.kiv.multicloud.json.AccountInfo;
@@ -78,11 +79,15 @@ public class MultiCloud {
 	private AccountManager accountManager;
 	/** Last error that occurred during any operation. */
 	private OperationError lastError;
-	/** List of sources for douwloading a file from. */
+	/** List of sources for downloading a file from. */
 	private List<FileCloudSource> fileMultiDownloadSources;
 
 	/** Listener of the transfer progress. */
 	private ProgressListener listener;
+	/** Currently running operation. */
+	private Operation<?> op;
+	/** Lock object for concurrent method calls. */
+	private final Object lock;
 
 	/**
 	 * Empty ctor.
@@ -105,6 +110,7 @@ public class MultiCloud {
 		accountManager = um;
 		lastError = null;
 		fileMultiDownloadSources = new ArrayList<>();
+		lock = new Object();
 	}
 
 	/**
@@ -139,6 +145,18 @@ public class MultiCloud {
 			accountManager = settings.getAccountManager();
 		}
 		lastError = null;
+		lock = new Object();
+	}
+
+	/**
+	 * Aborts the currently running operation, if any.
+	 */
+	public void abortOperation() {
+		synchronized (lock) {
+			if (op != null) {
+				op.abort();
+			}
+		}
 	}
 
 	/**
@@ -150,6 +168,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public AccountInfo accountInfo(String accountName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -169,10 +192,19 @@ public class MultiCloud {
 		if (token.isExpired()) {
 			refreshAccount(accountName, null);
 		}
-		AccountInfoOp op = new AccountInfoOp(token, settings.getAccountInfoRequest());
+		synchronized (lock) {
+			op = new AccountInfoOp(token, settings.getAccountInfoRequest());
+		}
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		AccountInfo result = ((AccountInfoOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**
@@ -184,6 +216,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public AccountQuota accountQuota(String accountName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -203,10 +240,19 @@ public class MultiCloud {
 		if (token.isExpired()) {
 			refreshAccount(accountName, null);
 		}
-		AccountQuotaOp op = new AccountQuotaOp(token, settings.getAccountQuotaRequest());
+		synchronized (lock) {
+			op = new AccountQuotaOp(token, settings.getAccountQuotaRequest());
+		}
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		AccountQuota result = ((AccountQuotaOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**
@@ -284,6 +330,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public FileInfo copy(String accountName, FileInfo file, FileInfo destination, String destinationName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -312,10 +363,19 @@ public class MultiCloud {
 		if (destination.getFileType() != FileType.FOLDER) {
 			throw new MultiCloudException("Destination must be a folder.");
 		}
-		CopyOp op = new CopyOp(token, settings.getCopyRequest(), file, destination, destinationName);
+		synchronized (lock) {
+			op = new CopyOp(token, settings.getCopyRequest(), file, destination, destinationName);
+		}
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo result = ((CopyOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**
@@ -348,6 +408,11 @@ public class MultiCloud {
 	 * @throws OAuth2SettingsException If the authorization failed.
 	 */
 	public FileInfo createFolder(String accountName, String folderName, FileInfo parent) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -374,10 +439,19 @@ public class MultiCloud {
 		if (useFolder.getFileType() != FileType.FOLDER) {
 			throw new MultiCloudException("Supplied file instead of folder.");
 		}
-		FolderCreateOp op = new FolderCreateOp(token, settings.getCreateDirRequest(), folderName, useFolder);
+		synchronized (lock) {
+			op = new FolderCreateOp(token, settings.getCreateDirRequest(), folderName, useFolder);
+		}
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo result = ((FolderCreateOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**
@@ -390,6 +464,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public FileInfo delete(String accountName, FileInfo file) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -412,10 +491,19 @@ public class MultiCloud {
 		if (file == null) {
 			throw new MultiCloudException("File or folder must be supplied.");
 		}
-		DeleteOp op = new DeleteOp(token, settings.getDeleteRequest(), file);
+		synchronized (lock) {
+			op = new DeleteOp(token, settings.getDeleteRequest(), file);
+		}
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo result = ((DeleteOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**
@@ -446,6 +534,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public File downloadFile(String accountName, FileInfo sourceFile, File destination, boolean overwrite) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -483,10 +576,19 @@ public class MultiCloud {
 		}
 		List<FileCloudSource> sources = new ArrayList<>();
 		sources.add(new FileCloudSource(accountName, sourceFile, settings.getDownloadFileRequest(), token));
-		FileDownloadOp op = new FileDownloadOp(sources, target, listener);
+		synchronized (lock) {
+			op = new FileDownloadOp(sources, target, listener);
+		}
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		File result = ((FileDownloadOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**
@@ -514,6 +616,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public File downloadMultiFile(File destination, boolean overwrite) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		if (fileMultiDownloadSources.size() == 0) {
 			throw new MultiCloudException("No sources supplied.");
 		}
@@ -539,11 +646,20 @@ public class MultiCloud {
 				refreshAccount(source.getAccountName(), null);
 			}
 		}
-		FileDownloadOp op = new FileDownloadOp(fileMultiDownloadSources, target, listener);
+		synchronized (lock) {
+			op = new FileDownloadOp(fileMultiDownloadSources, target, listener);
+		}
 		op.execute();
 		fileMultiDownloadSources.clear();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		File result = ((FileDownloadOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**
@@ -626,6 +742,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public FileInfo listFolder(String accountName, FileInfo folder, boolean showDeleted, boolean showShared) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -652,10 +773,18 @@ public class MultiCloud {
 		if (useFolder.getFileType() != FileType.FOLDER) {
 			throw new MultiCloudException("Supplied file instead of folder.");
 		}
-		FolderListOp op = new FolderListOp(token, settings.getListDirBeginRequest(), settings.getListDirRequest(), useFolder, showDeleted);
+		synchronized (lock) {
+			op = new FolderListOp(token, settings.getListDirBeginRequest(), settings.getListDirRequest(), useFolder, showDeleted);
+		}
 		op.execute();
 		lastError = op.getError();
-		FileInfo info = op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo info = ((FolderListOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
 		if (info != null) {
 			/* remove shared files from the result */
 			if (!showShared) {
@@ -693,6 +822,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public FileInfo move(String accountName, FileInfo file, FileInfo destination, String destinationName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -721,10 +855,19 @@ public class MultiCloud {
 		if (destination.getFileType() != FileType.FOLDER) {
 			throw new MultiCloudException("Destination must be a folder.");
 		}
-		MoveOp op = new MoveOp(token, settings.getMoveRequest(), file, destination, destinationName);
+		synchronized (lock) {
+			op = new MoveOp(token, settings.getMoveRequest(), file, destination, destinationName);
+		}
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo result = ((MoveOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**
@@ -770,6 +913,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public FileInfo rename(String accountName, FileInfo file, String fileName) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -792,10 +940,19 @@ public class MultiCloud {
 		if (file == null) {
 			throw new MultiCloudException("File or folder must be supplied.");
 		}
-		RenameOp op = new RenameOp(token, settings.getRenameRequest(), file, fileName);
+		synchronized (lock) {
+			op = new RenameOp(token, settings.getRenameRequest(), file, fileName);
+		}
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo result = ((RenameOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**
@@ -853,6 +1010,11 @@ public class MultiCloud {
 	 * @throws InterruptedException If the token refreshing process was interrupted.
 	 */
 	public FileInfo uploadFile(String accountName, FileInfo destination, String destinationName, boolean overwrite, InputStream data, long size) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
 		AccountSettings account = accountManager.getAccountSettings(accountName);
 		if (account == null) {
 			throw new MultiCloudException("User account not found.");
@@ -878,10 +1040,19 @@ public class MultiCloud {
 		if (destination.getFileType() != FileType.FOLDER) {
 			throw new MultiCloudException("Destination must be a folder.");
 		}
-		FileUploadOp op = new FileUploadOp(token, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), destination, destinationName, overwrite, data, size, listener);
+		synchronized (lock) {
+			op = new FileUploadOp(token, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), destination, destinationName, overwrite, data, size, listener);
+		}
 		op.execute();
 		lastError = op.getError();
-		return op.getResult();
+		if (op.isAborted()) {
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo result = ((FileUploadOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**

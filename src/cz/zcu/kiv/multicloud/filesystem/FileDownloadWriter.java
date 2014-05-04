@@ -54,7 +54,6 @@ public class FileDownloadWriter implements Closeable {
 	public synchronized void write(byte[] buffer, long position) {
 		if (raf != null) {
 			try {
-				System.out.println("writing at position " + position);
 				raf.seek(position);
 				raf.write(buffer);
 			} catch (IOException e) {

@@ -36,6 +36,10 @@ public class RenameOp extends Operation<FileInfo> {
 	private final Map<String, Object> jsonBody;
 	/** Body of the request. */
 	private String body;
+	/** The request of the operation. */
+	private HttpUriRequest request;
+	/** Lock object for concurrent method calls. */
+	private final Object lock;
 
 	/**
 	 * Ctor with necessary parameters.
@@ -62,6 +66,20 @@ public class RenameOp extends Operation<FileInfo> {
 		type = file.getFileType();
 		jsonBody = request.getJsonBody();
 		body = request.getBody();
+		lock = new Object();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void abort() {
+		synchronized (lock) {
+			if (request != null) {
+				request.abort();
+				isAborted = true;
+			}
+		}
 	}
 
 	/**
@@ -77,16 +95,19 @@ public class RenameOp extends Operation<FileInfo> {
 	 */
 	@Override
 	protected void operationExecute() throws MultiCloudException {
-		HttpUriRequest request = prepareRequest(null);
 		try {
 			if (jsonBody != null) {
 				ObjectMapper mapper = json.getMapper();
 				body = mapper.writeValueAsString(jsonBody);
 			}
 			if (body != null) {
-				request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+				synchronized (lock) {
+					request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+				}
 			} else {
-				request = prepareRequest(null);
+				synchronized (lock) {
+					request = prepareRequest(null);
+				}
 			}
 		} catch (UnsupportedEncodingException | JsonProcessingException e1) {
 			throw new MultiCloudException("Failed to prepare request.");
@@ -123,7 +144,14 @@ public class RenameOp extends Operation<FileInfo> {
 				}
 			}));
 		} catch (IOException e) {
-			throw new MultiCloudException("Failed to rename the specified file or folder.");
+			synchronized (lock) {
+				if (!isAborted) {
+					throw new MultiCloudException("Failed to rename the specified file or folder.");
+				}
+			}
+		}
+		synchronized (lock) {
+			request = null;
 		}
 	}
 
