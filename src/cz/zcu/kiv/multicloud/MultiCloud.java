@@ -422,6 +422,7 @@ public class MultiCloud {
 		account.setUserId(accountName);
 		account.setSettingsId(cloudStorage);
 		accountManager.addAccountSettings(account);
+		accountManager.saveAccountSettings();
 	}
 
 	/**
@@ -547,6 +548,7 @@ public class MultiCloud {
 			credentialStore.deleteCredential(account.getTokenId());
 		}
 		accountManager.removeAccountSettings(accountName);
+		accountManager.saveAccountSettings();
 	}
 
 	/**
