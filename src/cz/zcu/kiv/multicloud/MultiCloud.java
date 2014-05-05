@@ -1112,10 +1112,14 @@ public class MultiCloud {
 		}
 		accountManager.saveAccountSettings();
 		/* remove unused tokens */
+		List<String> remove = new ArrayList<>();
 		for (String token: credentialStore.getIdentifiers()) {
 			if (!usedTokens.contains(token)) {
-				credentialStore.deleteCredential(token);
+				remove.add(token);
 			}
+		}
+		for (String token: remove) {
+			credentialStore.deleteCredential(token);
 		}
 	}
 
