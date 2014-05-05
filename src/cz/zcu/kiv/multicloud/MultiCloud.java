@@ -107,7 +107,7 @@ public class MultiCloud {
 		try {
 			um.loadAccountSettings();
 		} catch (IOException e) {
-			System.err.println("Failed to load account settings.");
+			System.err.println("Failed to load accounts.");
 		}
 		accountManager = um;
 		lastError = null;
