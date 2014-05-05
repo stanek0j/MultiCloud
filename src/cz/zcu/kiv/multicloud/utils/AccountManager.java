@@ -1,6 +1,7 @@
 package cz.zcu.kiv.multicloud.utils;
 
 import java.util.Collection;
+import java.util.Set;
 
 import cz.zcu.kiv.multicloud.json.AccountSettings;
 
@@ -33,6 +34,12 @@ public interface AccountManager {
 	 * @return All user settings.
 	 */
 	Collection<AccountSettings> getAllAccountSettings();
+
+	/**
+	 * Returns all the identifiers used for the accounts.
+	 * @return Set of all identifiers.
+	 */
+	Set<String> getIdentifiers();
 
 	/**
 	 * Removes the specified {@link cz.zcu.kiv.multicloud.json.AccountSettings}.

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -83,6 +84,14 @@ public class FileAccountManager implements AccountManager {
 	@Override
 	public Collection<AccountSettings> getAllAccountSettings() {
 		return accounts.values();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<String> getIdentifiers() {
+		return accounts.keySet();
 	}
 
 	/**

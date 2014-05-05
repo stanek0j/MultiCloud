@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -62,8 +64,24 @@ public class FileCloudManager implements CloudManager {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Collection<CloudSettings> getAllCloudSettings() {
+		return settings.values();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public CloudSettings getCloudSettings(String cloudName) {
 		return settings.get(cloudName);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<String> getIdentifiers() {
+		return settings.keySet();
 	}
 
 	/**
