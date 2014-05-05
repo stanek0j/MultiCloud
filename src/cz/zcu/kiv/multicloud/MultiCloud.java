@@ -331,16 +331,19 @@ public class MultiCloud {
 			auth.setAuthCallback(callback);
 		}
 		OAuth2Error error = auth.authorize(null);
-		synchronized (lock) {
-			auth = null;
-		}
 		if (error.getType() != OAuth2ErrorType.SUCCESS) {
+			synchronized (lock) {
+				auth = null;
+			}
 			throw new MultiCloudException("Authorization failed.");
 		} else {
 			if (!Utils.isNullOrEmpty(account.getTokenId())) {
 				credentialStore.deleteCredential(account.getTokenId());
 			}
 			account.setTokenId(auth.getObtainedStoreKey());
+		}
+		synchronized (lock) {
+			auth = null;
 		}
 		accountManager.saveAccountSettings();
 	}
