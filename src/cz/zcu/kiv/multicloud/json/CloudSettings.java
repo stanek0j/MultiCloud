@@ -547,4 +547,12 @@ public class CloudSettings {
 		this.username = username;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return settingsId;
+	}
+
 }

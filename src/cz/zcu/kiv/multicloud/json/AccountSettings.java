@@ -82,4 +82,12 @@ public class AccountSettings {
 		this.accountId = accountId;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return accountId;
+	}
+
 }
