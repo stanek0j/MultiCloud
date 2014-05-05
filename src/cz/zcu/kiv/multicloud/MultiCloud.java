@@ -100,14 +100,14 @@ public class MultiCloud {
 		try {
 			cm.loadCloudSettings();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("Failed to load cloud settings.");
 		}
 		cloudManager = cm;
 		FileAccountManager um = FileAccountManager.getInstance();
 		try {
 			um.loadAccountSettings();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("Failed to load account settings.");
 		}
 		accountManager = um;
 		lastError = null;

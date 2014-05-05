@@ -10,7 +10,6 @@ import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -110,9 +109,6 @@ public class SecureFileCredentialStore extends FileCredentialStore implements Cr
 			cis = new CipherInputStream(fis, cipher);
 			ois = new ObjectInputStream(cis);
 			tokens = (Map<String, OAuth2Token>) ois.readObject();
-			for (Entry<String, OAuth2Token> entry: tokens.entrySet()) {
-				System.out.println(entry.getKey() + " -->\n" + entry.getValue());
-			}
 		} catch (GeneralSecurityException | IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
