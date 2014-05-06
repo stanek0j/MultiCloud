@@ -161,6 +161,7 @@ public class MultiCloud {
 		synchronized (lock) {
 			if (auth != null) {
 				auth.close();
+				auth = null;
 			}
 		}
 	}
@@ -172,6 +173,7 @@ public class MultiCloud {
 		synchronized (lock) {
 			if (op != null) {
 				op.abort();
+				op = null;
 			}
 		}
 	}
@@ -995,6 +997,26 @@ public class MultiCloud {
 			op = null;
 		}
 		return result;
+	}
+
+	/**
+	 * Rename an existing user account.
+	 * @param accountName User account to be renamed.
+	 * @param newName New name for the user account.
+	 * @throws MultiCloudException If the given parameters were wrong.
+	 */
+	public void renameAccount(String accountName, String newName) throws MultiCloudException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account does not exist.");
+		}
+		if (accountManager.getAccountSettings(newName) != null) {
+			throw new MultiCloudException("Desired user account name already taken.");
+		}
+		account.setUserId(newName);
+		accountManager.removeAccountSettings(accountName);
+		accountManager.addAccountSettings(account);
+		accountManager.saveAccountSettings();
 	}
 
 	/**
