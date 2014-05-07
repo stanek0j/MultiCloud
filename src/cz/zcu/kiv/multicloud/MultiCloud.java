@@ -1028,7 +1028,7 @@ public class MultiCloud {
 	}
 
 	/**
-	 * 
+	 * Upload the supplied file to the desired cloud storage service.
 	 * @param accountName Name of the user account.
 	 * @param destination Destination file or folder to be moved to.
 	 * @param destinationName New name at the destination location.
@@ -1061,7 +1061,7 @@ public class MultiCloud {
 	}
 
 	/**
-	 * 
+	 * Upload the supplied file to the desired cloud storage service.
 	 * @param accountName Name of the user account.
 	 * @param destination Destination file or folder to be moved to.
 	 * @param destinationName New name at the destination location.
