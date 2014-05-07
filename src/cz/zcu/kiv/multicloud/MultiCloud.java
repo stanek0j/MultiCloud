@@ -100,14 +100,14 @@ public class MultiCloud {
 		try {
 			cm.loadCloudSettings();
 		} catch (IOException e) {
-			System.err.println("Failed to load cloud settings.");
+			System.err.println("Failed to load cloud settings: " + e.getMessage());
 		}
 		cloudManager = cm;
 		FileAccountManager um = FileAccountManager.getInstance();
 		try {
 			um.loadAccountSettings();
 		} catch (IOException e) {
-			System.err.println("Failed to load accounts.");
+			System.err.println("Failed to load accounts: " + e.getMessage());
 		}
 		accountManager = um;
 		lastError = null;
@@ -132,7 +132,7 @@ public class MultiCloud {
 			try {
 				cm.loadCloudSettings();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("Failed to load cloud settings: " + e.getMessage());
 			}
 			cloudManager = cm;
 		} else {
@@ -143,7 +143,7 @@ public class MultiCloud {
 			try {
 				um.loadAccountSettings();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("Failed to load accounts: " + e.getMessage());
 			}
 		} else {
 			accountManager = settings.getAccountManager();
