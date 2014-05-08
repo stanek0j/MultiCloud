@@ -1,6 +1,8 @@
 package cz.zcu.kiv.multicloud.filesystem;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,7 +54,7 @@ import cz.zcu.kiv.multicloud.utils.Utils;
  * @author Jaromír Staněk
  * @version 1.0
  *
- * @param <T>
+ * @param <T> Return type of the operation.
  */
 public abstract class Operation<T> {
 
@@ -251,7 +253,16 @@ public abstract class Operation<T> {
 			}
 			Matcher matcher = pattern.matcher(result);
 			if (matcher.find()) {
-				result = result.replaceAll(find, mapping.getValue());
+				String value = mapping.getValue();
+				if (find.equals("<path>") && value != null) {
+					try {
+						value = URLEncoder.encode(value, "utf-8");
+						value = value.replace("%2F", "/").replace("+", "%20").replace("*", "%2A");
+					} catch (UnsupportedEncodingException e) {
+						/* in this case, continue with what we've got */
+					}
+				}
+				result = result.replaceAll(find, value);
 			}
 		}
 		return result;
