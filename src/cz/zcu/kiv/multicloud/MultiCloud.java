@@ -173,7 +173,6 @@ public class MultiCloud {
 		synchronized (lock) {
 			if (op != null) {
 				op.abort();
-				op = null;
 			}
 		}
 	}
@@ -217,6 +216,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		AccountInfo result = ((AccountInfoOp) op).getResult();
@@ -265,6 +267,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		AccountQuota result = ((AccountQuotaOp) op).getResult();
@@ -401,6 +406,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		FileInfo result = ((CopyOp) op).getResult();
@@ -478,6 +486,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		FileInfo result = ((FolderCreateOp) op).getResult();
@@ -530,6 +541,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		FileInfo result = ((DeleteOp) op).getResult();
@@ -616,6 +630,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		File result = ((FileDownloadOp) op).getResult();
@@ -687,6 +704,9 @@ public class MultiCloud {
 		fileMultiDownloadSources.clear();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		File result = ((FileDownloadOp) op).getResult();
@@ -813,6 +833,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		FileInfo info = ((FolderListOp) op).getResult();
@@ -895,6 +918,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		FileInfo result = ((MoveOp) op).getResult();
@@ -990,6 +1016,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		FileInfo result = ((RenameOp) op).getResult();
@@ -1110,6 +1139,9 @@ public class MultiCloud {
 		op.execute();
 		lastError = op.getError();
 		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
 			throw new AbortedException("Operation aborted.");
 		}
 		FileInfo result = ((FileUploadOp) op).getResult();
