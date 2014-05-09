@@ -213,7 +213,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new AccountInfoOp(token, settings.getAccountInfoRequest());
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {
@@ -264,7 +271,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new AccountQuotaOp(token, settings.getAccountQuotaRequest());
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {
@@ -337,7 +351,15 @@ public class MultiCloud {
 		if (callback != null) {
 			auth.setAuthCallback(callback);
 		}
-		OAuth2Error error = auth.authorize(null);
+		OAuth2Error error = new OAuth2Error();
+		try {
+			error = auth.authorize(null);
+		} catch (Exception e) {
+			synchronized (lock) {
+				auth = null;
+			}
+			throw e;
+		}
 		if (error.getType() != OAuth2ErrorType.SUCCESS) {
 			synchronized (lock) {
 				auth = null;
@@ -403,7 +425,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new CopyOp(token, settings.getCopyRequest(), file, destination, destinationName);
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {
@@ -483,7 +512,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new FolderCreateOp(token, settings.getCreateDirRequest(), folderName, useFolder);
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {
@@ -538,7 +574,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new DeleteOp(token, settings.getDeleteRequest(), file);
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {
@@ -627,7 +670,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new FileDownloadOp(sources, target, listener);
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {
@@ -700,7 +750,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new FileDownloadOp(fileMultiDownloadSources, target, listener);
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		fileMultiDownloadSources.clear();
 		lastError = op.getError();
 		if (op.isAborted()) {
@@ -830,7 +887,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new FolderListOp(token, settings.getListDirBeginRequest(), settings.getListDirRequest(), useFolder, showDeleted);
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {
@@ -915,7 +979,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new MoveOp(token, settings.getMoveRequest(), file, destination, destinationName);
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {
@@ -962,7 +1033,15 @@ public class MultiCloud {
 		if (callback != null) {
 			auth.setAuthCallback(callback);
 		}
-		OAuth2Error error = auth.refresh(account.getTokenId());
+		OAuth2Error error = new OAuth2Error();
+		try {
+			error = auth.refresh(account.getTokenId());
+		} catch (Exception e) {
+			synchronized (lock) {
+				auth = null;
+			}
+			throw e;
+		}
 		synchronized (lock) {
 			auth = null;
 		}
@@ -1013,7 +1092,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new RenameOp(token, settings.getRenameRequest(), file, fileName);
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {
@@ -1136,7 +1222,14 @@ public class MultiCloud {
 		synchronized (lock) {
 			op = new FileUploadOp(token, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), destination, destinationName, overwrite, data, size, listener);
 		}
-		op.execute();
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
 		lastError = op.getError();
 		if (op.isAborted()) {
 			synchronized (lock) {

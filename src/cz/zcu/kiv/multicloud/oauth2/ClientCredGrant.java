@@ -153,6 +153,8 @@ public class ClientCredGrant implements OAuth2Grant {
 	 */
 	private void obtainAccessToken() {
 		try {
+			token = new OAuth2Token();
+			error = new OAuth2Error();
 			/* build the request and send it to the token server */
 			CloseableHttpClient client = HttpClients.createDefault();
 			HttpPost request = new HttpPost(tokenServer);
@@ -160,8 +162,6 @@ public class ClientCredGrant implements OAuth2Grant {
 			CloseableHttpResponse response = client.execute(request);
 			HttpEntity entity = response.getEntity();
 			/* get the response and parse it */
-			token = new OAuth2Token();
-			error = new OAuth2Error();
 			JsonParser jp = json.getFactory().createParser(entity.getContent());
 			while (jp.nextToken() != null) {
 				JsonToken jsonToken = jp.getCurrentToken();
