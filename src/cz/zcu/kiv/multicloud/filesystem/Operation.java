@@ -238,9 +238,10 @@ public abstract class Operation<T> {
 	/**
 	 * Finds all non-generic strings and replaces them with corresponding values.
 	 * @param source The string to replace these properties in.
+	 * @param encode If the replaced string should be URL encoded.
 	 * @return String with replaces values.
 	 */
-	protected String doPropertyMapping(String source) {
+	protected String doPropertyMapping(String source, boolean encode) {
 		String result = source;
 		Pattern pattern = Pattern.compile("(<.*?>)");
 		for (Entry<String, String> mapping: propertyMapping.entrySet()) {
@@ -254,12 +255,14 @@ public abstract class Operation<T> {
 			Matcher matcher = pattern.matcher(result);
 			if (matcher.find()) {
 				String value = mapping.getValue();
-				if (find.equals("<path>") && value != null) {
-					try {
-						value = URLEncoder.encode(value, "utf-8");
-						value = value.replace("%2F", "/").replace("+", "%20").replace("*", "%2A");
-					} catch (UnsupportedEncodingException e) {
-						/* in this case, continue with what we've got */
+				if (value != null && encode) {
+					if (find.equals("<path>") || find.equals("<source_path>") || find.equals("<destination_path>")) {
+						try {
+							value = URLEncoder.encode(value, "utf-8");
+							value = value.replace("%2F", "/").replace("+", "%20").replace("*", "%2A");
+						} catch (UnsupportedEncodingException e) {
+							/* in this case, continue with what we've got */
+						}
 					}
 				}
 				result = result.replaceAll(find, value);
@@ -454,10 +457,10 @@ public abstract class Operation<T> {
 	 */
 	protected HttpUriRequest prepareRequest(HttpEntity requestData) {
 		HttpUriRequest request = null;
-		String uri = doPropertyMapping(uriTemplate);
+		String uri = doPropertyMapping(uriTemplate, true);
 		if (!requestParams.isEmpty()) {
 			for (Entry<String, String> param: requestParams.entrySet()) {
-				String update = doPropertyMapping(param.getValue());
+				String update = doPropertyMapping(param.getValue(), false);
 				requestParams.put(param.getKey(), update);
 			}
 			uri += "?" + URLEncodedUtils.format(Utils.mapToList(requestParams), Charset.forName("utf-8"));
@@ -495,7 +498,7 @@ public abstract class Operation<T> {
 			break;
 		}
 		for (Entry<String, String> header: requestHeaders.entrySet()) {
-			request.addHeader(header.getKey(), doPropertyMapping(header.getValue()));
+			request.addHeader(header.getKey(), doPropertyMapping(header.getValue(), false));
 		}
 		if (request instanceof HttpEntityEnclosingRequestBase) {
 			((HttpEntityEnclosingRequestBase) request).setEntity(requestData);

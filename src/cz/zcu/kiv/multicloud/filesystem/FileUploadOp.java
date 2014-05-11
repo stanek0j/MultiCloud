@@ -162,7 +162,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 					ObjectMapper mapper = json.getMapper();
 					body = mapper.writeValueAsString(jsonBody);
 					synchronized (lock) {
-						request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+						request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
 					}
 				} else {
 					if (body != null) {
@@ -174,7 +174,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 							}
 						} else {
 							synchronized (lock) {
-								request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+								request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
 							}
 						}
 					} else {
@@ -261,7 +261,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 						ObjectMapper mapper = json.getMapper();
 						body = mapper.writeValueAsString(jsonBody);
 						synchronized (lock) {
-							request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+							request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
 						}
 					} else {
 						if (body != null) {
@@ -274,7 +274,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 								}
 							} else {
 								synchronized (lock) {
-									request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+									request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
 								}
 							}
 						} else {
@@ -341,7 +341,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 					ObjectMapper mapper = json.getMapper();
 					body = mapper.writeValueAsString(jsonBody);
 					synchronized (lock) {
-						request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+						request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
 					}
 				} else {
 					if (body != null) {
@@ -352,7 +352,7 @@ public class FileUploadOp extends Operation<FileInfo> {
 							}
 						} else {
 							synchronized (lock) {
-								request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+								request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
 							}
 						}
 					} else {

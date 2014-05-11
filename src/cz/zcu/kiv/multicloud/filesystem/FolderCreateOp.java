@@ -116,7 +116,7 @@ public class FolderCreateOp extends Operation<FileInfo> {
 			}
 			if (body != null) {
 				synchronized (lock) {
-					request = prepareRequest(new StringEntity(doPropertyMapping(body)));
+					request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
 				}
 			} else {
 				synchronized (lock) {
