@@ -57,7 +57,7 @@ public class RenameOp extends Operation<FileInfo> {
 		String path = file.getPath();
 		if (path != null) {
 			if (path.contains(FileInfo.PATH_SEPARATOR)) {
-				path = path.substring(0, path.lastIndexOf(FileInfo.PATH_SEPARATOR)) + fileName;
+				path = path.substring(0, path.lastIndexOf(FileInfo.PATH_SEPARATOR) + 1) + fileName;
 			}
 		}
 		addPropertyMapping("destination_path", path);
