@@ -161,6 +161,10 @@ public class Utils {
 				decimalSize /= SIZE_BINARY_STEP;
 				index++;
 			}
+			if (decimalSize >= SIZE_DECIMAL_STEP) {
+				decimalSize /= SIZE_BINARY_STEP;
+				index++;
+			}
 			if (index >= SIZE_BINARY_UNITS.length) {
 				index = SIZE_BINARY_UNITS.length - 1;
 			}
