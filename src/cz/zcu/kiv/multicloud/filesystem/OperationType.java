@@ -20,6 +20,7 @@ public enum OperationType {
 	RENAME,					// applies to files and folders
 	COPY,					// applies to files and folders
 	MOVE,					// applies to files and folders
-	DELETE					// applies to files and folders
+	DELETE,					// applies to files and folders
+	SEARCH
 
 }

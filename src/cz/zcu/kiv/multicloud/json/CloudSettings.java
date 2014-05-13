@@ -100,6 +100,9 @@ public class CloudSettings {
 	/** Delete request parameters. */
 	@JsonProperty("delete_request")
 	private CloudRequest deleteRequest;
+	/** Search request parameters. */
+	@JsonProperty("search_request")
+	private CloudRequest searchRequest;
 
 	/**
 	 * Returns the account information request parameters.
@@ -251,6 +254,14 @@ public class CloudSettings {
 	 */
 	public String getScope() {
 		return scope;
+	}
+
+	/**
+	 * Returns the search request parameters.
+	 * @return Search request parameters.
+	 */
+	public CloudRequest getSearchRequest() {
+		return searchRequest;
 	}
 
 	/**
@@ -489,6 +500,14 @@ public class CloudSettings {
 	 */
 	public void setScope(String scope) {
 		this.scope = scope;
+	}
+
+	/**
+	 * Sets the search request parameters.
+	 * @param searchRequest Search request parameters.
+	 */
+	public void setSearchRequest(CloudRequest searchRequest) {
+		this.searchRequest = searchRequest;
 	}
 
 	/**

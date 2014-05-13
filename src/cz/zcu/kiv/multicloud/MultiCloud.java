@@ -23,6 +23,7 @@ import cz.zcu.kiv.multicloud.filesystem.MoveOp;
 import cz.zcu.kiv.multicloud.filesystem.Operation;
 import cz.zcu.kiv.multicloud.filesystem.ProgressListener;
 import cz.zcu.kiv.multicloud.filesystem.RenameOp;
+import cz.zcu.kiv.multicloud.filesystem.SearchOp;
 import cz.zcu.kiv.multicloud.json.AccountInfo;
 import cz.zcu.kiv.multicloud.json.AccountQuota;
 import cz.zcu.kiv.multicloud.json.AccountSettings;
@@ -1132,6 +1133,63 @@ public class MultiCloud {
 		accountManager.removeAccountSettings(accountName);
 		accountManager.addAccountSettings(account);
 		accountManager.saveAccountSettings();
+	}
+
+	public List<FileInfo> search(String accountName, FileInfo folder, String fileName, boolean showDeleted) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
+		}
+		FileInfo useFolder = settings.getRootFolder();
+		if (folder != null) {
+			useFolder = folder;
+		}
+		if (useFolder.getFileType() != FileType.FOLDER) {
+			throw new MultiCloudException("Supplied file instead of folder.");
+		}
+		synchronized (lock) {
+			op = new SearchOp(token, settings.getSearchRequest(), folder, fileName, showDeleted);
+		}
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
+		lastError = op.getError();
+		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw new AbortedException("Operation aborted.");
+		}
+		List<FileInfo> result = ((SearchOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
 	}
 
 	/**

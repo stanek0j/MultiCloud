@@ -228,5 +228,22 @@
 	{
 		"uri":"https://www.googleapis.com/drive/v2/files/<id>",
 		"method":"DELETE"
+	},
+	"search_request":
+	{
+		"uri":"https://www.googleapis.com/drive/v2/files",
+		"method":"GET",
+		"params":
+		{
+			"q":"title contains '<query>'"
+			"trashed":"<deleted>"
+		},
+		"mapping":
+		{
+			"content":"items",
+			"deleted":"labels/trashed",
+			"size":"quotaBytesUsed",
+			"name":"title"
+		}
 	}
 }
