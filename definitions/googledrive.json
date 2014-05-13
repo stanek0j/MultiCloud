@@ -235,7 +235,7 @@
 		"method":"GET",
 		"params":
 		{
-			"q":"title contains '<query>'"
+			"q":"title contains '<query>'",
 			"trashed":"<deleted>"
 		},
 		"mapping":

@@ -197,7 +197,16 @@ public class Utils {
 				remove.add(file);
 			}
 		}
-		contents.getContent().removeAll(remove);
+		/* manual removal due to overloaded equals method of FileInfo */
+		for (FileInfo r: remove) {
+			for (int i = 0; i < contents.getContent().size(); i++) {
+				FileInfo file = contents.getContent().get(i);
+				if (file.getId().equals(r.getId())) {
+					contents.getContent().remove(i);
+					break;
+				}
+			}
+		}
 		return contents;
 	}
 
