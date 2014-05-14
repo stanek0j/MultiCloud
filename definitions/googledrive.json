@@ -43,13 +43,8 @@
 	},
 	"download_file_request":
 	{
-		"uri":"https://docs.google.com/uc",
-		"method":"GET",
-		"params":
-		{
-			"id":"<id>",
-			"export":"download"
-		}
+		"uri":"<download_url>",
+		"method":"GET"
 	},
 	"upload_file_begin_request":
 	{
