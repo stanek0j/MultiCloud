@@ -21,8 +21,12 @@ import cz.zcu.kiv.multicloud.MultiCloudException;
  */
 public class FileDownloadOp extends Operation<File> {
 
-	/** Size of a chunk for file download. Default value is set to 4 MiB. */
-	public static final long CHUNK_SIZE = 4 * 1024 * 1024;
+	/** Minimum size of chunk for file download, set to 256 kiB. */
+	public static final long MIN_CHUNK_SIZE = 256 * 1024;
+	/** Maximum size of chunk for file download, set to 16 MiB. */
+	public static final long MAX_CHUNK_SIZE = 16 * 1024 * 1024;
+	/** Optimal number of chunks for each worker. */
+	public static final int CHUNK_NUM_PER_WORKER = 5;
 
 	/** List of sources used to download the file. */
 	private final List<FileCloudSource> sources;
@@ -100,11 +104,19 @@ public class FileDownloadOp extends Operation<File> {
 			/* prepare chunks */
 			long pos = 0;
 			long size = base.getFile().getSize();
+			long chunk = MIN_CHUNK_SIZE;
 			listener.setTotalSize(size);
-			while (size > CHUNK_SIZE) {
-				queue.add(new DataChunk(pos, pos + CHUNK_SIZE));
-				pos += CHUNK_SIZE;
-				size -= CHUNK_SIZE;
+			/* dynamic chunk size */
+			while (size / chunk > sources.size() * CHUNK_NUM_PER_WORKER) {
+				chunk *= 2;
+				if (chunk >= MAX_CHUNK_SIZE) {
+					break;
+				}
+			}
+			while (size > chunk) {
+				queue.add(new DataChunk(pos, pos + chunk));
+				pos += chunk;
+				size -= chunk;
 			}
 			queue.add(new DataChunk(pos, pos + size));
 			/* open file for writing */
@@ -116,7 +128,7 @@ public class FileDownloadOp extends Operation<File> {
 				addPropertyMapping("id", source.getFile().getId());
 				addPropertyMapping("path", source.getFile().getPath());
 				HttpUriRequest request = prepareRequest(null);
-				pool.add(new FileDownloadThread(queue, request, writer, listener));
+				pool.add(new FileDownloadThread(queue, request, writer, listener, chunk));
 			}
 			for (FileDownloadThread thread: pool) {
 				thread.start();

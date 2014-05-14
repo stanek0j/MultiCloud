@@ -35,6 +35,8 @@ public class FileDownloadThread extends Thread {
 	private int failCount;
 	/** Progress listener. */
 	private final ProgressListener listener;
+	/** Size of the chunk. */
+	private final long chunkSize;
 
 	/**
 	 * Ctor with necessary parameters.
@@ -42,11 +44,12 @@ public class FileDownloadThread extends Thread {
 	 * @param request Request to get the file data from.
 	 * @param writer File writer.
 	 */
-	public FileDownloadThread(BlockingQueue<DataChunk> queue, HttpUriRequest request, FileDownloadWriter writer, ProgressListener listener) {
+	public FileDownloadThread(BlockingQueue<DataChunk> queue, HttpUriRequest request, FileDownloadWriter writer, ProgressListener listener, long chunkSize) {
 		this.queue = queue;
 		this.request = request;
 		this.writer = writer;
 		this.listener = listener;
+		this.chunkSize = chunkSize;
 		this.terminate = false;
 		this.failCount = 0;
 	}
@@ -56,7 +59,7 @@ public class FileDownloadThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		byte[] buffer = new byte[(int) FileDownloadOp.CHUNK_SIZE];
+		byte[] buffer = new byte[(int) chunkSize];
 		CloseableHttpClient client = HttpClients.createDefault();
 		while (!shouldTerminate()) {
 			try {
