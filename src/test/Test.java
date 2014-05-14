@@ -1,6 +1,6 @@
 package test;
 
-import java.io.File;
+import java.util.List;
 
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
@@ -123,6 +123,7 @@ public class Test {
 			e1.printStackTrace();
 		}
 
+		/*
 		drive = "googledrive";
 		try {
 			FileInfo list = cloud.listFolder(drive, null);
@@ -165,7 +166,9 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		 */
 
+		/*
 		drive = "onedrive";
 		try {
 			FileInfo list = cloud.listFolder(drive, null);
@@ -208,6 +211,7 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		 */
 
 		/*
 		Thread stopper = new Thread() {
@@ -235,6 +239,25 @@ public class Test {
 		}
 		 */
 
+		try {
+			List<FileInfo> list = cloud.search(drive, "test", false);
+			if (list == null) {
+				System.out.println("search failed");
+			} else {
+				if (list.isEmpty()) {
+					System.out.println("no result");
+				} else {
+					System.out.println("results:");
+					for (FileInfo f: list) {
+						System.out.println("  " + f.getName() + " :: " + f.getId() + " :: " + f.getPath());
+					}
+				}
+			}
+		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+		/*
 		Thread stopper = new Thread() {
 			@Override
 			public void run() {
@@ -262,6 +285,7 @@ public class Test {
 		}
 		long time = System.currentTimeMillis() - start;
 		System.out.println("time: " + (time / 1000.0) + "s");
+		 */
 
 		/*
 		try {

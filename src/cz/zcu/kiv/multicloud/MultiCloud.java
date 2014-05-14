@@ -1135,7 +1135,7 @@ public class MultiCloud {
 		accountManager.saveAccountSettings();
 	}
 
-	public List<FileInfo> search(String accountName, FileInfo folder, String fileName, boolean showDeleted) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+	public List<FileInfo> search(String accountName, String search, boolean showDeleted) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
 		synchronized (lock) {
 			if (op != null) {
 				throw new MultiCloudException("Concurrent operation forbidden.");
@@ -1160,15 +1160,8 @@ public class MultiCloud {
 		if (token.isExpired()) {
 			refreshAccount(accountName, null);
 		}
-		FileInfo useFolder = settings.getRootFolder();
-		if (folder != null) {
-			useFolder = folder;
-		}
-		if (useFolder.getFileType() != FileType.FOLDER) {
-			throw new MultiCloudException("Supplied file instead of folder.");
-		}
 		synchronized (lock) {
-			op = new SearchOp(token, settings.getSearchRequest(), folder, fileName, showDeleted);
+			op = new SearchOp(token, settings.getSearchRequest(), search, showDeleted);
 		}
 		try {
 			op.execute();

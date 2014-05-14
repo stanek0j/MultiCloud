@@ -34,6 +34,7 @@ import org.apache.http.impl.client.HttpClients;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import cz.zcu.kiv.multicloud.MultiCloudException;
@@ -152,87 +153,109 @@ public abstract class Operation<T> {
 	 * @return Tree with mapped values.
 	 */
 	private JsonNode doJsonMapping(JsonNode root) {
-		for (Entry<String, String> mapping: responseMapping.entrySet()) {
-			for (String submapping: mapping.getValue().split(JSON_MAPPING_SEPARATOR)) {
-				JsonNode node = root;
-				for (String subpath: submapping.split(JSON_PATH_SEPARATOR)) {
-					node = node.path(subpath);
-				}
-				JsonNode existing = root.path(mapping.getKey());
-				if (!node.isMissingNode()) {
-					switch (node.getNodeType()) {
-					case STRING:
-						String text = "";
-						if (!existing.isMissingNode() && existing.isTextual()) {
-							text += existing.textValue(); // prepend existing string
-						}
-						text += node.textValue();
-						((ObjectNode) root).put(mapping.getKey(), text);
-						break;
-					case NUMBER:
-						switch (node.numberType()) {
-						case INT:
-						case LONG:
-						case BIG_INTEGER:
-							long numLng = node.longValue();
-							if (!existing.isMissingNode() && existing.isNumber()) {
-								switch (existing.numberType()) {
-								case INT:
-								case LONG:
-								case BIG_INTEGER:
-									numLng += existing.longValue(); // add numbers
-									((ObjectNode) root).put(mapping.getKey(), numLng);
-									break;
-								case FLOAT:
-								case DOUBLE:
-								case BIG_DECIMAL:
-									double exDbl = existing.doubleValue() + numLng; // add numbers
-									((ObjectNode) root).put(mapping.getKey(), exDbl);
-									break;
+		if (responseMapping.isEmpty()) {
+			return root;
+		}
+		JsonNode obj = null;
+		switch (root.getNodeType()) {
+		case OBJECT:
+			/* create new empty object */
+			obj = new ObjectNode(json.getMapper().getNodeFactory());
+			/* fill object with mapped properties */
+			Iterator<String> keys = root.fieldNames();
+			while (keys.hasNext()) {
+				String key = keys.next();
+				((ObjectNode) obj).put(key, doJsonMapping(root.get(key)));
+			}
+			/* do the mapping */
+			for (Entry<String, String> mapping: responseMapping.entrySet()) {
+				for (String submapping: mapping.getValue().split(JSON_MAPPING_SEPARATOR)) {
+					JsonNode node = root;
+					for (String subpath: submapping.split(JSON_PATH_SEPARATOR)) {
+						node = node.path(subpath);
+					}
+					JsonNode existing = root.path(mapping.getKey());
+					if (!node.isMissingNode()) {
+						switch (node.getNodeType()) {
+						case STRING:
+							String text = "";
+							if (!existing.isMissingNode() && existing.isTextual()) {
+								text += existing.textValue(); // prepend existing string
+							}
+							text += node.textValue();
+							((ObjectNode) obj).put(mapping.getKey(), text);
+							break;
+						case NUMBER:
+							switch (node.numberType()) {
+							case INT:
+							case LONG:
+							case BIG_INTEGER:
+								long numLng = node.longValue();
+								if (!existing.isMissingNode() && existing.isNumber()) {
+									switch (existing.numberType()) {
+									case INT:
+									case LONG:
+									case BIG_INTEGER:
+										numLng += existing.longValue(); // add numbers
+										((ObjectNode) obj).put(mapping.getKey(), numLng);
+										break;
+									case FLOAT:
+									case DOUBLE:
+									case BIG_DECIMAL:
+										double exDbl = existing.doubleValue() + numLng; // add numbers
+										((ObjectNode) obj).put(mapping.getKey(), exDbl);
+										break;
+									}
+								} else {
+									((ObjectNode) obj).put(mapping.getKey(), numLng);
 								}
-							} else {
-								((ObjectNode) root).put(mapping.getKey(), numLng);
+								break;
+							case FLOAT:
+							case DOUBLE:
+							case BIG_DECIMAL:
+								double numDbl = node.doubleValue();
+								if (!existing.isMissingNode() && existing.isNumber()) {
+									numDbl += existing.doubleValue(); // add numbers
+									((ObjectNode) obj).put(mapping.getKey(), numDbl);
+								}
+								break;
 							}
 							break;
-						case FLOAT:
-						case DOUBLE:
-						case BIG_DECIMAL:
-							double numDbl = node.doubleValue();
-							if (!existing.isMissingNode() && existing.isNumber()) {
-								numDbl += existing.doubleValue(); // add numbers
-								((ObjectNode) root).put(mapping.getKey(), numDbl);
-							}
+						case OBJECT:
+							JsonNode mappedObjectNode = doJsonMapping(node); // map JSON values inside object
+							((ObjectNode) obj).put(mapping.getKey(), mappedObjectNode);
+							break;
+						case ARRAY:
+							JsonNode mappedArrayNode = doJsonMapping(node); // map JSON values inside array
+							((ObjectNode) obj).put(mapping.getKey(), mappedArrayNode);
+							break;
+						case BOOLEAN:
+							((ObjectNode) obj).put(mapping.getKey(), node.booleanValue());
+							break;
+						case NULL:
+						default:
 							break;
 						}
-						break;
-					case OBJECT:
-						JsonNode mappedObjectNode = doJsonMapping(node); // map JSON values
-						((ObjectNode) root).put(mapping.getKey(), mappedObjectNode);
-						break;
-					case ARRAY:
-						if (!existing.isMissingNode() && existing.isArray()) {
-							((ArrayNode) node).addAll((ArrayNode) existing); // append array values
-						}
-						JsonNode mappedArrayNode = doJsonMapping(node); // map JSON values
-						ArrayNode deeplyMappedArrayNode = new ArrayNode(json.getMapper().getNodeFactory());
-						Iterator<JsonNode> it = ((ArrayNode) mappedArrayNode).elements();
-						while (it.hasNext()) {
-							JsonNode element = it.next();
-							deeplyMappedArrayNode.add(doJsonMapping(element)); // map values inside the array
-						}
-						((ObjectNode) root).put(mapping.getKey(), deeplyMappedArrayNode);
-						break;
-					case BOOLEAN:
-						((ObjectNode) root).put(mapping.getKey(), node.booleanValue());
-						break;
-					case NULL:
-					default:
-						break;
 					}
 				}
 			}
+			break;
+		case ARRAY:
+			obj = new ArrayNode(json.getMapper().getNodeFactory());
+			Iterator<JsonNode> it = root.iterator();
+			while (it.hasNext()) {
+				((ArrayNode) obj).add(doJsonMapping(it.next()));
+			}
+			break;
+		case STRING:
+		case NUMBER:
+		case BOOLEAN:
+		case NULL:
+		default:
+			obj = root;
+			break;
 		}
-		return root;
+		return obj;
 	}
 
 	/**
@@ -255,17 +278,19 @@ public abstract class Operation<T> {
 			Matcher matcher = pattern.matcher(result);
 			if (matcher.find()) {
 				String value = mapping.getValue();
-				if (value != null && encode) {
-					if (find.equals("<path>") || find.equals("<source_path>") || find.equals("<destination_path>")) {
-						try {
-							value = URLEncoder.encode(value, "utf-8");
-							value = value.replace("%2F", "/").replace("+", "%20").replace("*", "%2A");
-						} catch (UnsupportedEncodingException e) {
-							/* in this case, continue with what we've got */
+				if (value != null) {
+					if (encode) {
+						if (find.equals("<path>") || find.equals("<source_path>") || find.equals("<destination_path>")) {
+							try {
+								value = URLEncoder.encode(value, "utf-8");
+								value = value.replace("%2F", "/").replace("+", "%20").replace("*", "%2A");
+							} catch (UnsupportedEncodingException e) {
+								/* in this case, continue with what we've got */
+							}
 						}
 					}
+					result = result.replaceAll(find, value);
 				}
-				result = result.replaceAll(find, value);
 			}
 		}
 		return result;
@@ -418,6 +443,11 @@ public abstract class Operation<T> {
 			ObjectMapper mapper = json.getMapper();
 			try {
 				JsonNode root = mapper.readTree(response.getEntity().getContent());
+				if (root.getNodeType() != JsonNodeType.OBJECT) {
+					ObjectNode obj = new ObjectNode(mapper.getNodeFactory());
+					obj.put("content", root);
+					root = obj;
+				}
 				/* mapping JSON values to different field names */
 				root = doJsonMapping(root);
 				return root;
