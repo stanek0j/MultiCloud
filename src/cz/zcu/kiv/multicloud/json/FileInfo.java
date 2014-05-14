@@ -39,6 +39,8 @@ public class FileInfo {
 	private FileType fileType;
 	/** Mime type of the resource. */
 	private String mimeType;
+	/** URL for downloading the file. */
+	private String downloadUrl;
 	/** Size in bytes of the resource. */
 	private long size;
 	/** Content of a folder. */
@@ -113,6 +115,14 @@ public class FileInfo {
 	 */
 	public List<FileInfo> getContent() {
 		return content;
+	}
+
+	/**
+	 * Returns URL for downloading the file.
+	 * @return URL for downloading the file.
+	 */
+	public String getDownloadUrl() {
+		return downloadUrl;
 	}
 
 	/**
@@ -209,6 +219,14 @@ public class FileInfo {
 	 */
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	/**
+	 * Sets the URL for downloading the file.
+	 * @param downloadUrl URL for downloading the file.
+	 */
+	public void setDownloadUrl(String downloadUrl) {
+		this.downloadUrl = downloadUrl;
 	}
 
 	/**

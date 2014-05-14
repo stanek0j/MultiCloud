@@ -125,6 +125,7 @@ public class FileDownloadOp extends Operation<File> {
 			for (FileCloudSource source: sources) {
 				setToken(source.getToken());
 				setRequest(source.getRequest());
+				addPropertyMapping("download_url", source.getFile().getDownloadUrl());
 				addPropertyMapping("id", source.getFile().getId());
 				addPropertyMapping("path", source.getFile().getPath());
 				HttpUriRequest request = prepareRequest(null);
