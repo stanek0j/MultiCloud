@@ -174,7 +174,7 @@ public abstract class Operation<T> {
 					for (String subpath: submapping.split(JSON_PATH_SEPARATOR)) {
 						node = node.path(subpath);
 					}
-					JsonNode existing = root.path(mapping.getKey());
+					JsonNode existing = obj.path(mapping.getKey());
 					if (!node.isMissingNode()) {
 						switch (node.getNodeType()) {
 						case STRING:

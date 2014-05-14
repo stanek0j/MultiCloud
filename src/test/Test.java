@@ -5,10 +5,12 @@ import java.util.List;
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.filesystem.ProgressListener;
+import cz.zcu.kiv.multicloud.json.AccountQuota;
 import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.json.ParentInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
 import cz.zcu.kiv.multicloud.utils.Utils;
+import cz.zcu.kiv.multicloud.utils.Utils.UnitsFormat;
 
 public class Test {
 
@@ -39,19 +41,20 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		 */
 		try {
-			AccountQuota quota = cloud.getAccountQuota("test");
+			AccountQuota quota = cloud.accountQuota("test");
 			if (quota == null) {
 				System.out.println(cloud.getLastError());
 			} else {
-				System.out.println("Quota total: " + quota.getTotalBytes());
-				System.out.println("Quota used: " + quota.getUsedBytes());
-				System.out.println("Quota free: " + quota.getFreeBytes());
+				System.out.println("Quota total: " + Utils.formatSize(quota.getTotalBytes(), UnitsFormat.BINARY));
+				System.out.println("Quota used: " + Utils.formatSize(quota.getUsedBytes(), UnitsFormat.BINARY));
+				System.out.println("Quota free: " + Utils.formatSize(quota.getFreeBytes(), UnitsFormat.BINARY));
 			}
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		 */
+		System.exit(0);
 
 		String drive = "test";
 		//String drive = "googledrive";
