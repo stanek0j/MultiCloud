@@ -103,6 +103,9 @@ public class CloudSettings {
 	/** Search request parameters. */
 	@JsonProperty("search_request")
 	private CloudRequest searchRequest;
+	/** Metadata request parameters. */
+	@JsonProperty("metadata_request")
+	private CloudRequest metadataRequest;
 
 	/**
 	 * Returns the account information request parameters.
@@ -206,6 +209,14 @@ public class CloudSettings {
 	 */
 	public CloudRequest getListDirRequest() {
 		return listDirRequest;
+	}
+
+	/**
+	 * Returns the metadata request parameters.
+	 * @return Metadata request parameters.
+	 */
+	public CloudRequest getMetadataRequest() {
+		return metadataRequest;
 	}
 
 	/**
@@ -450,6 +461,14 @@ public class CloudSettings {
 	 */
 	public void setListDirRequest(CloudRequest listDirRequest) {
 		this.listDirRequest = listDirRequest;
+	}
+
+	/**
+	 * Sets the metadata request parameters.
+	 * @param metadataRequest Metadata request parameters.
+	 */
+	public void setMetadataRequest(CloudRequest metadataRequest) {
+		this.metadataRequest = metadataRequest;
 	}
 
 	/**

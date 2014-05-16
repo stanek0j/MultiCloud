@@ -19,6 +19,7 @@ import cz.zcu.kiv.multicloud.filesystem.FileType;
 import cz.zcu.kiv.multicloud.filesystem.FileUploadOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderCreateOp;
 import cz.zcu.kiv.multicloud.filesystem.FolderListOp;
+import cz.zcu.kiv.multicloud.filesystem.MetadataOp;
 import cz.zcu.kiv.multicloud.filesystem.MoveOp;
 import cz.zcu.kiv.multicloud.filesystem.Operation;
 import cz.zcu.kiv.multicloud.filesystem.ProgressListener;
@@ -931,6 +932,69 @@ public class MultiCloud {
 		}
 		return info;
 	}
+
+	/**
+	 * Retrieve metadata of the supplied file or folder.
+	 * @param accountName Name of the user account.
+	 * @param file File or folder for retrieving metadata.
+	 * @return Metadata of the file or folder.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public FileInfo metadata(String accountName, FileInfo file) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
+		}
+		if (file == null) {
+			throw new MultiCloudException("File or folder must be supplied.");
+		}
+		synchronized (lock) {
+			op = new MetadataOp(token, settings.getMetadataRequest(), file);
+		}
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
+		lastError = op.getError();
+		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo info = ((MetadataOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return info;
+	}
+
 
 	/**
 	 * Move existing file or folder to new destination.

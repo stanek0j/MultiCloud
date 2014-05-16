@@ -21,6 +21,7 @@ public enum OperationType {
 	COPY,					// applies to files and folders
 	MOVE,					// applies to files and folders
 	DELETE,					// applies to files and folders
-	SEARCH
+	SEARCH,
+	METADATA
 
 }
