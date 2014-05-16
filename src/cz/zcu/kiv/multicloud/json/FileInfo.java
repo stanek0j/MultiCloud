@@ -64,7 +64,7 @@ public class FileInfo {
 			return false;
 		}
 		FileInfo cmp = (FileInfo) obj;
-		return (cmp.getName().equals(name) && cmp.getSize() == size);
+		return (cmp.getName().equals(name) && cmp.getSize() == size && cmp.getFileType() == fileType);
 	}
 
 	/**
