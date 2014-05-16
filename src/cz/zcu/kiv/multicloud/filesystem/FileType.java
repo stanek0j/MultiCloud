@@ -14,6 +14,14 @@ public enum FileType {
 	FOLDER("folder"),					// default option
 	FILE("file");
 
+	/** Recognized file type strings. */
+	public static final String[] FILE_TYPES = new String[] {
+		"file",
+		"audio",
+		"photo",
+		"video"
+	};
+
 	/**
 	 * Convert string to enumeration ignoring case.
 	 * @param text String to be converted.
@@ -25,6 +33,11 @@ public enum FileType {
 			for (FileType type: FileType.values()) {
 				if (text.equalsIgnoreCase(type.text)) {
 					return type;
+				}
+			}
+			for (String s: FILE_TYPES) {
+				if (text.equalsIgnoreCase(s)) {
+					return FILE;
 				}
 			}
 		}
