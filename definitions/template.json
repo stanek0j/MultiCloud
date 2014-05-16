@@ -108,5 +108,10 @@
 	{
 		"uri":"",
 		"method":""
+	},
+	"metadata_request":
+	{
+		"uri":"",
+		"method":""
 	}
 }
