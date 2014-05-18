@@ -288,6 +288,12 @@ public abstract class Operation<T> {
 								/* in this case, continue with what we've got */
 							}
 						}
+					} else {
+						if (find.equals("<query>")) {
+							if (result.contains("'")) {
+								value = value.replace("'", "\\\\'");
+							}
+						}
 					}
 					result = result.replaceAll(find, value);
 				}
