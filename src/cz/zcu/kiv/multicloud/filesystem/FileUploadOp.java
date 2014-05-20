@@ -1,12 +1,15 @@
 package cz.zcu.kiv.multicloud.filesystem;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.InputStreamEntity;
@@ -20,7 +23,6 @@ import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.json.CloudRequest;
 import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.json.UploadSession;
-import cz.zcu.kiv.multicloud.oauth2.OAuth2Token;
 import cz.zcu.kiv.multicloud.utils.Utils;
 
 /**
@@ -39,96 +41,38 @@ public class FileUploadOp extends Operation<FileInfo> {
 	/** String to indicate that the body of the request should contain upload data. */
 	public static final String DATA_MAPPING = "<data>";
 
-	/** File or folder name to be renamed to. */
-	private final String name;
-	/** JSON body represented as a map. */
-	private Map<String, Object> jsonBody;
-	/** Body of the request. */
-	private String body;
-	/** Parameters of the initial request. */
-	private final CloudRequest beginRequest;
-	/** Parameters of the chunked upload request. */
-	private final CloudRequest execRequest;
-	/** Parameters if the finalization request. */
-	private final CloudRequest finishRequest;
-	/** Size of the data uploaded. */
-	private final long size;
-	/** File data to be uploaded. */
-	private final InputStream data;
+	/** List of destinations to upload the file to. */
+	private final List<FileCloudSource> destinations;
+	/** Thread pool of worker threads. */
+	private final List<FileUploadThread> pool;
+	/** File to be uploaded. */
+	private final File data;
 	/** Progress listener. */
 	private final ProgressListener listener;
-	/** The request of the operation. */
-	private HttpUriRequest request;
 	/** Lock object for concurrent method calls. */
 	private final Object lock;
-
-	/** Number of bytes already sent to the server. */
-	private long transferred;
-	/** Identifier of the chunked upload session. */
-	private UploadSession session;
-	/** Byte buffer of the last chunk. */
-	private byte[] buffer;
+	/** If all the uploads are done. */
+	private boolean done;
 
 	/**
 	 * Ctor with necessary parameters.
-	 * @param token Access token for the storage service.
-	 * @param beginRequest Parameters of the request to start the upload.
-	 * @param execRequest Parameters of the request to upload the data.
-	 * @param finishRequest Parameters of the request to finish the upload.
-	 * @param destination Destination file or folder to be moved to.
-	 * @param destinationName New name at the destination location.
+	 * @param destinations List of destinations to upload the file to.
 	 * @param overwrite If the destination file should be overwritten.
-	 * @param data Data stream of the uploaded file.
-	 * @param size Size of the uploaded file.
+	 * @param data The uploaded file.
 	 * @param listener Progress listener.
 	 */
-	public FileUploadOp(
-			OAuth2Token token,
-			CloudRequest beginRequest,
-			CloudRequest execRequest,
-			CloudRequest finishRequest,
-			FileInfo destination,
-			String destinationName,
-			boolean overwrite,
-			InputStream data,
-			long size,
-			ProgressListener listener) {
-		super(OperationType.FILE_UPLOAD, token, beginRequest);
-		this.beginRequest = beginRequest;
-		this.execRequest = execRequest;
-		this.finishRequest = finishRequest;
-		this.size = size;
+	public FileUploadOp(List<FileCloudSource> destinations, boolean overwrite, File data, ProgressListener listener) {
+		super(OperationType.FILE_UPLOAD, null, null);
+		this.destinations = destinations;
 		this.data = data;
 		this.listener = listener;
+		this.pool = new ArrayList<>();
 
 		if (this.listener != null) {
-			this.listener.setTotalSize(size);
-		}
-		addPropertyMapping("id", destination.getId());
-		addPropertyMapping("destination_id", destination.getId());
-		String path = destination.getPath();
-		if (path != null) {
-			if (path.endsWith(FileInfo.PATH_SEPARATOR)) {
-				if (destinationName != null) {
-					path += destinationName;
-				}
-			} else {
-				if (destinationName != null) {
-					path += FileInfo.PATH_SEPARATOR + destinationName;
-				}
-			}
-		}
-		addPropertyMapping("path", path);
-		addPropertyMapping("destination_path", path);
-		if (destinationName != null) {
-			addPropertyMapping("name", destinationName);
-			name = destinationName;
-		} else {
-			name = null;
+			this.listener.setTotalSize(data.length());
 		}
 		addPropertyMapping("overwrite", overwrite ? "true" : "false");
-		addPropertyMapping("size", String.valueOf(size));
-		transferred = 0;
+		addPropertyMapping("size", String.valueOf(data.length()));
 		lock = new Object();
 	}
 
@@ -138,299 +82,178 @@ public class FileUploadOp extends Operation<FileInfo> {
 	@Override
 	public void abort() {
 		synchronized (lock) {
-			if (request != null) {
-				request.abort();
-				isAborted = true;
+			for (FileUploadThread thread: pool) {
+				thread.terminate();
 			}
+			isAborted = true;
 		}
 	}
 
 	/**
-	 * Beginning of the chunked upload. If the request parameters for this method are supplied, chunked upload is started.
-	 * The main purpose of this method is to obtain a session identifier for further data upload.
-	 * This request uploads maximum one single chunk of data.
+	 * Method for parsing upload session information out of a response.
+	 * @param request Request to which the response belongs to.
+	 * @param response Response to be parsed.
+	 * @return Upload session.
 	 */
-	@Override
-	protected void operationBegin() throws MultiCloudException {
-		if (beginRequest != null) {
-			setRequest(beginRequest);
-			jsonBody = beginRequest.getJsonBody();
-			body = beginRequest.getBody();
-			addPropertyMapping("offset", String.valueOf(transferred));
-			try {
-				if (jsonBody != null) {
-					ObjectMapper mapper = json.getMapper();
-					body = mapper.writeValueAsString(jsonBody);
-					synchronized (lock) {
-						request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
+	protected synchronized UploadSession getParsedSessionResponse(CloudRequest request, HttpResponse response) {
+		setRequest(request);
+		for (Header header: response.getAllHeaders()) {
+			responseHeaders.put(header.getName(), header.getValue());
+		}
+		UploadSession session = null;
+		try {
+			if (response.getStatusLine().getStatusCode() < 400) {
+				JsonNode tree = parseJsonResponse(response);
+				if (tree != null) {
+					session = json.getMapper().treeToValue(tree, UploadSession.class);
+				} else {
+					for (Entry<String, String> header: responseHeaders.entrySet()) {
+						if (header.getKey().equals("Location")) {
+							responseParams.putAll(Utils.extractParams(header.getValue()));
+							doResponseParamsMapping();
+							session = new UploadSession();
+							session.setSession(responseParams.get("session"));
+							try {
+								long offset = Long.parseLong(responseParams.get("offset"));
+								session.setOffset(offset);
+							} catch (NumberFormatException e) {
+								session.setOffset(0);
+							}
+						}
+					}
+				}
+			}
+		} catch (IllegalStateException | IOException e) {
+			/* return null value instead of throwing exception */
+		}
+		return session;
+	}
+
+	/**
+	 * Method for preparing a request for the worker thread.
+	 * @param dst Information about the destination.
+	 * @param request Request to be prepared.
+	 * @param session Upload session information.
+	 * @param data Data to be transferred.
+	 * @param transferred Amount of data already transferred.
+	 * @param buffer Size of the data to be transferred.
+	 * @return Request for the worker.
+	 * @throws MultiCloudException If preparation of the request failed.
+	 */
+	protected synchronized HttpUriRequest getPreparedRequest(FileCloudSource dst, CloudRequest request, UploadSession session, InputStream data, long transferred, long buffer) throws MultiCloudException {
+		HttpUriRequest preparedRequest = null;
+		setToken(dst.getToken());
+		setRequest(request);
+		Map<String, Object> jsonBody = request.getJsonBody();
+		String body = request.getBody();
+		addPropertyMapping("id", dst.getFile().getId());
+		addPropertyMapping("destination_id", dst.getFile().getId());
+		String path = dst.getFile().getPath();
+		if (path != null) {
+			if (path.endsWith(FileInfo.PATH_SEPARATOR)) {
+				if (dst.getFileName() != null) {
+					path += dst.getFileName();
+				}
+			} else {
+				if (dst.getFileName() != null) {
+					path += FileInfo.PATH_SEPARATOR + dst.getFileName();
+				}
+			}
+		}
+		addPropertyMapping("path", path);
+		addPropertyMapping("destination_path", path);
+		if (dst.getFileName() != null) {
+			addPropertyMapping("name", dst.getFileName());
+		}
+		addPropertyMapping("offset", String.valueOf(transferred));
+		if (session != null) {
+			addPropertyMapping("session", session.getSession());
+		}
+		try {
+			if (jsonBody != null) {
+				ObjectMapper mapper = json.getMapper();
+				body = mapper.writeValueAsString(jsonBody);
+				preparedRequest = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
+			} else {
+				if (body != null) {
+					if (body.equals(DATA_MAPPING)) {
+						addPropertyMapping("offsetbuffer", String.valueOf(transferred + buffer - 1));
+						preparedRequest = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), buffer));
+					} else {
+						preparedRequest = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
 					}
 				} else {
-					if (body != null) {
-						if (body.equals(DATA_MAPPING)) {
-							ByteArrayInputStream data = readData();
-							transferred = buffer.length;
-							synchronized (lock) {
-								request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), buffer.length));
-							}
-						} else {
-							synchronized (lock) {
-								request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
-							}
-						}
-					} else {
-						synchronized (lock) {
-							request = prepareRequest(null);
-						}
-					}
-				}
-			} catch (UnsupportedEncodingException | JsonProcessingException e1) {
-				throw new MultiCloudException("Failed to prepare request.");
-			}
-			try {
-				setResult(executeRequest(request, new ResponseProcessor<FileInfo>() {
-					/**
-					 * {@inheritDoc}
-					 */
-					@Override
-					public FileInfo processResponse(HttpResponse response) {
-						session = null;
-						try {
-							if (response.getStatusLine().getStatusCode() >= 400) {
-								parseOperationError(response);
-							} else {
-								JsonNode tree = parseJsonResponse(response);
-								if (tree != null) {
-									session = json.getMapper().treeToValue(tree, UploadSession.class);
-								} else {
-									for (Entry<String, String> header: responseHeaders.entrySet()) {
-										if (header.getKey().equals("Location")) {
-											responseParams.putAll(Utils.extractParams(header.getValue()));
-											doResponseParamsMapping();
-											session = new UploadSession();
-											session.setSession(responseParams.get("session"));
-											try {
-												long offset = Long.parseLong(responseParams.get("offset"));
-												session.setOffset(offset);
-											} catch (NumberFormatException e) {
-												session.setOffset(0);
-											}
-										}
-									}
-								}
-							}
-						} catch (IllegalStateException | IOException e) {
-							/* return null value instead of throwing exception */
-						}
-						return null;
-					}
-				}));
-			} catch (IOException e) {
-				synchronized (lock) {
-					if (!isAborted) {
-						throw new MultiCloudException("Failed to upload the file.");
-					}
+					preparedRequest = prepareRequest(null);
 				}
 			}
-			synchronized (lock) {
-				request = null;
-			}
+		} catch (UnsupportedEncodingException | JsonProcessingException e1) {
+			throw new MultiCloudException("Failed to prepare request.");
 		}
+		return preparedRequest;
 	}
 
 	/**
-	 * Chunked upload progress. Uploads all the remaining data chunks.
+	 * Returns if all the uploads are done.
+	 * @return If all the uploads are done.
+	 */
+	public boolean isDone() {
+		return done;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void operationBegin() {
+		/* no preparation necessary */
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void operationExecute() throws MultiCloudException {
-		synchronized (lock) {
-			if (isAborted) {
-				return;
+		if (!destinations.isEmpty()) {
+			/* create threads and start them */
+			listener.setDivisor(destinations.size());
+			for (FileCloudSource dst: destinations) {
+				pool.add(new FileUploadThread(this, dst, data));
 			}
-		}
-		if (execRequest != null) {
-			if (session != null) {
-				addPropertyMapping("session", session.getSession());
+			for (FileUploadThread thread: pool) {
+				thread.start();
 			}
-			while (transferred < size) {
-				setRequest(execRequest);
-				jsonBody = execRequest.getJsonBody();
-				body = execRequest.getBody();
-				addPropertyMapping("offset", String.valueOf(transferred));
+			for (FileUploadThread thread: pool) {
 				try {
-					if (jsonBody != null) {
-						ObjectMapper mapper = json.getMapper();
-						body = mapper.writeValueAsString(jsonBody);
-						synchronized (lock) {
-							request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
-						}
-					} else {
-						if (body != null) {
-							if (body.equals(DATA_MAPPING)) {
-								ByteArrayInputStream data = readData();
-								transferred += buffer.length;
-								addPropertyMapping("offsetbuffer", String.valueOf(transferred - 1));
-								synchronized (lock) {
-									request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), buffer.length));
-								}
-							} else {
-								synchronized (lock) {
-									request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
-								}
-							}
-						} else {
-							synchronized (lock) {
-								request = prepareRequest(null);
-							}
-						}
-					}
-				} catch (UnsupportedEncodingException | JsonProcessingException e1) {
-					throw new MultiCloudException("Failed to prepare request.");
-				}
-				try {
-					setResult(executeRequest(request, new ResponseProcessor<FileInfo>() {
-						/**
-						 * {@inheritDoc}
-						 */
-						@Override
-						public FileInfo processResponse(HttpResponse response) {
-							try {
-								if (response.getStatusLine().getStatusCode() >= 400) {
-									parseOperationError(response);
-								}
-							} catch (IllegalStateException | IOException e) {
-								/* return null value instead of throwing exception */
-							}
-							return null;
-						}
-					}));
-				} catch (IOException e) {
-					synchronized (lock) {
-						if (!isAborted) {
-							throw new MultiCloudException("Failed to upload the file.");
-						}
-					}
-				}
-				synchronized (lock) {
-					request = null;
-				}
-
-			}
-		}
-	}
-
-	/**
-	 * Finish the upload of the file. If no data were submitted so far, a normal direct upload is performed.
-	 */
-	@Override
-	protected void operationFinish() throws MultiCloudException {
-		synchronized (lock) {
-			if (isAborted) {
-				return;
-			}
-		}
-		if (finishRequest != null) {
-			setRequest(finishRequest);
-			jsonBody = finishRequest.getJsonBody();
-			body = finishRequest.getBody();
-			if (session != null) {
-				addPropertyMapping("session", session.getSession());
-			}
-			addPropertyMapping("offset", String.valueOf(transferred));
-			try {
-				if (jsonBody != null) {
-					ObjectMapper mapper = json.getMapper();
-					body = mapper.writeValueAsString(jsonBody);
-					synchronized (lock) {
-						request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
-					}
-				} else {
-					if (body != null) {
-						if (body.equals(DATA_MAPPING)) {
-							transferred = size;
-							synchronized (lock) {
-								request = prepareRequest(new InputStreamEntity(new CountingInputStream(data, listener), size));
-							}
-						} else {
-							synchronized (lock) {
-								request = prepareRequest(new StringEntity(doPropertyMapping(body, false)));
-							}
-						}
-					} else {
-						synchronized (lock) {
-							request = prepareRequest(null);
-						}
-					}
-				}
-			} catch (UnsupportedEncodingException | JsonProcessingException e1) {
-				throw new MultiCloudException("Failed to prepare request.");
-			}
-			try {
-				setResult(executeRequest(request, new ResponseProcessor<FileInfo>() {
-					/**
-					 * {@inheritDoc}
-					 */
-					@Override
-					public FileInfo processResponse(HttpResponse response) {
-						FileInfo info = null;
-						try {
-							if (response.getStatusLine().getStatusCode() >= 400) {
-								parseOperationError(response);
-							} else {
-								JsonNode tree = parseJsonResponse(response);
-								if (tree != null) {
-									info = json.getMapper().treeToValue(tree, FileInfo.class);
-									info.fillMissing();
-									for (FileInfo content: info.getContent()) {
-										content.fillMissing();
-									}
-								} else {
-									info = new FileInfo();
-									info.setName(name);
-									info.setFileType(FileType.FILE);
-								}
-							}
-						} catch (IllegalStateException | IOException e) {
-							/* return null value instead of throwing exception */
-						}
-						return info;
-					}
-				}));
-			} catch (IOException e) {
-				synchronized (lock) {
-					if (!isAborted) {
-						throw new MultiCloudException("Failed to upload the file.");
-					}
+					thread.join();
+				} catch (InterruptedException e) {
+					/* join interrupted */
 				}
 			}
-			synchronized (lock) {
-				request = null;
-			}
-		} else {
+			listener.finishTransfer();
 			if (getError() == null && getResult() == null) {
 				FileInfo info = new FileInfo();
-				info.setName(name);
+				info.setName(data.getName());
 				info.setFileType(FileType.FILE);
 				setResult(info);
 			}
+			done = true;
+			for (FileUploadThread thread: pool) {
+				if (thread.isFailed()) {
+					done = false;
+					break;
+				}
+			}
+		} else {
+			throw new MultiCloudException("No destination specified.");
 		}
 	}
 
 	/**
-	 * Read chunk from the input stream, save it to a buffer and return input stream made off that buffer.
-	 * @return Chunk data stream.
+	 * {@inheritDoc}
 	 */
-	private ByteArrayInputStream readData() {
-		long size = CHUNK_SIZE;
-		if (this.size - transferred < size) {
-			size = this.size - transferred;
-		}
-		buffer = new byte[(int) size];
-		try {
-			data.read(buffer, 0, (int) size);
-		} catch (IOException e) {
-			/* returns empty buffer */
-		}
-		return new ByteArrayInputStream(buffer);
+	@Override
+	protected void operationFinish() {
+		/* no finalization necessary */
 	}
 
 }

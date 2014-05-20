@@ -52,7 +52,7 @@ public class FileDownloadOp extends Operation<File> {
 		super(OperationType.FILE_DOWNLOAD, null, null);
 		this.sources = new ArrayList<>();
 		for (FileCloudSource pair: sources) {
-			if (pair.getFile() != null && pair.getRequest() != null) {
+			if (pair.getFile() != null && pair.getExecRequest() != null) {
 				this.sources.add(pair);
 			}
 		}
@@ -89,7 +89,7 @@ public class FileDownloadOp extends Operation<File> {
 	 */
 	@Override
 	protected void operationExecute() throws MultiCloudException {
-		if (sources.size() > 0) {
+		if (!sources.isEmpty()) {
 			/* remove inconsistent files */
 			FileCloudSource base = sources.get(0);
 			List<FileCloudSource> remove = new ArrayList<>();
@@ -124,7 +124,7 @@ public class FileDownloadOp extends Operation<File> {
 			/* create threads and start them */
 			for (FileCloudSource source: sources) {
 				setToken(source.getToken());
-				setRequest(source.getRequest());
+				setRequest(source.getExecRequest());
 				addPropertyMapping("download_url", source.getFile().getDownloadUrl());
 				addPropertyMapping("id", source.getFile().getId());
 				addPropertyMapping("path", source.getFile().getPath());
@@ -154,7 +154,7 @@ public class FileDownloadOp extends Operation<File> {
 				}
 			}
 		} else {
-			throw new MultiCloudException("No sources specified.");
+			throw new MultiCloudException("No source specified.");
 		}
 	}
 

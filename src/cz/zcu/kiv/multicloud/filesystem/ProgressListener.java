@@ -22,22 +22,26 @@ public abstract class ProgressListener {
 	private long transferred;
 	/** Time of the last report of progress. */
 	private long lastUpdate;
+	/** Number of bytes that count as one. */
+	private int divisor;
 
 	/**
-	 * Ctor with total size supplied.
+	 * Empty ctor.
 	 */
 	public ProgressListener() {
 		this.refreshInterval = DEFAULT_REFRESH_INTERVAL;
 		this.lastUpdate = 0;
+		this.divisor = 1;
 	}
 
 	/**
-	 * Ctor with total size and refresh interval supplied.
+	 * Ctor with refresh interval supplied.
 	 * @param refreshInterval Refresh interval.
 	 */
 	public ProgressListener(long refreshInterval) {
 		this.refreshInterval = refreshInterval;
 		this.lastUpdate = 0;
+		this.divisor = 1;
 	}
 
 	/**
@@ -59,6 +63,14 @@ public abstract class ProgressListener {
 	public synchronized void finishTransfer() {
 		lastUpdate = 0;
 		onProgress();
+	}
+
+	/**
+	 * Returns the number of bytes that count as one.
+	 * @return Number of bytes that count as one.
+	 */
+	public int getDivisor() {
+		return divisor;
 	}
 
 	/**
@@ -89,6 +101,18 @@ public abstract class ProgressListener {
 	 * Reports the progress.
 	 */
 	protected abstract void onProgress();
+
+	/**
+	 * Sets the number of bytes that count as one.
+	 * @param divisor Number of bytes that count as one.
+	 */
+	public void setDivisor(int divisor) {
+		if (divisor < 1) {
+			this.divisor = 1;
+		} else {
+			this.divisor = divisor;
+		}
+	}
 
 	/**
 	 * Sets the total number of bytes.

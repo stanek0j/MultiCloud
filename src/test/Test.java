@@ -1,16 +1,14 @@
 package test;
 
-import java.util.List;
+import java.io.File;
 
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.filesystem.ProgressListener;
-import cz.zcu.kiv.multicloud.json.AccountQuota;
 import cz.zcu.kiv.multicloud.json.FileInfo;
 import cz.zcu.kiv.multicloud.json.ParentInfo;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2SettingsException;
 import cz.zcu.kiv.multicloud.utils.Utils;
-import cz.zcu.kiv.multicloud.utils.Utils.UnitsFormat;
 
 public class Test {
 
@@ -24,7 +22,7 @@ public class Test {
 		cloud.setListener(new ProgressListener(200) {
 			@Override
 			public void onProgress() {
-				System.out.println("progress: " + getTransferred() + " / " + getTotalSize());
+				System.out.println("progress: " + (getTransferred() / getDivisor()) + " / " + getTotalSize());
 			}
 		});
 
@@ -41,7 +39,6 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		 */
 		try {
 			AccountQuota quota = cloud.accountQuota("test");
 			if (quota == null) {
@@ -54,7 +51,7 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		System.exit(0);
+		 */
 
 		String drive = "test";
 		//String drive = "googledrive";
@@ -94,6 +91,7 @@ public class Test {
 					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
 					if (content.getName().equals("test")) {
 						folder = content;
+						cloud.addUploadDestination(drive, content, "test-file.mp3");
 					}
 					if (content.getName().equals("target")) {
 						target = content;
@@ -126,7 +124,6 @@ public class Test {
 			e1.printStackTrace();
 		}
 
-		/*
 		drive = "googledrive";
 		try {
 			FileInfo list = cloud.listFolder(drive, null);
@@ -138,6 +135,7 @@ public class Test {
 					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
 					if (content.getName().equals("test")) {
 						folder = content;
+						cloud.addUploadDestination(drive, content, "test-file.mp3");
 					}
 					if (content.getName().equals("target")) {
 						target = content;
@@ -169,9 +167,7 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		 */
 
-		/*
 		drive = "onedrive";
 		try {
 			FileInfo list = cloud.listFolder(drive, null);
@@ -183,6 +179,7 @@ public class Test {
 					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
 					if (content.getName().equals("test")) {
 						folder = content;
+						cloud.addUploadDestination(drive, content, "test-file.mp3");
 					}
 					if (content.getName().equals("target")) {
 						target = content;
@@ -214,7 +211,6 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		 */
 
 		/*
 		Thread stopper = new Thread() {
@@ -225,13 +221,16 @@ public class Test {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				System.out.println("ABORT!");
 				cloud.abortOperation();
 			};
 		};
 		stopper.start();
+		 */
 
 		try {
-			FileInfo info = cloud.uploadFile(drive, folder, "test-file.mp3", true, new File("test-file.mp3"));
+			//FileInfo info = cloud.uploadFile(drive, folder, "test-file.mp3", true, new File("test-file.mp3"));
+			FileInfo info = cloud.uploadMultiFile(true, new File("test-file.mp3"));
 			if (info == null) {
 				System.out.println(cloud.getLastError());
 			} else {
@@ -240,8 +239,8 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		 */
 
+		/*
 		try {
 			List<FileInfo> list = cloud.search(drive, "test", false);
 			if (list == null) {
@@ -259,6 +258,7 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		 */
 
 		/*
 		Thread stopper = new Thread() {
