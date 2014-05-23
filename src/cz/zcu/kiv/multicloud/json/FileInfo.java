@@ -124,6 +124,10 @@ public class FileInfo {
 		return content;
 	}
 
+	/**
+	 * Returns the creation date.
+	 * @return Creation date.
+	 */
 	public Date getCreated() {
 		return created;
 	}
@@ -168,6 +172,10 @@ public class FileInfo {
 		return mimeType;
 	}
 
+	/**
+	 * Returns the last modification date.
+	 * @return Last modification date.
+	 */
 	public Date getModified() {
 		return modified;
 	}
@@ -236,6 +244,10 @@ public class FileInfo {
 		this.content = content;
 	}
 
+	/**
+	 * Sets the creation date.
+	 * @param created Creation date.
+	 */
 	public void setCreated(Date created) {
 		this.created = created;
 	}
@@ -296,6 +308,10 @@ public class FileInfo {
 		this.mimeType = mimeType;
 	}
 
+	/**
+	 * Sets the last modification date.
+	 * @param modified Last modification date.
+	 */
 	public void setModified(Date modified) {
 		this.modified = modified;
 	}
