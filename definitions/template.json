@@ -19,8 +19,6 @@
 	"password":"",
 	"redirect_uri":"",
 	"scope":"",
-	"chunked_upload":true,
-	"chunked_download":true,
 	"root_folder":
 	{
 		"id":""

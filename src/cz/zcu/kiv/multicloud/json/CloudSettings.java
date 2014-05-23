@@ -51,12 +51,9 @@ public class CloudSettings {
 	private String redirectUri;
 	/** Scope for accessing the cloud storage service. */
 	private String scope;
-	/** If chunked upload is supported. */
-	@JsonProperty("chunked_upload")
-	private boolean chunkedUpload;
-	/** If chunked download is supported. */
-	@JsonProperty("chunked_download")
-	private boolean chunkedDownload;
+	/** Format of the date used. */
+	@JsonProperty("date_format")
+	private String dateFormat;
 	/** Default root folder of the storage. */
 	@JsonProperty("root_folder")
 	private FileInfo rootFolder;
@@ -161,6 +158,14 @@ public class CloudSettings {
 	 */
 	public CloudRequest getCreateDirRequest() {
 		return createDirRequest;
+	}
+
+	/**
+	 * Returns the format of the date used.
+	 * @return Format of the date used.
+	 */
+	public String getDateFormat() {
+		return dateFormat;
 	}
 
 	/**
@@ -332,22 +337,6 @@ public class CloudSettings {
 	}
 
 	/**
-	 * Returns if chunked download is enabled.
-	 * @return If chunked download is enabled.
-	 */
-	public boolean isChunkedDownload() {
-		return chunkedDownload;
-	}
-
-	/**
-	 * Returns if chunked upload is enabled.
-	 * @return If chunked upload is enabled.
-	 */
-	public boolean isChunkedUpload() {
-		return chunkedUpload;
-	}
-
-	/**
 	 * Sets the account information request parameters.
 	 * @param accountInfoRequest Account information request parameters.
 	 */
@@ -404,6 +393,14 @@ public class CloudSettings {
 	}
 
 	/**
+	 * Sets the format of the date used.
+	 * @param dateFormat Format of the date used.
+	 */
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	/**
 	 * Sets the delete request parameters.
 	 * @param deleteRequest Delete request parameters.
 	 */
@@ -429,22 +426,6 @@ public class CloudSettings {
 	 */
 	public void setGrantType(OAuth2GrantType grantType) {
 		this.grantType = grantType;
-	}
-
-	/**
-	 * Sets if chunked download is enabled.
-	 * @param chunkedDownload If chunked download is enabled.
-	 */
-	public void setChunkedDownload(boolean chunkedDownload) {
-		this.chunkedDownload = chunkedDownload;
-	}
-
-	/**
-	 * Sets if chunked upload is enabled.
-	 * @param chunkedUpload If chunked upload is enabled.
-	 */
-	public void setChunkedUpload(boolean chunkedUpload) {
-		this.chunkedUpload = chunkedUpload;
 	}
 
 	/**

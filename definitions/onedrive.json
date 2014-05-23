@@ -16,8 +16,6 @@
 	"client_secret":"GlPTCgir1pn35eaXlqe29avCnVmSNg5i",
 	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
 	"scope":"wl.skydrive_update,wl.offline_access",
-	"chunked_upload":false,
-	"chunked_download":true,
 	"root_folder":
 	{
 		"id":"me/skydrive"
@@ -74,7 +72,9 @@
 		{
 			"content":"data",
 			"parent":"parent_id",
-			"stringFileType":"type"
+			"stringFileType":"type",
+			"created":"created_time",
+			"modified":"updated_time"
 		}
 	},
 	"rename_request":
@@ -134,7 +134,9 @@
 		{
 			"content":"data",
 			"parent":"parent_id",
-			"stringFileType":"type"
+			"stringFileType":"type",
+			"created":"created_time",
+			"modified":"updated_time"
 		}
 	},
 	"metadata_request":
@@ -145,7 +147,9 @@
 		{
 			"content":"data",
 			"parent":"parent_id",
-			"stringFileType":"type"
+			"stringFileType":"type",
+			"created":"created_time",
+			"modified":"updated_time"
 		}
 	}
 }

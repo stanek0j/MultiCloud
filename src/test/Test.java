@@ -1,7 +1,5 @@
 package test;
 
-import java.io.File;
-
 import cz.zcu.kiv.multicloud.MultiCloud;
 import cz.zcu.kiv.multicloud.MultiCloudException;
 import cz.zcu.kiv.multicloud.filesystem.ProgressListener;
@@ -89,6 +87,9 @@ public class Test {
 				System.out.println("list of " + list.getPath() + " / " + list.getName() + " :: " + list.getId() + " :");
 				for (FileInfo content: list.getContent()) {
 					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					System.out.println("  created: " + content.getCreated());
+					System.out.println("  modified: " + content.getModified());
+					System.out.println("  checksum: " + content.getChecksum());
 					if (content.getName().equals("test")) {
 						folder = content;
 						cloud.addUploadDestination(drive, content, "test-file.mp3");
@@ -133,6 +134,9 @@ public class Test {
 				System.out.println("list of " + list.getPath() + " / " + list.getName() + " :: " + list.getId() + " :");
 				for (FileInfo content: list.getContent()) {
 					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					System.out.println("  created: " + content.getCreated());
+					System.out.println("  modified: " + content.getModified());
+					System.out.println("  checksum: " + content.getChecksum());
 					if (content.getName().equals("test")) {
 						folder = content;
 						cloud.addUploadDestination(drive, content, "test-file.mp3");
@@ -177,6 +181,9 @@ public class Test {
 				System.out.println("list of " + list.getPath() + " / " + list.getName() + " :: " + list.getId() + " :");
 				for (FileInfo content: list.getContent()) {
 					System.out.println(content.getFileType() + " :: " + content.getId() + " :: " + content.getName() + " :: " + content.getMimeType() + " :: " + Utils.formatSize(content.getSize(), Utils.UnitsFormat.BINARY));
+					System.out.println("  created: " + content.getCreated());
+					System.out.println("  modified: " + content.getModified());
+					System.out.println("  checksum: " + content.getChecksum());
 					if (content.getName().equals("test")) {
 						folder = content;
 						cloud.addUploadDestination(drive, content, "test-file.mp3");
@@ -228,6 +235,7 @@ public class Test {
 		stopper.start();
 		 */
 
+		/*
 		try {
 			//FileInfo info = cloud.uploadFile(drive, folder, "test-file.mp3", true, new File("test-file.mp3"));
 			FileInfo info = cloud.uploadMultiFile(true, new File("test-file.mp3"));
@@ -239,6 +247,7 @@ public class Test {
 		} catch (MultiCloudException | OAuth2SettingsException | InterruptedException e1) {
 			e1.printStackTrace();
 		}
+		 */
 
 		/*
 		try {

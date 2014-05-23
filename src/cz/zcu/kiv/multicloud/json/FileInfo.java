@@ -1,6 +1,7 @@
 package cz.zcu.kiv.multicloud.json;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cz.zcu.kiv.multicloud.filesystem.FileType;
@@ -45,6 +46,12 @@ public class FileInfo {
 	private long size;
 	/** Content of a folder. */
 	private List<FileInfo> content;
+	/** MD5 checksum of the file. */
+	private String checksum;
+	/** Creation date. */
+	private Date created;
+	/** Last modification date. */
+	private Date modified;
 	/** If the resource is deleted. */
 	private boolean deleted;
 	/** If the resource is shared. */
@@ -117,6 +124,10 @@ public class FileInfo {
 		return content;
 	}
 
+	public Date getCreated() {
+		return created;
+	}
+
 	/**
 	 * Returns URL for downloading the file.
 	 * @return URL for downloading the file.
@@ -134,6 +145,14 @@ public class FileInfo {
 	}
 
 	/**
+	 * Returns the MD5 checksum of the file.
+	 * @return MD5 checksum of the file.
+	 */
+	public String getChecksum() {
+		return checksum;
+	}
+
+	/**
 	 * Returns the identifier of the resource.
 	 * @return Resource identifier.
 	 */
@@ -147,6 +166,10 @@ public class FileInfo {
 	 */
 	public String getMimeType() {
 		return mimeType;
+	}
+
+	public Date getModified() {
+		return modified;
 	}
 
 	/**
@@ -213,6 +236,10 @@ public class FileInfo {
 		this.content = content;
 	}
 
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
 	/**
 	 * Sets if the resource is deleted.
 	 * @param deleted If the resource is deleted.
@@ -238,6 +265,14 @@ public class FileInfo {
 	}
 
 	/**
+	 * Sets the MD5 checksum of the file.
+	 * @param checksum MD5 checksum of the file.
+	 */
+	public void setChecksum(String checksum) {
+		this.checksum = checksum;
+	}
+
+	/**
 	 * Sets the identifier of the resource.
 	 * @param id Resource identifier.
 	 */
@@ -259,6 +294,10 @@ public class FileInfo {
 	 */
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
+	}
+
+	public void setModified(Date modified) {
+		this.modified = modified;
 	}
 
 	/**

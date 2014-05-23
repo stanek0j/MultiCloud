@@ -16,8 +16,6 @@
 	"client_secret":"t1bt2kfaodgl1q1",
 	"redirect_uri":"https://home.zcu.cz/~stanek0j/multicloud",
 	"scope":null,
-	"chunked_upload":true,
-	"chunked_download":true,
 	"root_folder":
 	{
 		"path":""
