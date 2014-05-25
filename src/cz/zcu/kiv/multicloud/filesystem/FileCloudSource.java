@@ -19,6 +19,8 @@ public class FileCloudSource {
 	private String accountName;
 	/** File information. */
 	private FileInfo file;
+	/** Remote file to be updated. */
+	private FileInfo remote;
 	/** Name of the file. */
 	private String fileName;
 	/** Cloud begin request settings. */
@@ -36,6 +38,7 @@ public class FileCloudSource {
 	public FileCloudSource() {
 		accountName = null;
 		file = null;
+		remote = null;
 		fileName = null;
 		beginRequest = null;
 		execRequest = null;
@@ -44,18 +47,20 @@ public class FileCloudSource {
 	}
 
 	/**
-	 * Ctro with file information, access token and cloud request settings supplied.
+	 * Ctor with file information, access token and cloud request settings supplied.
 	 * @param accountName Account name.
 	 * @param file File information.
+	 * @param remote Remote file to be updated.
 	 * @param fileName Name of the file.
 	 * @param beginRequest Cloud begin request settings.
 	 * @param execRequest Cloud execute request settings.
 	 * @param finishRequest Cloud finish request settings.
 	 * @param token Access token for the cloud storage service.
 	 */
-	public FileCloudSource(String accountName, FileInfo file, String fileName, CloudRequest beginRequest, CloudRequest execRequest, CloudRequest finishRequest, OAuth2Token token) {
+	public FileCloudSource(String accountName, FileInfo file, FileInfo remote, String fileName, CloudRequest beginRequest, CloudRequest execRequest, CloudRequest finishRequest, OAuth2Token token) {
 		this.accountName = accountName;
 		this.file = file;
+		this.remote = remote;
 		this.fileName = fileName;
 		this.beginRequest = beginRequest;
 		this.execRequest = execRequest;
@@ -112,6 +117,14 @@ public class FileCloudSource {
 	}
 
 	/**
+	 * Return the remote file to be updated.
+	 * @return Remote file to be updated.
+	 */
+	public FileInfo getRemote() {
+		return remote;
+	}
+
+	/**
 	 * Returns the access token for the storage service.
 	 * @return Access token for the storage service.
 	 */
@@ -165,6 +178,14 @@ public class FileCloudSource {
 	 */
 	public void setFinishRequest(CloudRequest finishRequest) {
 		this.finishRequest = finishRequest;
+	}
+
+	/**
+	 * Sets the remote file to be updated.
+	 * @param remote Remote file to be updated.
+	 */
+	public void setRemote(FileInfo remote) {
+		this.remote = remote;
 	}
 
 	/**

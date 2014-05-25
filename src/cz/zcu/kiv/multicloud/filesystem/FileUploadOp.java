@@ -148,6 +148,9 @@ public class FileUploadOp extends Operation<FileInfo> {
 		String body = request.getBody();
 		addPropertyMapping("id", dst.getFile().getId());
 		addPropertyMapping("destination_id", dst.getFile().getId());
+		if (dst.getRemote() != null) {
+			addPropertyMapping("file_id", dst.getRemote().getId());
+		}
 		String path = dst.getFile().getPath();
 		if (path != null) {
 			if (path.endsWith(FileInfo.PATH_SEPARATOR)) {

@@ -76,6 +76,15 @@ public class CloudSettings {
 	/** File upload finishing parameters. */
 	@JsonProperty("upload_file_finish_request")
 	private CloudRequest uploadFileFinishRequest;
+	/** File update beginning parameters. */
+	@JsonProperty("update_file_begin_request")
+	private CloudRequest updateFileBeginRequest;
+	/** File update request parameters. */
+	@JsonProperty("update_file_request")
+	private CloudRequest updateFileRequest;
+	/** File update finishing parameters. */
+	@JsonProperty("update_file_finish_request")
+	private CloudRequest updateFileFinishRequest;
 	/** Folder create request parameters. */
 	@JsonProperty("create_dir_request")
 	private CloudRequest createDirRequest;
@@ -302,6 +311,30 @@ public class CloudSettings {
 	 */
 	public CloudRequest getTokenRequest() {
 		return tokenRequest;
+	}
+
+	/**
+	 * Returns the request to begin file update.
+	 * @return File update begin request.
+	 */
+	public CloudRequest getUpdateFileBeginRequest() {
+		return updateFileBeginRequest;
+	}
+
+	/**
+	 * Returns the request to finish file update.
+	 * @return File update finish request.
+	 */
+	public CloudRequest getUpdateFileFinishRequest() {
+		return updateFileFinishRequest;
+	}
+
+	/**
+	 * Returns the file update request parameters.
+	 * @return File update request parameters.
+	 */
+	public CloudRequest getUpdateFileRequest() {
+		return updateFileRequest;
 	}
 
 	/**
@@ -532,6 +565,30 @@ public class CloudSettings {
 	 */
 	public void setTokenRequest(CloudRequest tokenRequest) {
 		this.tokenRequest = tokenRequest;
+	}
+
+	/**
+	 * Sets the request to begin file update.
+	 * @param updateFileBeginRequest File update begin request.
+	 */
+	public void setUpdateFileBeginRequest(CloudRequest updateFileBeginRequest) {
+		this.updateFileBeginRequest = updateFileBeginRequest;
+	}
+
+	/**
+	 * Sets the request to finish file update.
+	 * @param updateFileFinishRequest File update finish request.
+	 */
+	public void setUpdateFileFinishRequest(CloudRequest updateFileFinishRequest) {
+		this.updateFileFinishRequest = updateFileFinishRequest;
+	}
+
+	/**
+	 * Sets the file update request parameters.
+	 * @param updateFileRequest File update request parameters.
+	 */
+	public void setUpdateFileRequest(CloudRequest updateFileRequest) {
+		this.updateFileRequest = updateFileRequest;
 	}
 
 	/**

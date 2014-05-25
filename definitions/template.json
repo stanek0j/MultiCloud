@@ -66,7 +66,22 @@
 	{
 		"uri":"",
 		"method":""
-	}
+	},
+	"update_file_begin_request":
+	{
+		"uri":"",
+		"method":""
+	},
+	"update_file_request":
+	{
+		"uri":"",
+		"method":""
+	},
+	"update_file_finish_request":
+	{
+		"uri":"",
+		"method":""
+	},
 	"create_dir_request":
 	{
 		"uri":"",

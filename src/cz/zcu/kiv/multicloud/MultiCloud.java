@@ -318,7 +318,35 @@ public class MultiCloud {
 			account.setTokenId(null);
 			throw new MultiCloudException("Access token not found.");
 		}
-		fileMultiDownloadSources.add(new FileCloudSource(accountName, sourceFile, null, null, settings.getDownloadFileRequest(), null, token));
+		fileMultiDownloadSources.add(new FileCloudSource(accountName, sourceFile, null, null, null, settings.getDownloadFileRequest(), null, token));
+	}
+
+	/**
+	 * Adds a new destination for update to multiple cloud storage services.
+	 * @param accountName Name of the user account.
+	 * @param destination Destination folder to be uploaded to.
+	 * @param destinationFile Destination file to be updated.
+	 * @param destinationName New name at the destination location.
+	 * @throws MultiCloudException If the operation failed.
+	 */
+	public void addUpdateDestination(String accountName, FileInfo destination, FileInfo destinationFile, String destinationName) throws MultiCloudException {
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		fileMultiUploadDestinations.add(new FileCloudSource(accountName, destination, destinationFile, destinationName, settings.getUpdateFileBeginRequest(), settings.getUpdateFileRequest(), settings.getUpdateFileFinishRequest(), token));
 	}
 
 	/**
@@ -345,7 +373,7 @@ public class MultiCloud {
 			account.setTokenId(null);
 			throw new MultiCloudException("Access token not found.");
 		}
-		fileMultiUploadDestinations.add(new FileCloudSource(accountName, destination, destinationName, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), token));
+		fileMultiUploadDestinations.add(new FileCloudSource(accountName, destination, null, destinationName, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), token));
 	}
 
 	/**
@@ -695,7 +723,7 @@ public class MultiCloud {
 			throw new MultiCloudException("Failed to create the target file.");
 		}
 		List<FileCloudSource> sources = new ArrayList<>();
-		sources.add(new FileCloudSource(accountName, sourceFile, null, null, settings.getDownloadFileRequest(), null, token));
+		sources.add(new FileCloudSource(accountName, sourceFile, null, null, null, settings.getDownloadFileRequest(), null, token));
 		synchronized (lock) {
 			op = new FileDownloadOp(sources, target, listener);
 		}
@@ -1286,9 +1314,138 @@ public class MultiCloud {
 	}
 
 	/**
+	 * Update the supplied file to the desired cloud storage service.
+	 * @param accountName Name of the user account.
+	 * @param destination Destination folder to be uploaded to.
+	 * @param destinationFile Destination file to be updated.
+	 * @param destinationName New name at the destination location.
+	 * @param overwrite If the destination file should be overwritten.
+	 * @param data File to be uploaded.
+	 * @return File information about the uploaded file.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public FileInfo updateFile(String accountName, FileInfo destination, FileInfo destinationFile, String destinationName, File data) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
+		AccountSettings account = accountManager.getAccountSettings(accountName);
+		if (account == null) {
+			throw new MultiCloudException("User account not found.");
+		}
+		if (!account.isAuthorized()) {
+			throw new MultiCloudException("User account not authorized.");
+		}
+		CloudSettings settings = cloudManager.getCloudSettings(account.getSettingsId());
+		if (settings == null) {
+			throw new MultiCloudException("Cloud storage settings not found.");
+		}
+		OAuth2Token token = credentialStore.retrieveCredential(account.getTokenId());
+		if (token == null) {
+			account.setTokenId(null);
+			throw new MultiCloudException("Access token not found.");
+		}
+		if (token.isExpired()) {
+			refreshAccount(accountName, null);
+		}
+		if (destination == null) {
+			throw new MultiCloudException("Destination folder must be supplied.");
+		}
+		if (destination.getFileType() != FileType.FOLDER) {
+			throw new MultiCloudException("Destination must be a folder.");
+		}
+		List<FileCloudSource> destinations = new ArrayList<>();
+		destinations.add(new FileCloudSource(accountName, destination, destinationFile, destinationName, settings.getUpdateFileBeginRequest(), settings.getUpdateFileRequest(), settings.getUpdateFileFinishRequest(), token));
+		synchronized (lock) {
+			op = new FileUploadOp(destinations, true, data, listener);
+		}
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
+		lastError = op.getError();
+		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo result = ((FileUploadOp) op).getResult();
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
+	}
+
+	/**
+	 * Update a file in multiple destinations.
+	 * @param data File to be uploaded.
+	 * @return File information about the uploaded file.
+	 * @throws MultiCloudException If the operation failed.
+	 * @throws OAuth2SettingsException If the authorization failed.
+	 * @throws InterruptedException If the token refreshing process was interrupted.
+	 */
+	public FileInfo updateMultiFile(File data) throws MultiCloudException, OAuth2SettingsException, InterruptedException {
+		synchronized (lock) {
+			if (op != null) {
+				throw new MultiCloudException("Concurrent operation forbidden.");
+			}
+		}
+		if (fileMultiUploadDestinations.size() == 0) {
+			throw new MultiCloudException("No destination supplied.");
+		}
+		if (data.isDirectory()) {
+			throw new MultiCloudException("Source must be a file.");
+		}
+		for (FileCloudSource destination: fileMultiUploadDestinations) {
+			if (destination.getToken().isExpired()) {
+				refreshAccount(destination.getAccountName(), null);
+			}
+		}
+		synchronized (lock) {
+			op = new FileUploadOp(fileMultiUploadDestinations, true, data, listener);
+		}
+		try {
+			op.execute();
+		} catch (MultiCloudException e) {
+			fileMultiUploadDestinations.clear();
+			synchronized (lock) {
+				op = null;
+			}
+			throw e;
+		}
+		fileMultiUploadDestinations.clear();
+		lastError = op.getError();
+		if (op.isAborted()) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw new AbortedException("Operation aborted.");
+		}
+		FileInfo result = ((FileUploadOp) op).getResult();
+		if (!((FileUploadOp) op).isDone()) {
+			synchronized (lock) {
+				op = null;
+			}
+			throw new MultiCloudException("Failed to upload the file to one or more destinations.");
+		}
+		synchronized (lock) {
+			op = null;
+		}
+		return result;
+	}
+
+	/**
 	 * Upload the supplied file to the desired cloud storage service.
 	 * @param accountName Name of the user account.
-	 * @param destination Destination file or folder to be uploaded to.
+	 * @param destination Destination folder to be uploaded to.
 	 * @param destinationName New name at the destination location.
 	 * @param overwrite If the destination file should be overwritten.
 	 * @param data File to be uploaded.
@@ -1329,7 +1486,7 @@ public class MultiCloud {
 			throw new MultiCloudException("Destination must be a folder.");
 		}
 		List<FileCloudSource> destinations = new ArrayList<>();
-		destinations.add(new FileCloudSource(accountName, destination, destinationName, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), token));
+		destinations.add(new FileCloudSource(accountName, destination, null, destinationName, settings.getUploadFileBeginRequest(), settings.getUploadFileRequest(), settings.getUploadFileFinishRequest(), token));
 		synchronized (lock) {
 			op = new FileUploadOp(destinations, overwrite, data, listener);
 		}
