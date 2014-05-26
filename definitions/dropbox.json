@@ -84,8 +84,7 @@
 			"content":"contents",
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	},
 	"update_file_begin_request":
@@ -127,8 +126,7 @@
 			"content":"contents",
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	},
 	"create_dir_request":
@@ -145,8 +143,7 @@
 			"content":"contents",
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	},
 	"list_dir_request":
@@ -163,8 +160,7 @@
 			"content":"contents",
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	},
 	"rename_request":
@@ -182,8 +178,7 @@
 			"content":"contents",
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	},	
 	"copy_request":
@@ -201,8 +196,7 @@
 			"content":"contents",
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	},
 	"move_request":
@@ -220,8 +214,7 @@
 			"content":"contents",
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	},
 	"delete_request":
@@ -238,8 +231,7 @@
 			"content":"contents",
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	},
 	"search_request":
@@ -255,8 +247,7 @@
 		{
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	},
 	"metadata_request":
@@ -272,8 +263,7 @@
 			"content":"contents",
 			"deleted":"is_deleted",
 			"size":"bytes",
-			"mimeType":"mime_type",
-			"id":"rev"
+			"mimeType":"mime_type"
 		}
 	}	
 }
