@@ -60,6 +60,48 @@ public class FileInfo {
 	private boolean isRoot;
 
 	/**
+	 * Create a copy of the file information.
+	 * @return Copy of the file information.
+	 */
+	public FileInfo copy() {
+		FileInfo obj = new FileInfo();
+		if (checksum != null) {
+			obj.setChecksum(new String(checksum));
+		}
+		obj.setContent(new ArrayList<FileInfo>());
+		obj.getContent().addAll(content);
+		if (created != null) {
+			obj.setCreated(new Date(created.getTime()));
+		}
+		obj.setDeleted(deleted);
+		if (downloadUrl != null) {
+			obj.setDownloadUrl(new String(downloadUrl));
+		}
+		obj.setFileType(fileType);
+		if (id != null) {
+			obj.setId(new String(id));
+		}
+		obj.setIsRoot(isRoot);
+		if (mimeType != null) {
+			obj.setMimeType(new String(mimeType));
+		}
+		if (modified != null) {
+			obj.setModified(new Date(modified.getTime()));
+		}
+		if (name != null) {
+			obj.setName(new String(name));
+		}
+		obj.setParents(new ArrayList<ParentInfo>());
+		obj.getParents().addAll(parents);
+		if (path != null) {
+			obj.setPath(new String(path));
+		}
+		obj.setShared(shared);
+		obj.setSize(size);
+		return obj;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
