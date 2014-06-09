@@ -117,7 +117,7 @@ public class Utils {
 
 	/**
 	 * Parses the supplied string and obtains URI query parameters.
-	 * @param uri URI to be parsed.
+	 * @param s String to be parsed.
 	 * @return Obtained parameters.
 	 */
 	public static Map<String, String> extractParams(String s) {

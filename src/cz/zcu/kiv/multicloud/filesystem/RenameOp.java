@@ -45,7 +45,7 @@ public class RenameOp extends Operation<FileInfo> {
 	 * Ctor with necessary parameters.
 	 * @param token Access token for the storage service.
 	 * @param request Parameters of the request.
-	 * @param source Source file or folder to be renamed.
+	 * @param file Source file or folder to be renamed.
 	 * @param fileName New name of the file or folder.
 	 */
 	public RenameOp(OAuth2Token token, CloudRequest request, FileInfo file, String fileName) {

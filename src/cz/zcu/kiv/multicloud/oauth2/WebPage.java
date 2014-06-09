@@ -57,7 +57,7 @@ public abstract class WebPage {
 
 	/**
 	 * Returns all the lines of the content of the web page in a {@link java.util.List}.
-	 * @return
+	 * @return List of content lines.
 	 */
 	public abstract List<String> getContentLines();
 

@@ -102,7 +102,7 @@ public class OAuth2Token implements Serializable {
 
 	/**
 	 * Returns the time when the access token was created.
-	 * @return
+	 * @return Timestamp of the creation of the token.
 	 */
 	public long getTimestamp() {
 		return timestamp;

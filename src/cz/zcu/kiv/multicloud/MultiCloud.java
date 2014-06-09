@@ -1319,7 +1319,6 @@ public class MultiCloud {
 	 * @param destination Destination folder to be uploaded to.
 	 * @param destinationFile Destination file to be updated.
 	 * @param destinationName New name at the destination location.
-	 * @param overwrite If the destination file should be overwritten.
 	 * @param data File to be uploaded.
 	 * @return File information about the uploaded file.
 	 * @throws MultiCloudException If the operation failed.

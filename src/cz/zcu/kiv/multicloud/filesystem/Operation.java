@@ -263,10 +263,12 @@ public abstract class Operation<T> {
 	 * @param source The string to replace these properties in.
 	 * @param encode If the replaced string should be URL encoded.
 	 * @return String with replaces values.
+	 * @throws MultiCloudException If property replacement is missing.
 	 */
-	protected String doPropertyMapping(String source, boolean encode) {
+	protected String doPropertyMapping(String source, boolean encode) throws MultiCloudException {
 		String result = source;
 		Pattern pattern = Pattern.compile("(<.*?>)");
+		Matcher matcher = null;
 		for (Entry<String, String> mapping: propertyMapping.entrySet()) {
 			String find = mapping.getKey();
 			if (!find.startsWith("<")) {
@@ -275,7 +277,7 @@ public abstract class Operation<T> {
 			if (!find.endsWith(">")) {
 				find += ">";
 			}
-			Matcher matcher = pattern.matcher(result);
+			matcher = pattern.matcher(result);
 			if (matcher.find()) {
 				String value = mapping.getValue();
 				if (value != null) {
@@ -298,6 +300,11 @@ public abstract class Operation<T> {
 					result = result.replaceAll(find, value);
 				}
 			}
+		}
+		/* test if all was replaced */
+		matcher = pattern.matcher(result);
+		if (matcher.find()) {
+			throw new MultiCloudException("Missing parameter.");
 		}
 		return result;
 	}
@@ -490,8 +497,9 @@ public abstract class Operation<T> {
 	 * Prepares {@link org.apache.http.client.methods.HttpUriRequest} and fills it with data provided.
 	 * @param requestData Data for filling the body of the request.
 	 * @return Prepared request.
+	 * @throws MultiCloudException If property replacement is missing.
 	 */
-	protected HttpUriRequest prepareRequest(HttpEntity requestData) {
+	protected HttpUriRequest prepareRequest(HttpEntity requestData) throws MultiCloudException {
 		HttpUriRequest request = null;
 		String uri = doPropertyMapping(uriTemplate, true);
 		if (!requestParams.isEmpty()) {
