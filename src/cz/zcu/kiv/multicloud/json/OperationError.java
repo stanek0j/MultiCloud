@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 /**
  * cz.zcu.kiv.multicloud.json/OperationError.java			<br /><br />
  *
- * Bean for holding error message that occured during {@link cz.zcu.kiv.multicloud.filesystem.Operation}.
+ * Bean for holding error message that occurred during {@link cz.zcu.kiv.multicloud.filesystem.Operation}.
  *
  * @author Jaromír Staněk
  * @version 1.0
