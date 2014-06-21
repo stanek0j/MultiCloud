@@ -17,6 +17,7 @@ public enum FileType {
 	/** Recognized file type strings. */
 	public static final String[] FILE_TYPES = new String[] {
 		"file",
+		"notebook",
 		"audio",
 		"photo",
 		"video"
