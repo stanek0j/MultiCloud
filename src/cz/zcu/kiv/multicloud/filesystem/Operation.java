@@ -3,7 +3,6 @@ package cz.zcu.kiv.multicloud.filesystem;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -507,7 +506,7 @@ public abstract class Operation<T> {
 				String update = doPropertyMapping(param.getValue(), false);
 				requestParams.put(param.getKey(), update);
 			}
-			uri += "?" + URLEncodedUtils.format(Utils.mapToList(requestParams), Charset.forName("utf-8"));
+			uri += "?" + URLEncodedUtils.format(Utils.mapToList(requestParams), "UTF-8");
 		}
 		switch (method) {
 		case GET:

@@ -1,7 +1,6 @@
 package cz.zcu.kiv.multicloud.oauth2;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -102,7 +101,7 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 				}
 			};
 		}
-		String queryString = URLEncodedUtils.format(Utils.mapToList(authorizeParams), Charset.forName("utf-8"));
+		String queryString = URLEncodedUtils.format(Utils.mapToList(authorizeParams), "UTF-8");
 		return new AuthorizationRequest(authorizeServer + "?" + queryString);
 	}
 
