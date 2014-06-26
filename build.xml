@@ -79,28 +79,33 @@
 		</copy>
 		<delete dir="${tmp.dir}/src/test" />
 
-		<!-- creates JAR file -->		
-		<jar destfile="${jar.dir}/${bin.jar.file}" basedir="${tmp.dir}">
+		<!-- creates JAR file -->
+		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="${lib.dir}/jarjar-1.4.jar"/>
+		<jarjar destfile="${jar.dir}/${bin.jar.file}" basedir="${tmp.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main-class}" />
 			</manifest>
+			<rule pattern="org.apache.**" result="xorg.apache.@1"/>
 			<zipgroupfileset dir="${lib.dir}">
 				<exclude name="*.txt" />
+				<exclude name="jarjar*" />
 			</zipgroupfileset>
-		</jar>
+		</jarjar>
 		
 		<delete dir="${tmp.dir}/doc" />
 		<delete dir="${tmp.dir}/src" />
 
 		<!-- creates JAR file -->		
-		<jar destfile="${jar.dir}/${bin.jar.file.compact}" basedir="${tmp.dir}">
+		<jarjar destfile="${jar.dir}/${bin.jar.file.compact}" basedir="${tmp.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main-class}" />
 			</manifest>
+			<rule pattern="org.apache.**" result="xorg.apache.@1"/>
 			<zipgroupfileset dir="${lib.dir}">
 				<exclude name="*.txt" />
+				<exclude name="jarjar*" />
 			</zipgroupfileset>
-		</jar>
+		</jarjar>
 
 		<delete dir="${tmp.dir}" />
 	</target>
