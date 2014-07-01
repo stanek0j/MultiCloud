@@ -79,9 +79,9 @@ public class MultiCloud {
 	/** Last error that occurred during any operation. */
 	private OperationError lastError;
 	/** List of sources for downloading a file from. */
-	private List<FileCloudSource> fileMultiDownloadSources;
+	private final List<FileCloudSource> fileMultiDownloadSources;
 	/**	List of destinations for uploading a file to. */
-	private List<FileCloudSource> fileMultiUploadDestinations;
+	private final List<FileCloudSource> fileMultiUploadDestinations;
 
 	/** Currently running authorization process. */
 	private OAuth2 auth;
@@ -151,6 +151,8 @@ public class MultiCloud {
 			accountManager = settings.getAccountManager();
 		}
 		lastError = null;
+		fileMultiDownloadSources = new ArrayList<>();
+		fileMultiUploadDestinations = new ArrayList<>();
 		auth = null;
 		op = null;
 		lock = new Object();
