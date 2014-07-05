@@ -69,6 +69,11 @@ public class ImplicitGrant implements OAuth2Grant, RedirectCallback {
 	public void close() throws IOException {
 		/* stops listening on local port */
 		server.stop();
+		/* notify all waiting objects */
+		synchronized (waitObject) {
+			ready = true;
+			waitObject.notifyAll();
+		}
 	}
 
 	/**

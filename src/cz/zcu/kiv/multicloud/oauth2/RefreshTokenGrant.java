@@ -103,6 +103,11 @@ public class RefreshTokenGrant implements OAuth2Grant {
 		if (tokenRequest != null && tokenRequest.isAlive()) {
 			tokenRequest.interrupt();
 		}
+		/* notify all waiting objects */
+		synchronized (waitObject) {
+			ready = true;
+			waitObject.notifyAll();
+		}
 	}
 
 	/**

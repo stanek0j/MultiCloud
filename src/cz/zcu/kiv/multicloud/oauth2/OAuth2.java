@@ -31,6 +31,8 @@ public class OAuth2 {
 	private OAuth2Grant grant;
 	/** Identifier returned after storing an access token. */
 	private String obtainedStoreKey;
+	/** Lock object for concurrent method calls. */
+	private final Object lock;
 
 	/**
 	 * Empty ctor.
@@ -77,6 +79,7 @@ public class OAuth2 {
 		this.store = store;
 		this.grant = null;
 		this.obtainedStoreKey = null;
+		this.lock = new Object();
 	}
 
 	/**
@@ -118,43 +121,52 @@ public class OAuth2 {
 		obtainedStoreKey = null;
 
 		/* create an instance of the grant implementation */
-		switch (settings.getGrantType()) {
-		case AUTHORIZATION_CODE_GRANT:
-			grant = new AuthorizationCodeGrant();
-			break;
-		case IMPLICIT_GRANT:
-			grant = new ImplicitGrant();
-			break;
-		case RESOURCE_OWNER_PASSWORD_CREDENTIAL_GRANT:
-			grant = new ResOwnerPassCredGrant();
-			break;
-		case CLIENT_CREDENTIAL_GRANT:
-			grant = new ClientCredGrant();
-			break;
-		case EXTENSION_GRANT:
-			if (settings.getGrantClass() != null) {
-				try {
-					grant = settings.getGrantClass().newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					throw new OAuth2SettingsException("Failed to create instance of the extension grant class.");
+		synchronized (lock) {
+			switch (settings.getGrantType()) {
+			case AUTHORIZATION_CODE_GRANT:
+				grant = new AuthorizationCodeGrant();
+				break;
+			case IMPLICIT_GRANT:
+				grant = new ImplicitGrant();
+				break;
+			case RESOURCE_OWNER_PASSWORD_CREDENTIAL_GRANT:
+				grant = new ResOwnerPassCredGrant();
+				break;
+			case CLIENT_CREDENTIAL_GRANT:
+				grant = new ClientCredGrant();
+				break;
+			case EXTENSION_GRANT:
+				if (settings.getGrantClass() != null) {
+					try {
+						grant = settings.getGrantClass().newInstance();
+					} catch (InstantiationException | IllegalAccessException e) {
+						throw new OAuth2SettingsException("Failed to create instance of the extension grant class.");
+					}
 				}
+				break;
 			}
-			break;
 		}
 
 		/* follow the generic authorization flow */
 		if (grant != null) {
-			grant.setup(settings);
-			AuthorizationRequest request = grant.authorize();
-			if (request.isActionRequied()) {
+			AuthorizationRequest request = null;
+			synchronized (lock) {
+				grant.setup(settings);
+				request = grant.authorize();
+			}
+			if (request != null && request.isActionRequied()) {
 				if (authCallback != null) {
 					authCallback.onAuthorizationRequest(request);
 				} else {
 					System.out.println(request);
 				}
 			}
-			token = grant.getToken();
-			error = grant.getError();
+			if (grant != null) {
+				token = grant.getToken();
+			}
+			if (grant != null) {
+				error = grant.getError();
+			}
 
 			/* store the acquired access token */
 			if (store != null && error != null && error.getType() == OAuth2ErrorType.SUCCESS) {
@@ -179,13 +191,15 @@ public class OAuth2 {
 	 * Closes all the resources used by the grant.
 	 */
 	public void close() {
-		if (grant != null) {
-			try {
-				grant.close();
-			} catch (IOException e) {
-				/* ignore closing exception */
+		synchronized (lock) {
+			if (grant != null) {
+				try {
+					grant.close();
+				} catch (IOException e) {
+					/* ignore closing exception */
+				}
+				grant = null;
 			}
-			grant = null;
 		}
 	}
 
@@ -247,26 +261,36 @@ public class OAuth2 {
 		OAuth2Error error = null;
 		obtainedStoreKey = null;
 
-		/* create an instance of the grant implementation */
-		grant = new RefreshTokenGrant();
+		synchronized (lock) {
+			/* create an instance of the grant implementation */
+			grant = new RefreshTokenGrant();
+		}
 
 		/* follow the generic authorization flow */
 		if (grant != null) {
-			settings.setRefreshToken(token.getRefreshToken());
-			grant.setup(settings);
-			AuthorizationRequest request = grant.authorize();
-			if (request.isActionRequied()) {
+			OAuth2Token tokenUpdate = new OAuth2Token();
+			AuthorizationRequest request = null;
+			synchronized (lock) {
+				settings.setRefreshToken(token.getRefreshToken());
+				grant.setup(settings);
+				request = grant.authorize();
+			}
+			if (request != null && request.isActionRequied()) {
 				if (authCallback != null) {
 					authCallback.onAuthorizationRequest(request);
 				} else {
 					System.out.println(request);
 				}
 			}
-			OAuth2Token tokenUpdate = grant.getToken();
-			error = grant.getError();
+			if (grant != null) {
+				tokenUpdate = grant.getToken();
+			}
+			if (grant != null) {
+				error = grant.getError();
+			}
 
 			/* update and store the refreshed token */
-			if (store != null && error.getType() == OAuth2ErrorType.SUCCESS) {
+			if (store != null && error != null && error.getType() == OAuth2ErrorType.SUCCESS) {
 				token.setType(tokenUpdate.getType());
 				if (!Utils.isNullOrEmpty(tokenUpdate.getAccessToken())) {
 					token.setAccessToken(tokenUpdate.getAccessToken());
@@ -291,7 +315,6 @@ public class OAuth2 {
 			}
 			close();
 		}
-
 		return error;
 	}
 

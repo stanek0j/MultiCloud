@@ -116,6 +116,11 @@ public class AuthorizationCodeGrant implements OAuth2Grant, RedirectCallback {
 		}
 		/* stops listening on local port */
 		server.stop();
+		/* notify all waiting objects */
+		synchronized (waitObject) {
+			ready = true;
+			waitObject.notifyAll();
+		}
 	}
 
 	/**

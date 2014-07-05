@@ -15,7 +15,6 @@ import org.apache.http.message.BasicNameValuePair;
 
 import cz.zcu.kiv.multicloud.json.CloudSettings;
 import cz.zcu.kiv.multicloud.json.FileInfo;
-import cz.zcu.kiv.multicloud.oauth2.OAuth2GrantType;
 import cz.zcu.kiv.multicloud.oauth2.OAuth2Settings;
 
 /**
@@ -85,19 +84,17 @@ public class Utils {
 			return null;
 		}
 		OAuth2Settings out = new OAuth2Settings();
-		if (settings.getGrantType() == OAuth2GrantType.AUTHORIZATION_CODE_GRANT) {
-			if (settings.getAuthorizeRequest() == null) {
-				return null;
-			} else {
-				out.setAuthorizeUri(settings.getAuthorizeRequest().getUri());
-				if (settings.getAuthorizeRequest().getParams() != null) {
-					for (Entry<String, String> param: settings.getAuthorizeRequest().getParams().entrySet()) {
-						out.addExtraAuthorizeParams(param.getKey(), param.getValue());
-					}
+		/* fill the OAuth2 settings */
+		if (settings.getAuthorizeRequest() == null) {
+			return null;
+		} else {
+			out.setAuthorizeUri(settings.getAuthorizeRequest().getUri());
+			if (settings.getAuthorizeRequest().getParams() != null) {
+				for (Entry<String, String> param: settings.getAuthorizeRequest().getParams().entrySet()) {
+					out.addExtraAuthorizeParams(param.getKey(), param.getValue());
 				}
 			}
 		}
-		/* fill the OAuth2 settings */
 		out.setTokenUri(settings.getTokenRequest().getUri());
 		if (settings.getTokenRequest().getParams() != null) {
 			for (Entry<String, String> param: settings.getTokenRequest().getParams().entrySet()) {
@@ -260,8 +257,10 @@ public class Utils {
 	 */
 	public static List<NameValuePair> mapToList(Map<String, String> map) {
 		List<NameValuePair> list = new LinkedList<>();
-		for (Entry<String, String> entry: map.entrySet()) {
-			list.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+		if (map != null) {
+			for (Entry<String, String> entry: map.entrySet()) {
+				list.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+			}
 		}
 		return list;
 	}
